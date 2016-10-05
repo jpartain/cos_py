@@ -1,63 +1,63 @@
 from enum import Enum
 
 Age = Enum('Age',
-           'Baby
-            Child
-            Teenager
-            YoungAdult
-            Adult
-            MiddleAge
-            Old')
+           'Baby'
+           'Child'
+           'Teenager'
+           'YoungAdult'
+           'Adult'
+           'MiddleAge'
+           'Old')
 
 Gender = Enum('Gender',
-              'Female
-               Male')
+              'Female'
+              'Male')
 
 Relationship = Enum('Relationship',
-                    'Wife
-                     Husband
-                     Daughter
-                     Son
-                     Father
-                     Mother
-                     Sister
-                     Brother
-                     Aunt
-                     Uncle
-                     Grandmother
-                     Grandfather
-                     Cousin
-                     Mistress
-                     Mister
-                     B_Son
-                     B_Daughter')
+                    'Wife'
+                    'Husband'
+                    'Daughter'
+                    'Son'
+                    'Father'
+                    'Mother'
+                    'Sister'
+                    'Brother'
+                    'Aunt'
+                    'Uncle'
+                    'Grandmother'
+                    'Grandfather'
+                    'Cousin'
+                    'Mistress'
+                    'Mister'
+                    'B_Son'
+                    'B_Daughter')
 
 Title = Enum('Title',
-             'King
-              Queen
-              Prince
-              Princess
-              Servant
-              Priest
-              Acolyte
-              Knight
-              Squire
-              Soldier
-              Farmer
-              RockMason
-              Smithy
-              Lumberjack
-              Weaver
-              Bartender
-              Waiter
-              Waitress
-              Janitor
-              Trader
-              Seller
-              Manager
-              Foreman')
+             'King'
+             'Queen'
+             'Prince'
+             'Princess'
+             'Servant'
+             'Priest'
+             'Acolyte'
+             'Knight'
+             'Squire'
+             'Soldier'
+             'Farmer'
+             'RockMason'
+             'Smithy'
+             'Lumberjack'
+             'Weaver'
+             'Bartender'
+             'Waiter'
+             'Waitress'
+             'Janitor'
+             'Trader'
+             'Seller'
+             'Manager'
+             'Foreman')
 
-class Person(self):
+class Person:
     def __init__(self, happiness, hunger, approval, fulfillment, fame, consensus, 
                        age, honesty, toughness, gender, relations, opinion_of_others,
                        job_title, inventory):
@@ -116,6 +116,7 @@ class Person(self):
 
     def setOpinion(self, person, opinion):
         # self.opinion_of_others.person = opinion
+        pass
 
     def setTitle(self, title):
         self.title = title

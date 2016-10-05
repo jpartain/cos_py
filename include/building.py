@@ -1,24 +1,24 @@
 from enum import Enum
 
 BuildingType = Enum('BuildingType', 
-                    'PoorHouse
-                     MiddleHouse
-                     NobleHouse
-                     Barn
-                     Windmill
-                     Barracks
-                     Mason
-                     Blacksmith
-                     Lumbermill
-                     Cathedral
-                     Weavery
-                     Tavern
-                     Colosseum
-                     PublicPlumbing
-                     Market
-                     TradePost')
+                    'PoorHouse'
+                    'MiddleHouse'
+                    'NobleHouse'
+                    'Barn'
+                    'Windmill'
+                    'Barracks'
+                    'Mason'
+                    'Blacksmith'
+                    'Lumbermill'
+                    'Cathedral'
+                    'Weavery'
+                    'Tavern'
+                    'Colosseum'
+                    'PublicPlumbing'
+                    'Market'
+                    'TradePost')
 
-class Building(self):
+class Building:
     def __init__(self, size, building_type, occupants, health, menu):
         self.size = size
         self.type = building_type
