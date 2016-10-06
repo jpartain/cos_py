@@ -2,8 +2,6 @@ from random import choice
 from string import digits
 
 from include.town import *
-from include.building import *
-from include.person import *
 
 def generateTown(random_seed):
     town = Town(random_seed)
@@ -16,8 +14,10 @@ def generateTown(random_seed):
     print('Nobility:\t', town.getNobility(), '%')
     print('')
 
+    town.printMapCorners()
+
 def main():
-    random_string = ''.join(choice(digits) for a in range(63))
+    random_string = ''.join(choice(digits) for a in range(50))
     generateTown(random_string)
 
 if __name__ == '__main__':

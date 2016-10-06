@@ -1,3 +1,6 @@
+from include.building import *
+from include.person import *
+
 TownEconomy = ['Farm',
                'Mine',
                'Military',
@@ -9,7 +12,8 @@ TownEconomy = ['Farm',
                'Tavern',
                'Colosseum']
 
-""" Town has the following attributes:
+"""
+    Town has the following attributes:
         wealth:     an integer from -5 to 4, indicating debt/wealth level
         economy:    a string chosen from a set of presets which determines special
                     buildings and employment oppotunities in town
@@ -25,7 +29,7 @@ class Town:
         self.generateDanger(seed[2])
         self.generateNobility(seed[3])
         self.generateHomeless(seed[4])
-        self.generateMap(seed[23:63])
+        self.generateMap(seed[5:25])
 
     def generateWealth(self, string):
         self.wealth = int(string) - 5
@@ -59,11 +63,18 @@ class Town:
         self.settled_ratio = int(10*(int(string)/5 + self.getWealth() + 5))
 
     def generateMap(self, string):
+        map_unit_size = [-25, 25, 25, 25, 25, -25, -25, -25]
+        self.map_corners = []
+
+        self.map_size_mod = int(string[0])/6 + 1
+        self.map_corners_mod = [string[1], string[2], string[3], string[4], string[5],
+                                string[6], string[7], string[8]] 
+
+        for i in range(0, len(self.map_corners_mod)):
+            self.map_corners.append(int(((int(self.map_corners_mod[i])/20 + 1)*map_unit_size[i])*self.map_size_mod))
+
         pass
         
-    def generateMap(self, string):
-        pass
-
     def addHomeless(self, person):
         self.homeless.append(person)
 
@@ -104,3 +115,37 @@ class Town:
 
     def createOpinions(self, string):
         pass
+
+    def printMapCorners(self):
+        print(self.map_corners[0:2], self.map_corners[2:4], self.map_corners[4:6], self.map_corners[6:8])
+        print(self.map_size_mod)
+        print(self.map_corners_mod)
+
+        y_coordinates = self.map_corners[1::2]
+        x_coordinates = self.map_corners[0::2]
+
+        min_x = min(x_coordinates)
+
+        first_draw = 2*y_coordinates.index(max(y_coordinates))
+        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+
+        second_draw = 2*y_coordinates.index(max(y_coordinates))
+        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+
+        third_draw = 2*y_coordinates.index(max(y_coordinates))
+        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+
+        fourth_draw = 2*y_coordinates.index(max(y_coordinates))
+        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+
+        print((self.map_corners[first_draw - 1] - min_x) * ' ', '*',
+              (self.map_corners[first_draw] - self.map_corners[second_draw]) * '\n')
+
+        print((self.map_corners[second_draw - 1] - min_x) * ' ', '*',
+              (self.map_corners[second_draw] - self.map_corners[third_draw]) * '\n')
+
+        print((self.map_corners[third_draw - 1] - min_x)* ' ', '*',
+              (self.map_corners[third_draw] - self.map_corners[fourth_draw]) * '\n')
+
+        print((self.map_corners[fourth_draw - 1] - min_x) * ' ', '*')
+
