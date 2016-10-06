@@ -65,15 +65,24 @@ class Town:
     def generateMap(self, string):
         map_unit_size = [-25, 25, 25, 25, 25, -25, -25, -25]
         self.map_corners = []
+        self.map_points = []
+        scale = 40
 
-        self.map_size_mod = int(string[0])/6 + 1
-        self.map_corners_mod = [string[1], string[2], string[3], string[4], string[5],
-                                string[6], string[7], string[8]] 
+        self.map_size_mod = int(string[0])/scale + 1
+        self.map_corners_mod = [int(string[1])/scale + 1, int(string[2])/scale + 1, int(string[3])/scale + 1, 
+                                int(string[4])/scale + 1, int(string[5])/scale + 1, int(string[6])/scale + 1,
+                                int(string[7])/scale + 1, int(string[8])/scale + 1] 
 
         for i in range(0, len(self.map_corners_mod)):
-            self.map_corners.append(int(((int(self.map_corners_mod[i])/20 + 1)*map_unit_size[i])*self.map_size_mod))
+            self.map_corners.append(int(self.map_corners_mod[i]*map_unit_size[i]*self.map_size_mod))
 
-        pass
+        x_coordinates = self.map_corners[0::2]
+        y_coordinates = self.map_corners[1::2]
+
+        x_min = min(x_coordinates)
+        x_max = max(x_coordinates)
+        y_min = min(y_coordinates)
+        y_max = max(y_coordinates)
         
     def addHomeless(self, person):
         self.homeless.append(person)
