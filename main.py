@@ -20,7 +20,7 @@ def main():
     random_string = ''.join(choice(digits) for a in range(50))
     generateTown(random_string)
 
-    input('Press enter to close this window.')
+    #input('Press enter to close this window.')
 
 if __name__ == '__main__':
     main()

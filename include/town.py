@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from include.building import *
 from include.person import *
 
@@ -63,27 +65,106 @@ class Town:
         self.settled_ratio = int(10*(int(string)/5 + self.getWealth() + 5))
 
     def generateMap(self, string):
+        def grouped(iterable, n):
+            return zip(*[iter(iterable)]*n)
+        
         map_unit_size = [-25, 25, 25, 25, 25, -25, -25, -25]
+        raw_map_corners = []
         self.map_corners = []
         self.map_points = []
-        scale = 40
+        self.x_coordinates = []
+        self.y_coordinates = []
+        self.draw_order = []
+        self.draw_segs = []
+        scale = 25
 
-        self.map_size_mod = int(string[0])/scale + 1
+        self.map_size_mod = int(string[0])/(scale + 15) + 1
         self.map_corners_mod = [int(string[1])/scale + 1, int(string[2])/scale + 1, int(string[3])/scale + 1, 
                                 int(string[4])/scale + 1, int(string[5])/scale + 1, int(string[6])/scale + 1,
                                 int(string[7])/scale + 1, int(string[8])/scale + 1] 
 
         for i in range(0, len(self.map_corners_mod)):
-            self.map_corners.append(int(self.map_corners_mod[i]*map_unit_size[i]*self.map_size_mod))
+            raw_map_corners.append(int(self.map_corners_mod[i]*map_unit_size[i]*self.map_size_mod))
 
-        x_coordinates = self.map_corners[0::2]
-        y_coordinates = self.map_corners[1::2]
+        for x, y in grouped(raw_map_corners, 2):
+            self.x_coordinates.append(x)
+            self.y_coordinates.append(y)
 
-        x_min = min(x_coordinates)
-        x_max = max(x_coordinates)
-        y_min = min(y_coordinates)
-        y_max = max(y_coordinates)
-        
+            point = MapPoint(x, y)
+            self.map_corners.append(point)
+
+        self.x_min = min(self.x_coordinates)
+        self.x_max = max(self.x_coordinates)
+        self.y_min = min(self.y_coordinates)
+        self.y_max = max(self.y_coordinates)
+
+        y_coords = self.y_coordinates
+
+        self.draw_order.append(self.map_corners[y_coords.index(max(y_coords))])
+        y_coords[y_coords.index(max(y_coords))] = -1000
+
+        self.draw_order.append(self.map_corners[y_coords.index(max(y_coords))])
+        y_coords[y_coords.index(max(y_coords))] = -1000
+
+        self.draw_order.append(self.map_corners[y_coords.index(max(y_coords))])
+        y_coords[y_coords.index(max(y_coords))] = -1000
+
+        self.draw_order.append(self.map_corners[y_coords.index(max(y_coords))])
+        y_coords[y_coords.index(max(y_coords))] = -1000
+
+        print(self.draw_order[0])
+
+        if self.draw_order[2].x > self.draw_order[3].x:
+            self.draw_segs.append([self.draw_order[3],
+                                   self.draw_order[2]])
+
+            if self.draw_order[0].x > self.draw_order[1].x:
+                self.draw_segs.append([self.draw_order[2],
+                                       self.draw_order[0]])
+                self.draw_segs.append([self.draw_order[0],
+                                       self.draw_order[1]])
+                self.draw_segs.append([self.draw_order[1],
+                                       self.draw_order[3]])
+            else:
+                self.draw_segs.append([self.draw_order[2],
+                                       self.draw_order[1]])
+                self.draw_segs.append([self.draw_order[1],
+                                       self.draw_order[0]])
+                self.draw_segs.append([self.draw_order[0],
+                                       self.draw_order[3]])
+
+        elif self.draw_order[0].x > self.draw_order[1].x:
+            self.draw_segs.append([self.draw_order[3],
+                                   self.draw_order[0]])
+            self.draw_segs.append([self.draw_order[0],
+                                   self.draw_order[1]])
+            self.draw_segs.append([self.draw_order[1],
+                                   self.draw_order[2]])
+            self.draw_segs.append([self.draw_order[2],
+                                   self.draw_order[3]])
+
+        else:
+            self.draw_segs.append([self.draw_order[3],
+                                   self.draw_order[1]])
+            self.draw_segs.append([self.draw_order[1],
+                                   self.draw_order[0]])
+            self.draw_segs.append([self.draw_order[0],
+                                   self.draw_order[2]])
+            self.draw_segs.append([self.draw_order[2],
+                                   self.draw_order[3]])
+
+        # Anti-clockwise from the bottom
+        seg1_slope = 0
+        seg2_slope = 0
+        seg3_slope = 0
+        seg4_slope = 0
+
+        """
+        for x in range(x_min, x_max):
+            for y in range(y_min, y_max):
+                if
+        """
+
     def addHomeless(self, person):
         self.homeless.append(person)
 
@@ -126,35 +207,30 @@ class Town:
         pass
 
     def printMapCorners(self):
-        print(self.map_corners[0:2], self.map_corners[2:4], self.map_corners[4:6], self.map_corners[6:8])
+        print(self.draw_order[0], self.draw_order[1], self.draw_order[2], self.draw_order[3])
+        print(self.draw_segs)
         print(self.map_size_mod)
         print(self.map_corners_mod)
 
-        y_coordinates = self.map_corners[1::2]
-        x_coordinates = self.map_corners[0::2]
+        print((self.draw_order[0].x - self.x_min) * ' ', '*',
+              (self.draw_order[0].y - self.draw_order[1].y) * '\n')
 
-        min_x = min(x_coordinates)
+        print((self.draw_order[1].x - self.x_min) * ' ', '*',
+              (self.draw_order[1].y - self.draw_order[2].y) * '\n')
 
-        first_draw = 2*y_coordinates.index(max(y_coordinates))
-        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+        print((self.draw_order[2].x - self.x_min)* ' ', '*',
+              (self.draw_order[2].y - self.draw_order[3].y) * '\n')
 
-        second_draw = 2*y_coordinates.index(max(y_coordinates))
-        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+        print((self.draw_order[3].x - self.x_min) * ' ', '*')
 
-        third_draw = 2*y_coordinates.index(max(y_coordinates))
-        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+class MapPoint:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-        fourth_draw = 2*y_coordinates.index(max(y_coordinates))
-        y_coordinates[y_coordinates.index(max(y_coordinates))] = -1000
+    def __str__(self):
+        return '({0}, {1})'.format(self.x, self.y)
 
-        print((self.map_corners[first_draw - 1] - min_x) * ' ', '*',
-              (self.map_corners[first_draw] - self.map_corners[second_draw]) * '\n')
-
-        print((self.map_corners[second_draw - 1] - min_x) * ' ', '*',
-              (self.map_corners[second_draw] - self.map_corners[third_draw]) * '\n')
-
-        print((self.map_corners[third_draw - 1] - min_x)* ' ', '*',
-              (self.map_corners[third_draw] - self.map_corners[fourth_draw]) * '\n')
-
-        print((self.map_corners[fourth_draw - 1] - min_x) * ' ', '*')
+    def __repr__(self):
+        return '({0}, {1})'.format(self.x, self.y)
 
