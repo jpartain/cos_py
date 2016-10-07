@@ -112,8 +112,6 @@ class Town:
         self.draw_order.append(self.map_corners[y_coords.index(max(y_coords))])
         y_coords[y_coords.index(max(y_coords))] = -1000
 
-        print(self.draw_order[0])
-
         if self.draw_order[2].x > self.draw_order[3].x:
             self.draw_segs.append([self.draw_order[3],
                                    self.draw_order[2]])
@@ -162,11 +160,74 @@ class Town:
             except ZeroDivisionError:
                 self.draw_slopes[i] = 'inf'
 
-        """
-        for x in range(x_min, x_max):
-            for y in range(y_min, y_max):
-                if
-        """
+        for x in range(self.x_min, self.x_max + 1):
+            for y in range(self.y_max, self.y_min - 1, -1):
+                point = MapPoint(x, y)
+
+                for i in range(-1, 3):
+                    if i == -1:
+                        if self.draw_slopes[i] != 'inf':
+                            if self.draw_slopes[i] < 0:
+                                if point.y >= (point.x * self.draw_slopes[i]):
+                                    continue
+                                else:
+                                    break
+                            elif self.draw_slopes[i] > 0:
+                                if point.y <= (point.x * self.draw_slopes[i]):
+                                    continue
+                                else:
+                                    break
+                            else:
+                                print('ERROR: Unhandled draw_slope[] value')
+                        else:
+                            if point.x >= self.draw_segs[i][0].x:
+                                continue
+                            else:
+                                break
+
+                    elif i == 0:
+                        if self.draw_slopes[i] == 0:
+                            if point.y >= self.draw_segs[i][0].y:
+                                continue
+                            else:
+                                break
+                        else:
+                            if point.y >= (point.x * self.draw_slopes[i]):
+                                continue
+                            else:
+                                break
+                    elif i == 1:
+                        if self.draw_slopes[i] != 'inf':
+                            if self.draw_slopes[i] < 0:
+                                if point.y <= (point.x * self.draw_slopes[i]):
+                                    continue
+                                else:
+                                    break
+                            elif self.draw_slopes[i] > 0:
+                                if point.y >= (point.x * self.draw_slopes[i]):
+                                    continue
+                                else:
+                                    break
+                            else:
+                                print('ERROR: Unhandled draw_slope[] value')
+                        else:
+                            if point.x <= self.draw_segs[i][0].x:
+                                continue
+                            else:
+                                break
+                    elif i == 2:
+                        if self.draw_slopes[i] == 0:
+                            if point.y <= self.draw_segs[i][0].y:
+                                continue
+                            else:
+                                break
+                        else:
+                            if point.y <= (point.x * self.draw_slopes[i]):
+                                continue
+                            else:
+                                break
+                else:
+                    self.map_points.append(point)
 
     def addHomeless(self, person):
         self.homeless.append(person)
@@ -224,7 +285,30 @@ class Town:
         print('\nMap corners modifiers:')
         print(self.map_corners_mod)
 
+        print('\nMap area: ', len(self.map_points))
+
+        print('\nMap points: ', self.map_points)
+
+        '''
         print('\nMap Visualization:')
+        last_point = MapPoint(0, 0)
+        start_x = 0
+        end_x = 0
+
+        for point in self.map_points:
+
+            if point.y != last_point.y:
+                end_x = last_point.x
+                print((start_x - self.x_min)*' ', (end_x - start_x)*'*' )
+
+                last_point.x = point.x
+                last_point.y = point.y
+                start_x = point.x
+
+            else:
+                last_point.x = point.x
+                last_point.y = point.y
+                
         print((self.draw_order[0].x - self.x_min) * ' ', '*',
               (self.draw_order[0].y - self.draw_order[1].y) * '\n')
 
@@ -235,6 +319,7 @@ class Town:
               (self.draw_order[2].y - self.draw_order[3].y) * '\n')
 
         print((self.draw_order[3].x - self.x_min) * ' ', '*')
+        '''
 
 class MapPoint:
     def __init__(self, x, y):
