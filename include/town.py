@@ -154,10 +154,13 @@ class Town:
                                    self.draw_order[3]])
 
         # Anti-clockwise from the bottom
-        seg1_slope = 0
-        seg2_slope = 0
-        seg3_slope = 0
-        seg4_slope = 0
+        self.draw_slopes = [0, 0, 0, 0]
+        for i in range(0, 4):
+            try:
+                self.draw_slopes[i] = (self.draw_segs[i][0].y - self.draw_segs[i][1].y)/ \
+                                      (self.draw_segs[i][0].x - self.draw_segs[i][1].x)
+            except ZeroDivisionError:
+                self.draw_slopes[i] = 'inf'
 
         """
         for x in range(x_min, x_max):
@@ -207,11 +210,21 @@ class Town:
         pass
 
     def printMapCorners(self):
+        print('Map corner points:')
         print(self.draw_order[0], self.draw_order[1], self.draw_order[2], self.draw_order[3])
+
+        print('\nMap perimeter segment endpoints:')
         print(self.draw_segs)
-        print(self.map_size_mod)
+
+        print('\nMap perimeter segment slopes:')
+        print(self.draw_slopes)
+
+        print('\nMap size modifier:', self.map_size_mod)
+
+        print('\nMap corners modifiers:')
         print(self.map_corners_mod)
 
+        print('\nMap Visualization:')
         print((self.draw_order[0].x - self.x_min) * ' ', '*',
               (self.draw_order[0].y - self.draw_order[1].y) * '\n')
 
