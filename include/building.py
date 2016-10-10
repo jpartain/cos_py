@@ -19,12 +19,23 @@ BuildingType = Enum('BuildingType',
                     'TradePost')
 
 class Building:
-    def __init__(self, size, building_type, occupants, health, menu):
+    def __init__(self, seed):
+        self.generateSize(seed[0])
+        self.generateType(seed[1:3])
+        self.generateOccupants(seed[3:20])
+        self.health = 100
+
+    def generateSize(self, string):
+        pass
+
+    def generateType(self, string):
+        pass
+
+    def generateOccupants(self, string):
+        pass
+
+    def setSize(self, size):
         self.size = size
-        self.type = building_type
-        self.occupants = occupants
-        self.health = health
-        self.menu = menu
 
     def setType(self, building_type):
         self.type = building_type
@@ -37,6 +48,9 @@ class Building:
         
     def setMenu(self, menu):
         self.menu = menu
+
+    def getSize(self):
+        return self.size
 
     def getType(self):
         return self.type

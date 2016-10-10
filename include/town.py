@@ -26,12 +26,16 @@ TownEconomy = ['Farm',
 """
 class Town:
     def __init__(self, seed):
-        self.generateWealth(seed[0])
-        self.generateEconomy(seed[1])
-        self.generateDanger(seed[2])
-        self.generateNobility(seed[3])
-        self.generateHomeless(seed[4])
-        self.generateMap(seed[5:25])
+        self.generatePopulation(seed[0])
+        self.generateWealth(seed[1])
+        self.generateEconomy(seed[2])
+        self.generateDanger(seed[3])
+        self.generateNobility(seed[4])
+        self.generateHomeless(seed[5])
+        self.generateMap(seed[6:25])
+
+    def generatePopulation(self, seed):
+        pass
 
     def generateWealth(self, string):
         self.wealth = int(string) - 5
@@ -76,9 +80,9 @@ class Town:
         self.y_coordinates = []
         self.draw_order = []
         self.draw_segs = []
-        scale = 15
+        scale = 10
 
-        self.map_size_mod = int(string[0])/(scale + 40) + 1
+        self.map_size_mod = int(string[0])/(scale + 30) + 1
         self.map_corners_mod = [int(string[1])/scale + 1, int(string[2])/scale + 1, int(string[3])/scale + 1, 
                                 int(string[4])/scale + 1, int(string[5])/scale + 1, int(string[6])/scale + 1,
                                 int(string[7])/scale + 1, int(string[8])/scale + 1] 
@@ -424,19 +428,6 @@ class Town:
             else:
                 last_point.x = point.x
                 last_point.y = point.y
-                
-        '''
-        print((self.draw_order[0].x - self.x_min) * ' ', '*',
-              (self.draw_order[0].y - self.draw_order[1].y) * '\n')
-
-        print((self.draw_order[1].x - self.x_min) * ' ', '*',
-              (self.draw_order[1].y - self.draw_order[2].y) * '\n')
-
-        print((self.draw_order[2].x - self.x_min)* ' ', '*',
-              (self.draw_order[2].y - self.draw_order[3].y) * '\n')
-
-        print((self.draw_order[3].x - self.x_min) * ' ', '*')
-        '''
 
 class MapPoint:
     def __init__(self, x, y):
@@ -449,3 +440,8 @@ class MapPoint:
     def __repr__(self):
         return '({0}, {1})'.format(self.x, self.y)
 
+    def setBuilding(self, building):
+        self.building = building
+
+    def getBuilding(self):
+        return self.building
