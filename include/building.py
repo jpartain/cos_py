@@ -1,6 +1,6 @@
 from enum import Enum
 
-BuildingType = Enum('BuildingType', 
+BuildingType = Enum('BuildingType',
                     'PoorHouse'
                     'MiddleHouse'
                     'NobleHouse'
@@ -17,6 +17,7 @@ BuildingType = Enum('BuildingType',
                     'PublicPlumbing'
                     'Market'
                     'TradePost')
+
 
 class Building:
     def __init__(self, seed):
@@ -45,7 +46,7 @@ class Building:
 
     def setHealth(self, health):
         self.health = health
-        
+
     def setMenu(self, menu):
         self.menu = menu
 
@@ -60,6 +61,6 @@ class Building:
 
     def getHealth(self):
         return self.health
-        
+
     def getMenu(self):
         return self.menu

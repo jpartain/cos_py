@@ -58,7 +58,7 @@ Title = Enum('Title',
              'Foreman')
 
 class Person:
-    def __init__(self, happiness, hunger, approval, fulfillment, fame, consensus, 
+    def __init__(self, happiness, hunger, approval, fulfillment, fame, consensus,
                        age, honesty, toughness, gender, relations, opinion_of_others,
                        job_title, inventory):
         self.happiness = happiness
@@ -75,7 +75,7 @@ class Person:
         self.opinion_of_others = opinion_of_others
         self.job_title = job_title
         self.inventory = inventory
-        
+
     def setHappiness(self, happiness):
         self.happiness = happiness
 
