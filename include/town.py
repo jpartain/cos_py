@@ -354,6 +354,9 @@ class Town:
         return self.settled_ratio
 
     def buildMap(self, string):
+        self.building_list = []
+        self.building_list.append(Building(string))
+
         # generate size
         # generate building types for each square
         pass

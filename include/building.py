@@ -16,13 +16,14 @@ BuildingType = Enum('BuildingType',
                     'Colosseum'
                     'PublicPlumbing'
                     'Market'
-                    'TradePost')
+                    'TradePost'
+                    'Butcher'
+                    'Inn')
 
 
 class Building:
-    def __init__(self, seed):
+    def __init__(self, seed, building_type):
         self.generateSize(seed[0])
-        self.generateType(seed[1:3])
         self.generateOccupants(seed[3:20])
         self.health = 100
 
