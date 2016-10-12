@@ -36,6 +36,7 @@ class Town:
         self.generateHomeless(seed[5])
         self.generateMap(seed[6:25])
         self.buildMap(seed[25:50])
+        self.generateBuildingRatios()
 
     def generatePopulation(self, seed):
         pass
@@ -328,6 +329,7 @@ class Town:
                                     break
                     else:
                         self.map_points.append(point)
+        self.map_area = len(self.map_points)
 
     def addHomeless(self, person):
         self.homeless.append(person)
@@ -354,8 +356,9 @@ class Town:
         return self.settled_ratio
 
     def buildMap(self, string):
-        self.building_list = []
-        self.building_list.append(Building(string))
+        pass
+        #self.building_list = []
+        #self.building_list.append(Building(string))
 
         # generate size
         # generate building types for each square
@@ -386,7 +389,7 @@ class Town:
         # print('\nMap corners modifiers:')
         # print(self.map_corners_mod)
 
-        print('\nMap area: ', len(self.map_points))
+        print('\nMap area: ', self.map_area)
 
         # print('\nMap points: ', self.map_points)
 
@@ -408,6 +411,29 @@ class Town:
             else:
                 last_point.x = point.x
                 last_point.y = point.y
+
+    def generateBuildingRatios(self):
+        area_mod = self.wealth / 25
+
+        self.tavern_area =      30 * (1 + area_mod)
+        self.plumbing_area =    20 * (1 + area_mod)
+        self.market_area =      100 * (1 + area_mod)
+        self.trade_area =       60 * (1 + area_mod)
+        self.inn_area =         30 * (1 + area_mod)
+        self.special_area =     100 * (1 + area_mod)
+
+        housing_area =  (self.map_area - self.tavern_area - self.plumbing_area -
+                         self.market_area - self.trade_area - self.inn_area -
+                         self.special_area)
+                                   
+        self.number_noble_house =  (housing_area * (0.2 + self.wealth/25))
+        self.number_middle_house = (housing_area * (0.4 + self.wealth/25))
+        self.number_poor_house =   (housing_area - self.number_noble_house -
+                                    self.number_middle_house)
+
+        print('Noble area: ', self.number_noble_house)
+        print('Middle area: ', self.number_middle_house)
+        print('Poor area: ', self.number_poor_house)
 
 
 class MapPoint:

@@ -1,24 +1,21 @@
-from enum import Enum
+CommonBuildings = ['PoorHouse',
+                   'MiddleHouse',
+                   'NobleHouse',
+                   'Tavern',
+                   'PublicPlumbing',
+                   'Market',
+                   'TradePost',
+                   'Inn']
 
-BuildingType = Enum('BuildingType',
-                    'PoorHouse'
-                    'MiddleHouse'
-                    'NobleHouse'
-                    'Barn'
-                    'Windmill'
-                    'Barracks'
-                    'Mason'
-                    'Blacksmith'
-                    'Lumbermill'
-                    'Cathedral'
-                    'Weavery'
-                    'Tavern'
-                    'Colosseum'
-                    'PublicPlumbing'
-                    'Market'
-                    'TradePost'
-                    'Butcher'
-                    'Inn')
+SpecialBuildings = ['Barn',
+                    'Butcher',
+                    'Mason',
+                    'Blacksmith',
+                    'Weavery',
+                    'Barracks',
+                    'Lumbermill',
+                    'Cathedral',
+                    'Colosseum']
 
 
 class Building:
