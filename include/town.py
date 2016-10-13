@@ -13,16 +13,16 @@ TownEconomy = ['Farm',
                'Colosseum']
 
 """
-    Town has the following attributes:
-        wealth:     an integer from -5 to 4, indicating debt/wealth level
-        economy:    a string chosen from a set of presets which determines
-                    special
-                    buildings and employment oppotunities in town
-        danger:     an integer from 0 to 9 indicating threat level
-        nobility:   an integer from 0 to 9 indicating ratio of noble to poor
-                    (9 being 90% noble)
-        settled:    an integer from 1 to 10 indicating ratio of housed to
-                    homeles, also dependent on wealth
+Town has the following attributes:
+    wealth:     an integer from -5 to 4, indicating debt/wealth level
+    economy:    a string chosen from a set of presets which determines
+                special
+                buildings and employment oppotunities in town
+    danger:     an integer from 0 to 9 indicating threat level
+    nobility:   an integer from 0 to 9 indicating ratio of noble to poor
+                (9 being 90% noble)
+    settled:    an integer from 1 to 10 indicating ratio of housed to
+                homeles, also dependent on wealth
 """
 
 
