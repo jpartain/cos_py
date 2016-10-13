@@ -12,19 +12,6 @@ TownEconomy = ['Farm',
                'Tavern',
                'Colosseum']
 
-"""
-Town has the following attributes:
-    wealth:     an integer from -5 to 4, indicating debt/wealth level
-    economy:    a string chosen from a set of presets which determines
-                special
-                buildings and employment oppotunities in town
-    danger:     an integer from 0 to 9 indicating threat level
-    nobility:   an integer from 0 to 9 indicating ratio of noble to poor
-                (9 being 90% noble)
-    settled:    an integer from 1 to 10 indicating ratio of housed to
-                homeles, also dependent on wealth
-"""
-
 
 class Town:
     def __init__(self, seed):
@@ -36,6 +23,7 @@ class Town:
         self.generateHomeless(seed[5])
         self.generateMap(seed[6:25])
         self.generateBuildingRatios()
+        self.createRoadsEquations(seed[25:126])
         self.placeRoads()
         self.placeBuildings()
 
@@ -71,7 +59,7 @@ class Town:
         self.nobility = int(10*self.nobility_mod*int(string))
 
     def generateHomeless(self, string):
-        self.settled_ratio = int(10*(int(string)/5 + self.getWealth() + 5))
+        self.settled_ratio = int(10*(int(string)/5 + self.wealth + 5))
 
     def generateMap(self, string):
         def grouped(iterable, n):
@@ -332,37 +320,102 @@ class Town:
                         self.map_points.append(point)
         self.map_area = len(self.map_points)
 
-    def addHomeless(self, person):
-        self.homeless.append(person)
+    def createRoadsEquations(self, string):
+        horizontal_roads_m = []
+        horizontal_roads_b = []
+        vertical_roads_m = []
+        vertical_roads_b = []
 
-    def removeHomeless(self, person):
-        self.homeless.delete(person)
+        map_width = self.y_max - self.y_min
+        map_height = self.x_max - self.x_min
 
-    def getWealth(self):
-        return self.wealth
+        median_map_width = 72
+        median_map_height = 72
+        median_road_num = 10
 
-    def getEconomy(self):
-        return self.economy
+        horizontal_roads_num = int(map_height / median_map_height *
+                                   median_road_num * ((int(string[0]) - 4.5) / 3))
+        vertical_roads_num =   int(map_width / median_map_width *
+                                   median_road_num * ((int(string[1]) - 4.5) / 3))
 
-    def getDanger(self):
-        return self.danger
+        horizontal_road_space = int(map_height / (horizontal_roads_num + 1))
+        vertical_road_space =   int(map_width / (vertical_roads_num + 1))
 
-    def getNobility(self):
-        return self.nobility
+        for i in range(0, horizontal_roads_num - 2):
+            horizontal_slope =     ((int(string[i + 2]) - 4.5) / 18)
+            horizontal_intercept = (((int(string[i + 2 + horizontal_roads_num - 1])
+                                      - 4.5) / 36) * (i + 1) *
+                                    horizontal_road_space)
 
-    def getMap(self):
-        return self.map
+            horizontal_roads_m.append(horizontal_slope)
+            horizontal_roads_b.append(horizontal_intercept)
 
-    def getSettledRatio(self):
-        return self.settled_ratio
+        for i in range(0, vertical_roads_num - 2):
+            inv_vertical_slope = ((int(string[i + 2 + horizontal_roads_num * 2 - 1])
+                                   - 4.5) / 18)
+            vertical_intercept = (((int(string[i + 2 + horizontal_roads_num * 2 -
+                                           1 + vertical_roads_num - 1]) - 4.5) /
+                                   36) * (i + 1) * vertical_road_space)
+
+            try:
+                vertical_slope = pow(inv_vertical_slope, -1)
+            except ZeroDivisionError:
+                vertical_slope = 'inf'
+
+            vertical_roads_m.append(vertical_slope)
+            vertical_roads_b.append(vertical_intercept)
 
     def placeRoads(self):
+        for point in self.map_points:
+            for h_slope, h_int in zip(horizontal_roads_m, horizontal_roads_b):
+                if ((point.y == int(point.x * h_slope + h_int)) or
+                   (point.y == int(point.x * h_slope + h_int) + 1)):
+                    point.building = 'Road'
+                    break
 
-        pass
+            else:
+                for v_slope, v_int in zip(vertical_roads_m, vertical_roads_b):
+                    if ((point.y == int(point.x * v_slope + v_int)) or
+                       (point.y == int(point.x * v_slope + v_int) + 1)):
+                        point.building = 'Road'
+                        break
+
+    def generateBuildingRatios(self):
+        area_mod = self.wealth / 25
+        map_unit_area = 5256
+
+        self.tavern_area =      30 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.plumbing_area =    20 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.market_area =      100 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.trade_area =       60 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.inn_area =         30 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.special_area =     100 * (1 + area_mod) * (self.map_area/map_unit_area)
+
+        housing_area =  int(self.map_area - self.tavern_area - self.plumbing_area -
+                            self.market_area - self.trade_area - self.inn_area -
+                            self.special_area)
+
+        self.number_noble_house =  int(housing_area * (0.2 + self.wealth/25))
+        self.number_middle_house = int(housing_area * (0.4 + self.wealth/25))
+        self.number_poor_house =   (housing_area - self.number_noble_house -
+                                    self.number_middle_house)
+
+        """
+        print()
+        print('Noble area:\t', self.number_noble_house, '\t',
+              int(self.number_noble_house/housing_area * 100), '%')
+
+        print('Middle area:\t', self.number_middle_house, '\t',
+              int(self.number_middle_house/housing_area * 100), '%')
+
+        print('Poor area:\t', self.number_poor_house, '\t',
+              int(self.number_poor_house/housing_area * 100), '%')
+        print()
+        """
 
     def placeBuildings(self):
-        #self.building_list = []
-        #self.building_list.append(Building(string))
+        # self.building_list = []
+        # self.building_list.append(Building(string))
 
         # generate size
         # generate building types for each square
@@ -416,37 +469,6 @@ class Town:
                 last_point.x = point.x
                 last_point.y = point.y
 
-    def generateBuildingRatios(self):
-        area_mod = self.wealth / 25
-        map_unit_area = 5256
-
-        self.tavern_area =      30 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.plumbing_area =    20 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.market_area =      100 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.trade_area =       60 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.inn_area =         30 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.special_area =     100 * (1 + area_mod) * (self.map_area/map_unit_area)
-
-        housing_area =  int(self.map_area - self.tavern_area - self.plumbing_area -
-                            self.market_area - self.trade_area - self.inn_area -
-                            self.special_area)
-
-        self.number_noble_house =  int(housing_area * (0.2 + self.wealth/25))
-        self.number_middle_house = int(housing_area * (0.4 + self.wealth/25))
-        self.number_poor_house =   (housing_area - self.number_noble_house -
-                                    self.number_middle_house)
-
-        print()
-        print('Noble area:\t', self.number_noble_house, '\t',
-              int(self.number_noble_house/housing_area * 100), '%')
-
-        print('Middle area:\t', self.number_middle_house, '\t',
-              int(self.number_middle_house/housing_area * 100), '%')
-
-        print('Poor area:\t', self.number_poor_house, '\t',
-              int(self.number_poor_house/housing_area * 100), '%')
-        print()
-
 
 class MapPoint:
     def __init__(self, x, y):
@@ -459,9 +481,3 @@ class MapPoint:
 
     def __repr__(self):
         return '({0}, {1})'.format(self.x, self.y)
-
-    def setBuilding(self, building):
-        self.building = building
-
-    def getBuilding(self):
-        return self.building

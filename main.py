@@ -6,6 +6,7 @@ from include.town import *
 def generateTown(random_seed):
     town = Town(random_seed)
 
+    """
     print('')
     print('Wealth:\t\t', town.getWealth())
     print('Economy:\t', town.getEconomy())
@@ -15,9 +16,10 @@ def generateTown(random_seed):
     print('')
 
     town.printMapCorners()
+    """
 
 def main():
-    random_string = ''.join(choice(digits) for a in range(50))
+    random_string = ''.join(choice(digits) for a in range(150))
     generateTown(random_string)
 
     #input('Press enter to close this window.')

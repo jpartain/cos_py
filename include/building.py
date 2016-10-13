@@ -1,4 +1,5 @@
-CommonBuildings = ['PoorHouse',
+CommonBuildings = ['Road',
+                   'PoorHouse',
                    'MiddleHouse',
                    'NobleHouse',
                    'Tavern',
