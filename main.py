@@ -14,9 +14,9 @@ def generateTown(random_seed):
     print('Settled:\t', town.getSettledRatio(), '%')
     print('Nobility:\t', town.getNobility(), '%')
     print('')
+    """
 
     town.printMapCorners()
-    """
 
 def main():
     random_string = ''.join(choice(digits) for a in range(150))

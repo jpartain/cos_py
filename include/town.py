@@ -321,10 +321,10 @@ class Town:
         self.map_area = len(self.map_points)
 
     def createRoadsEquations(self, string):
-        horizontal_roads_m = []
-        horizontal_roads_b = []
-        vertical_roads_m = []
-        vertical_roads_b = []
+        self.horizontal_roads_m = []
+        self.horizontal_roads_b = []
+        self.vertical_roads_m = []
+        self.vertical_roads_b = []
 
         map_width = self.y_max - self.y_min
         map_height = self.x_max - self.x_min
@@ -334,9 +334,9 @@ class Town:
         median_road_num = 10
 
         horizontal_roads_num = int(map_height / median_map_height *
-                                   median_road_num * ((int(string[0]) - 4.5) / 3))
+                                   median_road_num - ((int(string[0]) - 4.5) / 3))
         vertical_roads_num =   int(map_width / median_map_width *
-                                   median_road_num * ((int(string[1]) - 4.5) / 3))
+                                   median_road_num - ((int(string[1]) - 4.5) / 3))
 
         horizontal_road_space = int(map_height / (horizontal_roads_num + 1))
         vertical_road_space =   int(map_width / (vertical_roads_num + 1))
@@ -347,8 +347,8 @@ class Town:
                                       - 4.5) / 36) * (i + 1) *
                                     horizontal_road_space)
 
-            horizontal_roads_m.append(horizontal_slope)
-            horizontal_roads_b.append(horizontal_intercept)
+            self.horizontal_roads_m.append(horizontal_slope)
+            self.horizontal_roads_b.append(horizontal_intercept)
 
         for i in range(0, vertical_roads_num - 2):
             inv_vertical_slope = ((int(string[i + 2 + horizontal_roads_num * 2 - 1])
@@ -357,26 +357,26 @@ class Town:
                                            1 + vertical_roads_num - 1]) - 4.5) /
                                    36) * (i + 1) * vertical_road_space)
 
-            try:
-                vertical_slope = pow(inv_vertical_slope, -1)
-            except ZeroDivisionError:
-                vertical_slope = 'inf'
+            if inv_vertical_slope == 0:
+                inv_vertical_slope = 0.1
 
-            vertical_roads_m.append(vertical_slope)
-            vertical_roads_b.append(vertical_intercept)
+            vertical_slope = pow(inv_vertical_slope, -1)
+
+            self.vertical_roads_m.append(vertical_slope)
+            self.vertical_roads_b.append(vertical_intercept)
 
     def placeRoads(self):
         for point in self.map_points:
-            for h_slope, h_int in zip(horizontal_roads_m, horizontal_roads_b):
+            for h_slope, h_int in zip(self.horizontal_roads_m, self.horizontal_roads_b):
                 if ((point.y == int(point.x * h_slope + h_int)) or
                    (point.y == int(point.x * h_slope + h_int) + 1)):
                     point.building = 'Road'
                     break
 
             else:
-                for v_slope, v_int in zip(vertical_roads_m, vertical_roads_b):
+                for v_slope, v_int in zip(self.vertical_roads_m, self.vertical_roads_b):
                     if ((point.y == int(point.x * v_slope + v_int)) or
-                       (point.y == int(point.x * v_slope + v_int) + 1)):
+                    (point.y == int(point.x * v_slope + v_int) + 1)):
                         point.building = 'Road'
                         break
 
@@ -452,22 +452,21 @@ class Town:
 
         print('\nMap Visualization:')
         last_point = MapPoint(0, 0)
-        start_x = 0
-        end_x = 0
 
         for point in self.map_points:
-
             if point.y != last_point.y:
-                end_x = last_point.x
-                print((start_x - self.x_min)*' ', (end_x - start_x)*'*')
+                print()
+                print((point.x - self.x_min) * ' ', end = '')
 
-                last_point.x = point.x
-                last_point.y = point.y
-                start_x = point.x
+            elif point.building == 'none':
+                print('*', end = '')
 
-            else:
-                last_point.x = point.x
-                last_point.y = point.y
+            elif point.building == 'Road':
+                print('R', end = '')
+
+            last_point.y = point.y
+
+        print()
 
 
 class MapPoint:
