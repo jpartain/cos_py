@@ -170,7 +170,7 @@ class Town:
                                            self.draw_slopes[i]*self.draw_segs[i][0].x)
 
             except ZeroDivisionError:
-                self.draw_slopes[i] = 'inf'
+                self.draw_slopes[i] = 1000
 
         for y in range(self.y_max, self.y_min - 1, -1):
             for x in range(self.x_min, self.x_max + 1):
@@ -331,7 +331,7 @@ class Town:
 
         median_map_width = 72
         median_map_height = 72
-        median_road_num = 10
+        median_road_num = 5
 
         horizontal_roads_num = int(map_height / median_map_height *
                                    median_road_num - ((int(string[0]) - 4.5) / 3))
@@ -344,8 +344,8 @@ class Town:
         for i in range(0, horizontal_roads_num - 2):
             horizontal_slope =     ((int(string[i + 2]) - 4.5) / 18)
             horizontal_intercept = (((int(string[i + 2 + horizontal_roads_num - 1])
-                                      - 4.5) / 36) * (i + 1) *
-                                    horizontal_road_space)
+                                      - 4.5) / 36) + (i + 1) *
+                                    horizontal_road_space - map_height/2)
 
             self.horizontal_roads_m.append(horizontal_slope)
             self.horizontal_roads_b.append(horizontal_intercept)
@@ -353,17 +353,36 @@ class Town:
         for i in range(0, vertical_roads_num - 2):
             inv_vertical_slope = ((int(string[i + 2 + horizontal_roads_num * 2 - 1])
                                    - 4.5) / 18)
-            vertical_intercept = (((int(string[i + 2 + horizontal_roads_num * 2 -
-                                           1 + vertical_roads_num - 1]) - 4.5) /
-                                   36) * (i + 1) * vertical_road_space)
+            vertical_x_intercept = (((int(string[i + 2 + horizontal_roads_num * 2 -
+                                   1 + vertical_roads_num - 1]) - 4.5) / 36) +
+                                   (i + 1) * vertical_road_space - map_width/2)
 
             if inv_vertical_slope == 0:
                 inv_vertical_slope = 0.1
 
             vertical_slope = pow(inv_vertical_slope, -1)
+            vertical_intercept = -1 * vertical_x_intercept * vertical_slope
 
             self.vertical_roads_m.append(vertical_slope)
             self.vertical_roads_b.append(vertical_intercept)
+
+        # Map Edges
+        for slope, intercept in zip(self.draw_slopes, self.draw_intercepts):
+            if abs(slope) > 1:
+                self.vertical_roads_m.append(slope)
+
+                if intercept > 0:
+                    self.vertical_roads_b.append(intercept - 1)
+                else:
+                    self.vertical_roads_b.append(intercept + 1)
+
+            else:
+                self.horizontal_roads_m.append(slope)
+
+                if intercept < 0:
+                    self.horizontal_roads_b.append(intercept - 1)
+                else:
+                    self.horizontal_roads_b.append(intercept)
 
     def placeRoads(self):
         for point in self.map_points:
@@ -375,8 +394,8 @@ class Town:
 
             else:
                 for v_slope, v_int in zip(self.vertical_roads_m, self.vertical_roads_b):
-                    if ((point.y == int(point.x * v_slope + v_int)) or
-                    (point.y == int(point.x * v_slope + v_int) + 1)):
+                    if ((point.x == int((point.y - v_int) / v_slope)) or
+                    (point.x == int((point.y - v_int) / v_slope) + 1)):
                         point.building = 'Road'
                         break
 
