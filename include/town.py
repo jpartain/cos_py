@@ -21,12 +21,53 @@ class Town:
         self.generateDanger(seed[3])
         self.generateNobility(seed[4])
         self.generateHomeless(seed[5])
-        self.generateMap(seed[6:25])
+
+        self.buildMap()
+        # self.generateMap(seed[6:25])
+
         self.generateBuildingRatios()
-        self.createRoadsEquations(seed[25:126])
-        self.placeRoads()
+        self.getStreetBlocks()
+
+        # self.createRoadsEquations(seed[25:126])
+
+        # self.placeRoads()
         # self.createStreetBlocks(seed[126:176])
         self.placeBuildings()
+
+    def buildMap(self):
+        self.height = 50
+        self.width = 50
+        self.road_area = 0
+
+        height = self.height
+        width = self.width
+
+        self.map_points = [[0 for i in range(width)] for j in range(height)]
+        self.map_area = height * width
+
+        for y, row in enumerate(self.map_points):
+            for x, cell in enumerate(row):
+                point = '*'
+
+                # Place roads on map edge
+                if (x == 0) or (x == width - 1) or (y == 0) or (y == height - 1):
+                    point = 'R'
+                    self.road_area = self.road_area + 1
+
+                # A couple simple straight roads
+                if (x == int(width/2)) or (y == int(height/2)):
+                    point = 'R'
+                    self.road_area = self.road_area + 1
+
+                if (x == int(width/4)) or (y == int(height/4)):
+                    point = 'R'
+                    self.road_area = self.road_area + 1
+
+                if (x == int(3*width/4)) or (y == int(3*height/4)):
+                    point = 'R'
+                    self.road_area = self.road_area + 1
+
+                self.map_points[y][x] = point
 
     def createOpinions(self, string):
         pass
@@ -80,44 +121,26 @@ class Town:
             self.vertical_roads_m.append(vertical_slope)
             self.vertical_roads_b.append(vertical_intercept)
 
-        # Map Edges
-        for slope, intercept in zip(self.draw_slopes, self.draw_intercepts):
-            if abs(slope) > 1:
-                self.vertical_roads_m.append(slope)
-
-                if intercept > 0:
-                    self.vertical_roads_b.append(intercept - 1)
-                else:
-                    self.vertical_roads_b.append(intercept + 1)
-
-            else:
-                self.horizontal_roads_m.append(slope)
-
-                if intercept < 0:
-                    self.horizontal_roads_b.append(intercept - 1)
-                else:
-                    self.horizontal_roads_b.append(intercept)
-
     def createStreetBlocks(self, string):
-        self.street_block_list = []
+        height = self.height
+        width = self.width
 
         # for point in self.map_points:
-        pass
 
     def generateBuildingRatios(self):
         area_mod = self.wealth / 25
         map_unit_area = 5256
 
-        self.tavern_area =      30 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.plumbing_area =    20 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.tavern_area =      30  * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.plumbing_area =    20  * (1 + area_mod) * (self.map_area/map_unit_area)
         self.market_area =      100 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.trade_area =       60 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.inn_area =         30 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.trade_area =       60  * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.inn_area =         30  * (1 + area_mod) * (self.map_area/map_unit_area)
         self.special_area =     100 * (1 + area_mod) * (self.map_area/map_unit_area)
 
         housing_area =  int(self.map_area - self.tavern_area - self.plumbing_area -
                             self.market_area - self.trade_area - self.inn_area -
-                            self.special_area)
+                            self.special_area - self.road_area)
 
         self.number_noble_house =  int(housing_area * (0.2 + self.wealth/25))
         self.number_middle_house = int(housing_area * (0.4 + self.wealth/25))
@@ -430,6 +453,76 @@ class Town:
     def generateWealth(self, string):
         self.wealth = int(string) - 5
 
+    def getStreetBlocks(self):
+        self.block_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                           'a', 'b', 'c', 'd', 'e', 'f']
+
+        height = self.height
+        width = self.width
+
+        for y, row in enumerate(self.map_points):
+            for x, cell in enumerate(row):
+                if (cell == '*'):
+                    if (x < width/4) and (y < height/4):
+                        self.map_points[y][x] = '0'
+
+                    if (x > width/4) and (x < width/2) and\
+                       (y < height/4):
+                        self.map_points[y][x] = '1'
+
+                    if (x > width/2) and (x < 3*width/4) and\
+                       (y < height/4):
+                        self.map_points[y][x] = '2'
+
+                    if (x > 3*width/4) and (y < height/4):
+                        self.map_points[y][x] = '3'
+
+                    if (x < width/4) and\
+                       (y > height/4) and (y < height/2):
+                        self.map_points[y][x] = '4'
+
+                    if (x > width/4) and (x < width/2) and\
+                       (y > height/4) and (y < height/2):
+                        self.map_points[y][x] = '5'
+
+                    if (x > width/2) and (x < 3*width/4) and\
+                       (y > height/4) and (y < height/2):
+                        self.map_points[y][x] = '6'
+
+                    if (x > 3*width/4) and\
+                       (y > height/4) and (y < height/2):
+                        self.map_points[y][x] = '7'
+
+                    if (x < width/4) and\
+                       (y > height/2) and (y < 3*height/4):
+                        self.map_points[y][x] = '8'
+
+                    if (x > width/4) and (x < width/2) and\
+                       (y > height/2) and (y < 3*height/4):
+                        self.map_points[y][x] = '9'
+
+                    if (x > width/2) and (x < 3*width/4) and\
+                       (y > height/2) and (y < 3*height/4):
+                        self.map_points[y][x] = 'a'
+
+                    if (x > 3*width/4) and\
+                       (y > height/2) and (y < 3*height/4):
+                        self.map_points[y][x] = 'b'
+
+                    if (x < width/4) and (y > 3*height/4):
+                        self.map_points[y][x] = 'c'
+
+                    if (x > width/4) and (x < width/2) and\
+                       (y > 3*height/4):
+                        self.map_points[y][x] = 'd'
+
+                    if (x > width/2) and (x < 3*width/4) and\
+                       (y > 3*height/4):
+                        self.map_points[y][x] = 'e'
+
+                    if (x > 3*width/4) and (y > 3*height/4):
+                        self.map_points[y][x] = 'f'
+
     def linkRelationships(self, string):
         pass
 
@@ -444,15 +537,13 @@ class Town:
     def placeRoads(self):
         for point in self.map_points:
             for h_slope, h_int in zip(self.horizontal_roads_m, self.horizontal_roads_b):
-                if ((point.y == int(point.x * h_slope + h_int)) or
-                   (point.y == int(point.x * h_slope + h_int) + 1)):
+                if (point.y == int(point.x * h_slope + h_int)):
                     point.building = 'Road'
                     break
 
             else:
                 for v_slope, v_int in zip(self.vertical_roads_m, self.vertical_roads_b):
-                    if ((point.x == int((point.y - v_int) / v_slope)) or
-                    (point.x == int((point.y - v_int) / v_slope) + 1)):
+                    if (point.x == int((point.y - v_int) / v_slope)):
                         point.building = 'Road'
                         break
 
@@ -467,7 +558,7 @@ class Town:
         # print('\nMap perimeter segment slopes:')
         # print(self.draw_slopes)
 
-        print('\nMap size modifier:', self.map_size_mod)
+        # print('\nMap size modifier:', self.map_size_mod)
 
         # print('\nMap corners modifiers:')
         # print(self.map_corners_mod)
@@ -477,29 +568,18 @@ class Town:
         # print('\nMap points: ', self.map_points)
 
         print('\nMap Visualization:')
-        last_point = MapPoint(0, 0)
+        for row in self.map_points:
+            for cell in row:
+                print(cell, end = '')
 
-        for point in self.map_points:
-            if point.y != last_point.y:
-                print()
-                print((point.x - self.x_min) * ' ', end = '')
-
-            elif point.building == 'none':
-                print('*', end = '')
-
-            elif point.building == 'Road':
-                print('R', end = '')
-
-            last_point.y = point.y
+            print()
 
         print()
 
 
 class MapPoint:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.building = 'none'
+    def __init__(self):
+        self.building = '*'
 
     def __str__(self):
         return '({0}, {1})'.format(self.x, self.y)
