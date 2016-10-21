@@ -20,9 +20,10 @@ SpecialBuildings = ['Barn',
 
 
 class Building:
-    def __init__(self, seed, building_type):
-        self.generateSize(seed[0])
-        self.generateOccupants(seed[3:20])
+    def __init__(self, building_type):
+        # self.generateSize(seed[0])
+        # self.generateOccupants(seed[3:20])
+        self.building_type = building_type
         self.health = 100
 
     def generateSize(self, string):
@@ -34,32 +35,50 @@ class Building:
     def generateOccupants(self, string):
         pass
 
-    def setSize(self, size):
-        self.size = size
+    def __str__(self):
+        typ = self.building_type
+        if typ == 'Road':
+            char = 'R'
+        elif typ == 'PoorHouse':
+            char = 'P'
+        elif typ == 'MiddleHouse':
+            char = 'M'
+        elif typ == 'NobleHouse':
+            char = 'N'
+        elif typ == 'Tavern':
+            char = 'T'
+        elif typ == 'PublicPlumbing':
+            char = 'B'
+        elif typ == 'Market':
+            char = 'K'
+        elif typ == 'TradePost':
+            char = 'D'
+        elif typ == 'Inn':
+            char = 'I'
+        else:
+            char = '*'
+        return char
 
-    def setType(self, building_type):
-        self.type = building_type
-
-    def setOccupants(self, occupants):
-        self.occupants = occupants
-
-    def setHealth(self, health):
-        self.health = health
-
-    def setMenu(self, menu):
-        self.menu = menu
-
-    def getSize(self):
-        return self.size
-
-    def getType(self):
-        return self.type
-
-    def getOccupants(self):
-        return self.occupants
-
-    def getHealth(self):
-        return self.health
-
-    def getMenu(self):
-        return self.menu
+    def __repr__(self):
+        typ = self.building_type
+        if typ == 'Road':
+            char = 'R'
+        elif typ == 'PoorHouse':
+            char = 'P'
+        elif typ == 'MiddleHouse':
+            char = 'M'
+        elif typ == 'NobleHouse':
+            char = 'N'
+        elif typ == 'Tavern':
+            char = 'T'
+        elif typ == 'PublicPlumbing':
+            char = 'B'
+        elif typ == 'Market':
+            char = 'K'
+        elif typ == 'TradePost':
+            char = 'D'
+        elif typ == 'Inn':
+            char = 'I'
+        else:
+            char = '*'
+        return char

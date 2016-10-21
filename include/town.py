@@ -1,5 +1,5 @@
 from include.building import Building
-# from include.person import Person
+from include.block import Block
 
 TownEconomy = ['Farm',
                'Mine',
@@ -31,12 +31,12 @@ class Town:
         # self.createRoadsEquations(seed[25:126])
 
         # self.placeRoads()
-        # self.createStreetBlocks(seed[126:176])
+        self.fillStreetBlocks(seed[126:176])
         self.placeBuildings()
 
     def buildMap(self):
-        self.height = 50
-        self.width = 50
+        self.height = 25
+        self.width = 40
         self.road_area = 0
 
         height = self.height
@@ -47,27 +47,27 @@ class Town:
 
         for y, row in enumerate(self.map_points):
             for x, cell in enumerate(row):
-                point = '*'
+                building = Building('none')
 
                 # Place roads on map edge
                 if (x == 0) or (x == width - 1) or (y == 0) or (y == height - 1):
-                    point = 'R'
+                    building.building_type = 'Road'
                     self.road_area = self.road_area + 1
 
                 # A couple simple straight roads
                 if (x == int(width/2)) or (y == int(height/2)):
-                    point = 'R'
+                    building.building_type = 'Road'
                     self.road_area = self.road_area + 1
 
                 if (x == int(width/4)) or (y == int(height/4)):
-                    point = 'R'
+                    building.building_type = 'Road'
                     self.road_area = self.road_area + 1
 
                 if (x == int(3*width/4)) or (y == int(3*height/4)):
-                    point = 'R'
+                    building.building_type = 'Road'
                     self.road_area = self.road_area + 1
 
-                self.map_points[y][x] = point
+                self.map_points[y][x] = building
 
     def createOpinions(self, string):
         pass
@@ -121,7 +121,7 @@ class Town:
             self.vertical_roads_m.append(vertical_slope)
             self.vertical_roads_b.append(vertical_intercept)
 
-    def createStreetBlocks(self, string):
+    def fillStreetBlocks(self, string):
         height = self.height
         width = self.width
 
@@ -454,74 +454,20 @@ class Town:
         self.wealth = int(string) - 5
 
     def getStreetBlocks(self):
-        self.block_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                           'a', 'b', 'c', 'd', 'e', 'f']
+        self.block_list = []
 
         height = self.height
         width = self.width
 
-        for y, row in enumerate(self.map_points):
-            for x, cell in enumerate(row):
-                if (cell == '*'):
-                    if (x < width/4) and (y < height/4):
-                        self.map_points[y][x] = '0'
+        for j in range(4):
+            for i in range(4):
+                top_left_x  = int(i*width/4)        + 1
+                top_left_y  = int(j*height/4)       + 1
+                bot_right_x = int((i + 1)*width/4)  - 1
+                bot_right_y = int((j + 1)*height/4) - 1
 
-                    if (x > width/4) and (x < width/2) and\
-                       (y < height/4):
-                        self.map_points[y][x] = '1'
-
-                    if (x > width/2) and (x < 3*width/4) and\
-                       (y < height/4):
-                        self.map_points[y][x] = '2'
-
-                    if (x > 3*width/4) and (y < height/4):
-                        self.map_points[y][x] = '3'
-
-                    if (x < width/4) and\
-                       (y > height/4) and (y < height/2):
-                        self.map_points[y][x] = '4'
-
-                    if (x > width/4) and (x < width/2) and\
-                       (y > height/4) and (y < height/2):
-                        self.map_points[y][x] = '5'
-
-                    if (x > width/2) and (x < 3*width/4) and\
-                       (y > height/4) and (y < height/2):
-                        self.map_points[y][x] = '6'
-
-                    if (x > 3*width/4) and\
-                       (y > height/4) and (y < height/2):
-                        self.map_points[y][x] = '7'
-
-                    if (x < width/4) and\
-                       (y > height/2) and (y < 3*height/4):
-                        self.map_points[y][x] = '8'
-
-                    if (x > width/4) and (x < width/2) and\
-                       (y > height/2) and (y < 3*height/4):
-                        self.map_points[y][x] = '9'
-
-                    if (x > width/2) and (x < 3*width/4) and\
-                       (y > height/2) and (y < 3*height/4):
-                        self.map_points[y][x] = 'a'
-
-                    if (x > 3*width/4) and\
-                       (y > height/2) and (y < 3*height/4):
-                        self.map_points[y][x] = 'b'
-
-                    if (x < width/4) and (y > 3*height/4):
-                        self.map_points[y][x] = 'c'
-
-                    if (x > width/4) and (x < width/2) and\
-                       (y > 3*height/4):
-                        self.map_points[y][x] = 'd'
-
-                    if (x > width/2) and (x < 3*width/4) and\
-                       (y > 3*height/4):
-                        self.map_points[y][x] = 'e'
-
-                    if (x > 3*width/4) and (y > 3*height/4):
-                        self.map_points[y][x] = 'f'
+                block = Block(top_left_x, top_left_y, bot_right_x, bot_right_y)
+                self.block_list.append(block)
 
     def linkRelationships(self, string):
         pass
