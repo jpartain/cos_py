@@ -1,5 +1,7 @@
 class Block:
     def __init__(self, top_left_x, top_left_y, bot_right_x, bot_right_y):
+        self.wealth = 'none'
+
         self.top_left_x = top_left_x
         self.top_left_y = top_left_y
         self.bot_right_x = bot_right_x
@@ -9,6 +11,7 @@ class Block:
         width = bot_right_x - top_left_x
 
         self.buildings = [[0 for x in range(width)] for y in range(height)]
+
 
     def __str__(self):
         return ('Top left:\t({0}, {1})\t\tBot right:\t({2}, {3})'.

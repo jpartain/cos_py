@@ -38,13 +38,13 @@ class Building:
     def __str__(self):
         typ = self.building_type
         if typ == 'Road':
-            char = 'R'
+            char = '\033[91mR'
         elif typ == 'PoorHouse':
-            char = 'P'
+            char = '\033[90mP'
         elif typ == 'MiddleHouse':
-            char = 'M'
+            char = '\033[94mM'
         elif typ == 'NobleHouse':
-            char = 'N'
+            char = '\033[95mN'
         elif typ == 'Tavern':
             char = 'T'
         elif typ == 'PublicPlumbing':
@@ -56,19 +56,19 @@ class Building:
         elif typ == 'Inn':
             char = 'I'
         else:
-            char = '*'
+            char = '\033[92m*'
         return char
 
     def __repr__(self):
         typ = self.building_type
         if typ == 'Road':
-            char = 'R'
+            char = '\033[91mR'
         elif typ == 'PoorHouse':
-            char = 'P'
+            char = '\033[90mP'
         elif typ == 'MiddleHouse':
-            char = 'M'
+            char = '\033[94mM'
         elif typ == 'NobleHouse':
-            char = 'N'
+            char = '\033[95mN'
         elif typ == 'Tavern':
             char = 'T'
         elif typ == 'PublicPlumbing':
@@ -80,5 +80,5 @@ class Building:
         elif typ == 'Inn':
             char = 'I'
         else:
-            char = '*'
+            char = '\033[92m*'
         return char

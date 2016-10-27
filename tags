@@ -5,26 +5,35 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 Age	include/person.py	/^Age = Enum('Age',$/;"	v
+Block	include/block.py	/^class Block:$/;"	c
 Building	include/building.py	/^class Building:$/;"	c
-BuildingType	include/building.py	/^BuildingType = Enum('BuildingType',$/;"	v
+CommonBuildings	include/building.py	/^CommonBuildings = ['Road',$/;"	v
 Gender	include/person.py	/^Gender = Enum('Gender',$/;"	v
 MapPoint	include/town.py	/^class MapPoint:$/;"	c
 Person	include/person.py	/^class Person:$/;"	c
 Relationship	include/person.py	/^Relationship = Enum('Relationship',$/;"	v
+SpecialBuildings	include/building.py	/^SpecialBuildings = ['Barn',$/;"	v
 Title	include/person.py	/^Title = Enum('Title',$/;"	v
 Town	include/town.py	/^class Town:$/;"	c
 TownEconomy	include/town.py	/^TownEconomy = ['Farm',$/;"	v
-__init__	include/building.py	/^    def __init__(self, seed):$/;"	m	class:Building
+__init__	include/block.py	/^    def __init__(self, top_left_x, top_left_y, bot_right_x, bot_right_y):$/;"	m	class:Block
+__init__	include/building.py	/^    def __init__(self, building_type):$/;"	m	class:Building
 __init__	include/person.py	/^    def __init__(self, happiness, hunger, approval, fulfillment, fame, consensus,$/;"	m	class:Person
+__init__	include/town.py	/^    def __init__(self):$/;"	m	class:MapPoint
 __init__	include/town.py	/^    def __init__(self, seed):$/;"	m	class:Town
-__init__	include/town.py	/^    def __init__(self, x, y):$/;"	m	class:MapPoint
+__repr__	include/block.py	/^    def __repr__(self):$/;"	m	class:Block	file:
+__repr__	include/building.py	/^    def __repr__(self):$/;"	m	class:Building	file:
 __repr__	include/town.py	/^    def __repr__(self):$/;"	m	class:MapPoint	file:
+__str__	include/block.py	/^    def __str__(self):$/;"	m	class:Block	file:
+__str__	include/building.py	/^    def __str__(self):$/;"	m	class:Building	file:
 __str__	include/town.py	/^    def __str__(self):$/;"	m	class:MapPoint	file:
-addHomeless	include/town.py	/^    def addHomeless(self, person):$/;"	m	class:Town
 addRelation	include/person.py	/^    def addRelation(self, relationship, person):$/;"	m	class:Person
-buildMap	include/town.py	/^    def buildMap(self, string):$/;"	m	class:Town
+buildMap	include/town.py	/^    def buildMap(self):$/;"	m	class:Town
 createOpinions	include/town.py	/^    def createOpinions(self, string):$/;"	m	class:Town
 createPerson	include/town.py	/^    def createPerson(self, string):$/;"	m	class:Town
+createRoadsEquations	include/town.py	/^    def createRoadsEquations(self, string):$/;"	m	class:Town
+fillStreetBlocks	include/town.py	/^    def fillStreetBlocks(self, string):$/;"	m	class:Town
+generateBuildingRatios	include/town.py	/^    def generateBuildingRatios(self):$/;"	m	class:Town
 generateDanger	include/town.py	/^    def generateDanger(self, string):$/;"	m	class:Town
 generateEconomy	include/town.py	/^    def generateEconomy(self, string):$/;"	m	class:Town
 generateHomeless	include/town.py	/^    def generateHomeless(self, string):$/;"	m	class:Town
@@ -38,52 +47,36 @@ generateType	include/building.py	/^    def generateType(self, string):$/;"	m	cla
 generateWealth	include/town.py	/^    def generateWealth(self, string):$/;"	m	class:Town
 getAge	include/person.py	/^    def getAge(self):$/;"	m	class:Person
 getApproval	include/person.py	/^    def getApproval(self):$/;"	m	class:Person
-getBuilding	include/town.py	/^    def getBuilding(self):$/;"	m	class:MapPoint
 getConsensus	include/person.py	/^    def getConsensus(self):$/;"	m	class:Person
-getDanger	include/town.py	/^    def getDanger(self):$/;"	m	class:Town
-getEconomy	include/town.py	/^    def getEconomy(self):$/;"	m	class:Town
 getFame	include/person.py	/^    def getFame(self):$/;"	m	class:Person
 getFulfillment	include/person.py	/^    def getFulfillment(self):$/;"	m	class:Person
 getHappiness	include/person.py	/^    def getHappiness(self):$/;"	m	class:Person
-getHealth	include/building.py	/^    def getHealth(self):$/;"	m	class:Building
 getHonesty	include/person.py	/^    def getHonesty(self):$/;"	m	class:Person
 getHunger	include/person.py	/^    def getHunger(self):$/;"	m	class:Person
 getInventory	include/person.py	/^    def getInventory(self):$/;"	m	class:Person
-getMap	include/town.py	/^    def getMap(self):$/;"	m	class:Town
-getMenu	include/building.py	/^    def getMenu(self):$/;"	m	class:Building
-getNobility	include/town.py	/^    def getNobility(self):$/;"	m	class:Town
-getOccupants	include/building.py	/^    def getOccupants(self):$/;"	m	class:Building
 getOpinion	include/person.py	/^    def getOpinion(self, person):$/;"	m	class:Person
 getRelations	include/person.py	/^    def getRelations(self):$/;"	m	class:Person
-getSettledRatio	include/town.py	/^    def getSettledRatio(self):$/;"	m	class:Town
-getSize	include/building.py	/^    def getSize(self):$/;"	m	class:Building
+getStreetBlocks	include/town.py	/^    def getStreetBlocks(self):$/;"	m	class:Town
 getTitle	include/person.py	/^    def getTitle(self):$/;"	m	class:Person
 getToughness	include/person.py	/^    def getToughness(self):$/;"	m	class:Person
-getType	include/building.py	/^    def getType(self):$/;"	m	class:Building
-getWealth	include/town.py	/^    def getWealth(self):$/;"	m	class:Town
 grouped	include/town.py	/^        def grouped(iterable, n):$/;"	f	function:Town.generateMap
 linkRelationships	include/town.py	/^    def linkRelationships(self, string):$/;"	m	class:Town
 main	main.py	/^def main():$/;"	f
+placeBuildings	include/town.py	/^    def placeBuildings(self):$/;"	m	class:Town
+placeRoads	include/town.py	/^    def placeRoads(self):$/;"	m	class:Town
 printMapCorners	include/town.py	/^    def printMapCorners(self):$/;"	m	class:Town
 putItem	include/person.py	/^    def putItem(self, item):$/;"	m	class:Person
-removeHomeless	include/town.py	/^    def removeHomeless(self, person):$/;"	m	class:Town
 removeRelation	include/person.py	/^    def removeRelation(self, person):$/;"	m	class:Person
 setAge	include/person.py	/^    def setAge(self, age):$/;"	m	class:Person
 setApproval	include/person.py	/^    def setApproval(self, approval):$/;"	m	class:Person
-setBuilding	include/town.py	/^    def setBuilding(self, building):$/;"	m	class:MapPoint
 setConsensus	include/person.py	/^    def setConsensus(self, consensus):$/;"	m	class:Person
 setFame	include/person.py	/^    def setFame(self, fame):$/;"	m	class:Person
 setFulfillment	include/person.py	/^    def setFulfillment(self, fulfillment):$/;"	m	class:Person
 setGender	include/person.py	/^    def setGender(self, gender):$/;"	m	class:Person
 setHappiness	include/person.py	/^    def setHappiness(self, happiness):$/;"	m	class:Person
-setHealth	include/building.py	/^    def setHealth(self, health):$/;"	m	class:Building
 setHonesty	include/person.py	/^    def setHonesty(self, honesty):$/;"	m	class:Person
 setHunger	include/person.py	/^    def setHunger(self, hunger):$/;"	m	class:Person
-setMenu	include/building.py	/^    def setMenu(self, menu):$/;"	m	class:Building
-setOccupants	include/building.py	/^    def setOccupants(self, occupants):$/;"	m	class:Building
 setOpinion	include/person.py	/^    def setOpinion(self, person, opinion):$/;"	m	class:Person
-setSize	include/building.py	/^    def setSize(self, size):$/;"	m	class:Building
 setTitle	include/person.py	/^    def setTitle(self, title):$/;"	m	class:Person
 setToughness	include/person.py	/^    def setToughness(self, toughness):$/;"	m	class:Person
-setType	include/building.py	/^    def setType(self, building_type):$/;"	m	class:Building
 takeItem	include/person.py	/^    def takeItem(self, item):$/;"	m	class:Person

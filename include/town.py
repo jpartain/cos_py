@@ -31,8 +31,8 @@ class Town:
         # self.createRoadsEquations(seed[25:126])
 
         # self.placeRoads()
-        self.fillStreetBlocks(seed[126:176])
-        self.placeBuildings()
+        self.fillStreetBlocks(seed[6:6 + 16])
+        self.placeBuildings(seed[22:22 + 16*2])
 
     def buildMap(self):
         self.height = 25
@@ -42,7 +42,7 @@ class Town:
         height = self.height
         width = self.width
 
-        self.map_points = [[0 for i in range(width)] for j in range(height)]
+        self.map_points = [[Building('none') for i in range(width)] for j in range(height)]
         self.map_area = height * width
 
         for y, row in enumerate(self.map_points):
@@ -122,10 +122,11 @@ class Town:
             self.vertical_roads_b.append(vertical_intercept)
 
     def fillStreetBlocks(self, string):
-        height = self.height
-        width = self.width
+        types_for_use = self.getAvailableBlocks()
 
-        # for point in self.map_points:
+        for i, block in enumerate(self.block_list):
+            rand_select = int((len(types_for_use) - 1) * int(string[i])/9)
+            block.wealth = types_for_use.pop(rand_select)
 
     def generateBuildingRatios(self):
         area_mod = self.wealth / 25
@@ -137,10 +138,12 @@ class Town:
         self.trade_area =       60  * (1 + area_mod) * (self.map_area/map_unit_area)
         self.inn_area =         30  * (1 + area_mod) * (self.map_area/map_unit_area)
         self.special_area =     100 * (1 + area_mod) * (self.map_area/map_unit_area)
+        self.empty_area =       20 * (self.map_area/map_unit_area)
 
         housing_area =  int(self.map_area - self.tavern_area - self.plumbing_area -
                             self.market_area - self.trade_area - self.inn_area -
-                            self.special_area - self.road_area)
+                            self.special_area - self.road_area -
+                            self.empty_area)
 
         self.number_noble_house =  int(housing_area * (0.2 + self.wealth/25))
         self.number_middle_house = int(housing_area * (0.4 + self.wealth/25))
@@ -179,7 +182,7 @@ class Town:
         self.danger = int(self.danger_mod*int(string))
 
     def generateHomeless(self, string):
-        self.settled_ratio = int(10*(int(string)/5 + self.wealth + 5))
+        self.settled_ratio = int(10*(int(string)/6 + self.wealth/2 + 7))
 
     def generateMap(self, string):
         def grouped(iterable, n):
@@ -453,6 +456,29 @@ class Town:
     def generateWealth(self, string):
         self.wealth = int(string) - 5
 
+    def getAvailableBlocks(self):
+        self.noble_blocks =  int(len(self.block_list) * self.number_noble_house /
+                                 (self.number_noble_house + self.number_middle_house
+                                 + self.number_poor_house))
+
+        self.middle_blocks = int(len(self.block_list) * self.number_middle_house /
+                                (self.number_noble_house + self.number_middle_house
+                                + self.number_poor_house))
+
+        self.poor_blocks = len(self.block_list) - self.noble_blocks - self.middle_blocks
+
+        available_block_types = []
+        for i in range(self.noble_blocks):
+            available_block_types.append('NobleHouse')
+
+        for i in range(self.middle_blocks):
+            available_block_types.append('MiddleHouse')
+
+        for i in range(self.poor_blocks):
+            available_block_types.append('PoorHouse')
+
+        return available_block_types
+
     def getStreetBlocks(self):
         self.block_list = []
 
@@ -472,13 +498,54 @@ class Town:
     def linkRelationships(self, string):
         pass
 
-    def placeBuildings(self):
-        # self.building_list = []
-        # self.building_list.append(Building(string))
+    def placeBuildings(self, string):
+        try:
+            n_house_per_block = self.number_noble_house / self.noble_blocks
+        except ZeroDivisionError:
+            n_house_per_block = 0
 
-        # generate size
-        # generate building types for each square
-        pass
+        try:
+            m_house_per_block = self.number_middle_house / self.middle_blocks
+        except ZeroDivisionError:
+            m_house_per_block = 0
+
+        try:
+            p_house_per_block = self.number_poor_house / self.poor_blocks
+        except ZeroDivisionError:
+            p_house_per_block = 0
+
+        house_per_block = {'NobleHouse':n_house_per_block,
+                           'MiddleHouse':m_house_per_block,
+                           'PoorHouse':p_house_per_block}
+
+        for i, block in enumerate(self.block_list):
+            begin_x = int(((block.bot_right_x - block.top_left_x) *
+                          int(string[2*i])/9 + block.top_left_x))
+            begin_y = int(((block.bot_right_y - block.top_left_y) *
+                          int(string[2*i + 1])/9 + block.top_left_y))
+
+            self.map_points[begin_y][begin_x] = Building(block.wealth)
+            point_x = begin_x
+            point_y = begin_y
+
+            for j in range(int(house_per_block[block.wealth]) - 1):
+                if self.pointGoodToUse(point_y + 1, point_x, block):
+                    point_y = point_y + 1
+
+                elif self.pointGoodToUse(point_y, point_x - 1, block):
+                    point_x = point_x - 1
+
+                elif self.pointGoodToUse(point_y - 1, point_x, block):
+                    point_y = point_y - 1
+
+                elif self.pointGoodToUse(point_y, point_x + 1, block):
+                    point_x = point_x + 1
+
+                else:
+                    print('Didn\'t place a building on a map point!')
+                    continue
+
+                self.map_points[point_y][point_x] = Building(block.wealth)
 
     def placeRoads(self):
         for point in self.map_points:
@@ -492,6 +559,16 @@ class Town:
                     if (point.x == int((point.y - v_int) / v_slope)):
                         point.building = 'Road'
                         break
+
+    def pointGoodToUse(self, point_y, point_x, block):
+        if ((block.top_left_y <= point_y) and (point_y <= block.bot_right_y) and
+            (block.top_left_x <= point_x) and (point_x <= block.bot_right_x)):
+            if self.map_points[point_y][point_x].building_type == 'none':
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def printMapCorners(self):
         # print('Map corner points:')
@@ -515,8 +592,8 @@ class Town:
 
         print('\nMap Visualization:')
         for row in self.map_points:
-            for cell in row:
-                print(cell, end = '')
+            for building in row:
+                print(building, end = '')
 
             print()
 

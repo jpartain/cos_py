@@ -6,15 +6,13 @@ from include.town import *
 def generateTown(random_seed):
     town = Town(random_seed)
 
-    """
     print('')
-    print('Wealth:\t\t', town.getWealth())
-    print('Economy:\t', town.getEconomy())
-    print('Danger:\t\t', town.getDanger())
-    print('Settled:\t', town.getSettledRatio(), '%')
-    print('Nobility:\t', town.getNobility(), '%')
+    print('Wealth:\t\t', town.wealth)
+    print('Economy:\t', town.economy)
+    print('Danger:\t\t', town.danger)
+    print('Settled:\t', town.settled_ratio, '%')
+    print('Nobility:\t', town.nobility, '%')
     print('')
-    """
 
     town.printMapCorners()
 
