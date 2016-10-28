@@ -46,15 +46,31 @@ class Building:
         elif typ == 'NobleHouse':
             char = '\033[95mN'
         elif typ == 'Tavern':
-            char = 'T'
+            char = '\033[96mT'
         elif typ == 'PublicPlumbing':
-            char = 'B'
+            char = '\033[96mB'
         elif typ == 'Market':
-            char = 'K'
+            char = '\033[96mK'
         elif typ == 'TradePost':
-            char = 'D'
+            char = '\033[96mD'
         elif typ == 'Inn':
-            char = 'I'
+            char = '\033[96mI'
+        elif typ == 'Barn':
+            char = '\033[97mA'
+        elif typ == 'Barracks':
+            char = '\033[97mX'
+        elif typ == 'Mason':
+            char = '\033[97mS'
+        elif typ == 'Blacksmith':
+            char = '\033[97mL'
+        elif typ == 'Lumbermill':
+            char = '\033[97mE'
+        elif typ == 'Cathedral':
+            char = '\033[97m+'
+        elif typ == 'Weavery':
+            char = '\033[97mY'
+        elif typ == 'Colosseum':
+            char = '\033[97mO'
         else:
             char = '\033[92m*'
         return char
@@ -70,15 +86,31 @@ class Building:
         elif typ == 'NobleHouse':
             char = '\033[95mN'
         elif typ == 'Tavern':
-            char = 'T'
+            char = '\033[96mT'
         elif typ == 'PublicPlumbing':
-            char = 'B'
+            char = '\033[96mB'
         elif typ == 'Market':
-            char = 'K'
+            char = '\033[96mK'
         elif typ == 'TradePost':
-            char = 'D'
+            char = '\033[96mD'
         elif typ == 'Inn':
-            char = 'I'
+            char = '\033[96mI'
+        elif typ == 'Barn':
+            char = '\033[97mA'
+        elif typ == 'Barracks':
+            char = '\033[97mX'
+        elif typ == 'Mason':
+            char = '\033[97mS'
+        elif typ == 'Blacksmith':
+            char = '\033[97mL'
+        elif typ == 'Lumbermill':
+            char = '\033[97mE'
+        elif typ == 'Cathedral':
+            char = '\033[97m+'
+        elif typ == 'Weavery':
+            char = '\033[97mY'
+        elif typ == 'Colosseum':
+            char = '\033[97mO'
         else:
             char = '\033[92m*'
         return char

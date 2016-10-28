@@ -1,5 +1,7 @@
 from include.building import Building
 from include.block import Block
+import include.seed as seed
+
 
 TownEconomy = ['Farm',
                'Mine',
@@ -15,6 +17,7 @@ TownEconomy = ['Farm',
 
 class Town:
     def __init__(self, seed):
+        self.createPointPlacementRadius()
         self.generatePopulation(seed[0])
         self.generateWealth(seed[1])
         self.generateEconomy(seed[2])
@@ -75,6 +78,30 @@ class Town:
     def createPerson(self, string):
         pass
 
+    def createPointPlacementRadius(self):
+        self.placement_radius = []
+
+        for r in range(0, 101):
+            x = r
+            y = 0
+            err = 0
+
+            while x >= y:
+                self.placement_radius.append([x, y])
+                self.placement_radius.append([y, x])
+                self.placement_radius.append([-y, x])
+                self.placement_radius.append([-x, y])
+                self.placement_radius.append([-x, -y])
+                self.placement_radius.append([-y, -x])
+                self.placement_radius.append([y, -x])
+                self.placement_radius.append([x, -y])
+
+                y = y + 1
+                err = err + 1 + 2*y
+                if (2*(err - x) + 1) > 0:
+                    x = x - 1
+                    err = err + 1 - 2*x
+
     def createRoadsEquations(self, string):
         self.horizontal_roads_m = []
         self.horizontal_roads_b = []
@@ -132,36 +159,33 @@ class Town:
         area_mod = self.wealth / 25
         map_unit_area = 5256
 
-        self.tavern_area =      30  * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.plumbing_area =    20  * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.market_area =      100 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.trade_area =       60  * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.inn_area =         30  * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.special_area =     100 * (1 + area_mod) * (self.map_area/map_unit_area)
-        self.empty_area =       20 * (self.map_area/map_unit_area)
+        self.tavern_area =   int(30  * (1 + area_mod) * (self.map_area/map_unit_area))
+        self.plumbing_area = int(20  * (1 + area_mod) * (self.map_area/map_unit_area))
+        self.market_area =   int(100 * (1 + area_mod) * (self.map_area/map_unit_area))
+        self.trade_area =    int(60  * (1 + area_mod) * (self.map_area/map_unit_area))
+        self.inn_area =      int(30  * (1 + area_mod) * (self.map_area/map_unit_area))
+        self.special_area =  int(100 * (1 + area_mod) * (self.map_area/map_unit_area))
+        self.empty_area =    int(20 * (self.map_area/map_unit_area))
 
-        housing_area =  int(self.map_area - self.tavern_area - self.plumbing_area -
-                            self.market_area - self.trade_area - self.inn_area -
-                            self.special_area - self.road_area -
-                            self.empty_area)
+        free_area =  int(self.map_area - self.tavern_area - self.plumbing_area -
+                         self.market_area - self.trade_area - self.inn_area -
+                         self.special_area - self.road_area - self.empty_area)
 
-        self.number_noble_house =  int(housing_area * (0.2 + self.wealth/25))
-        self.number_middle_house = int(housing_area * (0.4 + self.wealth/25))
-        self.number_poor_house =   (housing_area - self.number_noble_house -
-                                    self.number_middle_house)
+        self.number_noble_house =  int(free_area * (0.05 + self.wealth/100))
+        self.number_middle_house = int(free_area * (0.1 + self.wealth/100))
+        self.number_poor_house =   int((free_area - self.number_noble_house -
+                                        self.number_middle_house)*0.25)
 
-        """
         print()
         print('Noble area:\t', self.number_noble_house, '\t',
-              int(self.number_noble_house/housing_area * 100), '%')
+              int(self.number_noble_house/free_area * 100), '%')
 
         print('Middle area:\t', self.number_middle_house, '\t',
-              int(self.number_middle_house/housing_area * 100), '%')
+              int(self.number_middle_house/free_area * 100), '%')
 
         print('Poor area:\t', self.number_poor_house, '\t',
-              int(self.number_poor_house/housing_area * 100), '%')
+              int(self.number_poor_house/free_area * 100), '%')
         print()
-        """
 
     def generatePopulation(self, seed):
         pass
@@ -479,6 +503,34 @@ class Town:
 
         return available_block_types
 
+    def getHousePerBlock(self):
+        try:
+            n_house_per_block = self.number_noble_house / self.noble_blocks
+        except ZeroDivisionError:
+            n_house_per_block = 0
+
+        try:
+            m_house_per_block = self.number_middle_house / self.middle_blocks
+        except ZeroDivisionError:
+            m_house_per_block = 0
+
+        try:
+            p_house_per_block = self.number_poor_house / self.poor_blocks
+        except ZeroDivisionError:
+            p_house_per_block = 0
+
+        house_per_block = {'NobleHouse':n_house_per_block,
+                           'MiddleHouse':m_house_per_block,
+                           'PoorHouse':p_house_per_block}
+
+        return house_per_block
+
+    def getNewPoint(self, start_y, start_x, i):
+        move_x = self.placement_radius[i][0]
+        move_y = self.placement_radius[i][1]
+
+        return start_y + move_y, start_x + move_x
+
     def getStreetBlocks(self):
         self.block_list = []
 
@@ -499,53 +551,150 @@ class Town:
         pass
 
     def placeBuildings(self, string):
-        try:
-            n_house_per_block = self.number_noble_house / self.noble_blocks
-        except ZeroDivisionError:
-            n_house_per_block = 0
+        self.placed_nobles = 0
+        self.placed_middle = 0
+        self.placed_poor = 0
+        self.special_building_dict = {'tavern_idx':None, 'plumbing_idx':None,
+                                      'market_idx':None, 'trade_idx':None,
+                                      'inn_idx':None, 'special_idx':None}
 
-        try:
-            m_house_per_block = self.number_middle_house / self.middle_blocks
-        except ZeroDivisionError:
-            m_house_per_block = 0
+        house_per_block = self.getHousePerBlock()
 
-        try:
-            p_house_per_block = self.number_poor_house / self.poor_blocks
-        except ZeroDivisionError:
-            p_house_per_block = 0
+        # Assigning unique self.block_list indexes to special buildings
+        idx_list = []
+        while len(idx_list) < 6:
+            new_idx = int(seed.getRand()/9 * len(self.block_list) - 1)
+            if new_idx not in idx_list:
+                idx_list.append(new_idx)
 
-        house_per_block = {'NobleHouse':n_house_per_block,
-                           'MiddleHouse':m_house_per_block,
-                           'PoorHouse':p_house_per_block}
+        for i, building in enumerate(self.special_building_dict):
+            self.special_building_dict[building] = idx_list[i]
 
+        # Placing special buildings
+        for building, block_idx in self.special_building_dict.items():
+            block = self.block_list[block_idx]
+
+            if building == 'tavern_idx':
+                num_points = self.tavern_area
+                point_building = 'Tavern'
+            elif building == 'plumbing_idx':
+                num_points = self.plumbing_area
+                point_building = 'PublicPlumbing'
+            elif building == 'market_idx':
+                num_points = self.market_area
+                point_building = 'Market'
+            elif building == 'trade_idx':
+                num_points = self.trade_area
+                point_building = 'TradePost'
+            elif building == 'inn_idx':
+                num_points = self.inn_area
+                point_building = 'Inn'
+            elif building == 'special_idx':
+                if self.economy == 'Farm':
+                    point_building = 'Barn'
+                elif self.economy == 'Military':
+                    point_building = 'Barracks'
+                elif self.economy == 'Quarry':
+                    point_building = 'Mason'
+                elif self.economy == 'Metalworks':
+                    point_building = 'Blacksmith'
+                elif self.economy == 'Lumber':
+                    point_building = 'Lumbermill'
+                elif self.economy == 'Church':
+                    point_building = 'Cathedral'
+                elif self.economy == 'Textile':
+                    point_building = 'Weavery'
+                elif self.economy == 'Colosseum':
+                    point_building = 'Colosseum'
+                else:
+                    point_building = 'none'
+                    print(self.economy)
+                num_points = self.special_area
+            else:
+                num_points = 0
+                point_building = 'none'
+
+            # Get start point for special building
+            placed = False
+            while(not placed):
+                start_x = int((block.bot_right_x - block.top_left_x) *
+                            int(seed.getRand())/10 + block.top_left_x)
+                start_y = int((block.bot_right_y - block.top_left_y) *
+                            int(seed.getRand())/10 + block.top_left_y)
+
+                if self.pointGoodToUse(start_y, start_x, block):
+                    placed = True
+
+            self.map_points[start_y][start_x] = Building(point_building)
+
+            for i in range(num_points - 1):
+                placed = False
+                point_num = 0
+                while(not placed):
+                    point_y, point_x = self.getNewPoint(start_y, start_x, point_num)
+                    if self.pointGoodToUse(point_y, point_x, block):
+                        placed = True
+
+                    point_num = point_num + 1
+
+                self.map_points[point_y][point_x] = Building(point_building)
+
+        # Placing housing
         for i, block in enumerate(self.block_list):
             begin_x = int(((block.bot_right_x - block.top_left_x) *
-                          int(string[2*i])/9 + block.top_left_x))
+                          int(string[2*i])/10 + block.top_left_x))
             begin_y = int(((block.bot_right_y - block.top_left_y) *
-                          int(string[2*i + 1])/9 + block.top_left_y))
+                          int(string[2*i + 1])/10 + block.top_left_y))
 
             self.map_points[begin_y][begin_x] = Building(block.wealth)
             point_x = begin_x
             point_y = begin_y
 
             for j in range(int(house_per_block[block.wealth]) - 1):
-                if self.pointGoodToUse(point_y + 1, point_x, block):
-                    point_y = point_y + 1
+                point_y, point_x = self.placePoint(point_y, point_x,
+                                                   begin_y, begin_x, block)
 
-                elif self.pointGoodToUse(point_y, point_x - 1, block):
-                    point_x = point_x - 1
+    def placePoint(self, current_y, current_x, begin_x, begin_y, block):
+        if self.pointGoodToUse(current_y + 1, current_x, block):
+            place_x = current_x
+            place_y = current_y + 1
 
-                elif self.pointGoodToUse(point_y - 1, point_x, block):
-                    point_y = point_y - 1
+        elif self.pointGoodToUse(current_y, current_x - 1, block):
+            place_x = current_x - 1
+            place_y = current_y
 
-                elif self.pointGoodToUse(point_y, point_x + 1, block):
-                    point_x = point_x + 1
+        elif self.pointGoodToUse(current_y - 1, current_x, block):
+            place_x = current_x
+            place_y = current_y - 1
 
-                else:
-                    print('Didn\'t place a building on a map point!')
-                    continue
+        elif self.pointGoodToUse(current_y, current_x + 1, block):
+            place_x = current_x + 1
+            place_y = current_y
 
-                self.map_points[point_y][point_x] = Building(block.wealth)
+        else:
+            moved_current = False
+
+            while(not moved_current):
+                point_x = int((block.bot_right_x - block.top_left_x) *
+                            int(seed.getRand())/10 + block.top_left_x)
+                point_y = int((block.bot_right_y - block.top_left_y) *
+                            int(seed.getRand())/10 + block.top_left_y)
+
+                if self.pointGoodToUse(point_y, point_x, block):
+                    place_y = current_y = point_y
+                    place_x = current_x = point_x
+                    moved_current = True
+
+        self.map_points[place_y][place_x] = Building(block.wealth)
+
+        if block.wealth == 'NobleHouse':
+            self.placed_nobles = self.placed_nobles + 1
+        elif block.wealth == 'MiddleHouse':
+            self.placed_middle = self.placed_middle + 1
+        elif block.wealth == 'PoorHouse':
+            self.placed_poor = self.placed_poor + 1
+
+        return current_y, current_x
 
     def placeRoads(self):
         for point in self.map_points:

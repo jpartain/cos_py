@@ -2,11 +2,15 @@ from random import choice
 from string import digits
 
 from include.town import *
+import include.seed as seed
 
 def generateTown(random_seed):
     town = Town(random_seed)
 
     print('')
+    print('Nobles placed:\t', town.placed_nobles)
+    print('Middle placed:\t', town.placed_middle)
+    print('Poor placed:\t', town.placed_poor)
     print('Wealth:\t\t', town.wealth)
     print('Economy:\t', town.economy)
     print('Danger:\t\t', town.danger)
@@ -17,8 +21,8 @@ def generateTown(random_seed):
     town.printMapCorners()
 
 def main():
-    random_string = ''.join(choice(digits) for a in range(150))
-    generateTown(random_string)
+    seed.createSeed()
+    generateTown(seed.rand_seed)
 
     #input('Press enter to close this window.')
 
