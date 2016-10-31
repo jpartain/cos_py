@@ -38,7 +38,7 @@ class Town:
         self.placeBuildings(seed[22:22 + 16*2])
 
     def buildMap(self):
-        self.height = 25
+        self.height = 40
         self.width = 40
         self.road_area = 0
 
@@ -58,15 +58,11 @@ class Town:
                     self.road_area = self.road_area + 1
 
                 # A couple simple straight roads
-                if (x == int(width/2)) or (y == int(height/2)):
+                if (x == int(width/3)) or (y == int(height/3)):
                     building.building_type = 'Road'
                     self.road_area = self.road_area + 1
 
-                if (x == int(width/4)) or (y == int(height/4)):
-                    building.building_type = 'Road'
-                    self.road_area = self.road_area + 1
-
-                if (x == int(3*width/4)) or (y == int(3*height/4)):
+                if (x == int(2*width/3)) or (y == int(2*height/3)):
                     building.building_type = 'Road'
                     self.road_area = self.road_area + 1
 
@@ -673,8 +669,12 @@ class Town:
 
         else:
             moved_current = False
+            iteration = 0
 
             while(not moved_current):
+                if iteration > 100:
+                    return current_y, current_x
+
                 point_x = int((block.bot_right_x - block.top_left_x) *
                             int(seed.getRand())/10 + block.top_left_x)
                 point_y = int((block.bot_right_y - block.top_left_y) *
@@ -684,6 +684,8 @@ class Town:
                     place_y = current_y = point_y
                     place_x = current_x = point_x
                     moved_current = True
+
+                iteration = iteration + 1
 
         self.map_points[place_y][place_x] = Building(block.wealth)
 
