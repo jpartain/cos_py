@@ -1,3 +1,9 @@
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename = 'building.log', level = logging.DEBUG)
+
+
 CommonBuildings = ['Road',
                    'PoorHouse',
                    'MiddleHouse',
@@ -25,6 +31,7 @@ class Building:
         # self.generateOccupants(seed[3:20])
         self.building_type = building_type
         self.health = 100
+        self.people = []
 
     def generateSize(self, string):
         pass

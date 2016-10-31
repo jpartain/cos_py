@@ -1,6 +1,11 @@
 from include.building import Building
 from include.block import Block
 import include.seed as seed
+import include.person as person
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename = 'town.log', level = logging.DEBUG)
 
 
 TownEconomy = ['Farm',
@@ -16,26 +21,24 @@ TownEconomy = ['Farm',
 
 
 class Town:
-    def __init__(self, seed):
+    def __init__(self):
+        self.population = 0
         self.createPointPlacementRadius()
-        self.generatePopulation(seed[0])
-        self.generateWealth(seed[1])
-        self.generateEconomy(seed[2])
-        self.generateDanger(seed[3])
-        self.generateNobility(seed[4])
-        self.generateHomeless(seed[5])
 
+        self.generateWealth()
+        self.generateEconomy()
+        self.generateDanger()
+        self.generateNobility()
+        self.generateHomeless()
         self.buildMap()
         # self.generateMap(seed[6:25])
-
         self.generateBuildingRatios()
         self.getStreetBlocks()
-
         # self.createRoadsEquations(seed[25:126])
-
         # self.placeRoads()
-        self.fillStreetBlocks(seed[6:6 + 16])
-        self.placeBuildings(seed[22:22 + 16*2])
+        self.fillStreetBlocks()
+        self.placeBuildings()
+        self.createPopulation()
 
     def buildMap(self):
         self.height = 40
@@ -68,11 +71,60 @@ class Town:
 
                 self.map_points[y][x] = building
 
+    def createFamily(self, class):
+        family_name = person.createFamilyName()
+        family_size = seed.getRand() + 1
+
+        dice_roll = seed.getRand() + seed.getRand()
+        if family_size < 2:
+            if dice_roll <= 18/2:
+                # Single male in building
+                self.createPerson('Male', 'Child', 'Old', family_name)
+                self.increasePopulation(1)
+
+            else:
+                # Single female in building
+                self.createPerson('Female', 'Child', 'Old', family_name)
+                self.increasePopulation(1)
+
+        elif family_size < 3:
+            if dice_roll <= 18/4:
+                # Female + Male adults
+                pass
+
+            elif dice_roll <= 18/2:
+                # Mother + Children
+                pass
+
+            elif dice_roll <= 3*18/4:
+                # Father + Children
+                pass
+
+            else:
+                # Two kids
+                pass
+
+        for i in range(family_size):
+            create
+
     def createOpinions(self, string):
         pass
 
-    def createPerson(self, string):
+    def createPerson(self, gender, age_h_limit, age_l_limit, l_name):
         pass
+
+    def createPopulation(self):
+        for house in self.noble_houses:
+            family = self.createFamily('noble')
+            self.map_points[house.y][house.x].people = family
+
+        for house in self.middle_houses:
+            family = self.createFamily('middle')
+            self.map_points[house.y][house.x].people = family
+
+        for house in self.poor_houses:
+            family = self.createFamily('poor')
+            self.map_points[house.y][house.x].people = family
 
     def createPointPlacementRadius(self):
         self.placement_radius = []
@@ -144,11 +196,11 @@ class Town:
             self.vertical_roads_m.append(vertical_slope)
             self.vertical_roads_b.append(vertical_intercept)
 
-    def fillStreetBlocks(self, string):
+    def fillStreetBlocks(self):
         types_for_use = self.getAvailableBlocks()
 
-        for i, block in enumerate(self.block_list):
-            rand_select = int((len(types_for_use) - 1) * int(string[i])/9)
+        for block in self.block_list:
+            rand_select = int((len(types_for_use) - 1) * int(seed.getRand())/9)
             block.wealth = types_for_use.pop(rand_select)
 
     def generateBuildingRatios(self):
@@ -172,24 +224,19 @@ class Town:
         self.number_poor_house =   int((free_area - self.number_noble_house -
                                         self.number_middle_house)*0.25)
 
-        print()
-        print('Noble area:\t', self.number_noble_house, '\t',
-              int(self.number_noble_house/free_area * 100), '%')
+        logger.info('Noble area:\t', self.number_noble_house, '\t',
+                    int(self.number_noble_house/free_area * 100), '%')
 
-        print('Middle area:\t', self.number_middle_house, '\t',
-              int(self.number_middle_house/free_area * 100), '%')
+        logger.info('Middle area:\t', self.number_middle_house, '\t',
+                    int(self.number_middle_house/free_area * 100), '%')
 
-        print('Poor area:\t', self.number_poor_house, '\t',
-              int(self.number_poor_house/free_area * 100), '%')
-        print()
+        logger.info('Poor area:\t', self.number_poor_house, '\t',
+                    int(self.number_poor_house/free_area * 100), '%')
 
-    def generatePopulation(self, seed):
-        pass
+    def generateEconomy(self):
+        self.economy = TownEconomy[int(seed.getRand())]
 
-    def generateEconomy(self, string):
-        self.economy = TownEconomy[int(string)]
-
-    def generateDanger(self, string):
+    def generateDanger(self):
         if self.economy == 'Military':
             self.danger_mod = 0.4
         elif self.economy == 'Church':
@@ -199,10 +246,10 @@ class Town:
         else:
             self.danger_mod = 1
 
-        self.danger = int(self.danger_mod*int(string))
+        self.danger = int(self.danger_mod*int(seed.getRand()))
 
-    def generateHomeless(self, string):
-        self.settled_ratio = int(10*(int(string)/6 + self.wealth/2 + 7))
+    def generateHomeless(self):
+        self.settled_ratio = int(10*(int(seed.getRand())/6 + self.wealth/2 + 7))
 
     def generateMap(self, string):
         def grouped(iterable, n):
@@ -336,7 +383,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    print('ERROR: Unhandled draw_slope[] value')
+                                    logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x >= self.draw_segs[i][0].x:
                                     continue
@@ -370,7 +417,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    print('ERROR: Unhandled draw_slope[] value')
+                                    logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x <= self.draw_segs[i][0].x:
                                     continue
@@ -407,7 +454,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    print('ERROR: Unhandled draw_slope[] value')
+                                    logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x >= self.draw_segs[i][0].x:
                                     continue
@@ -441,7 +488,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    print('ERROR: Unhandled draw_slope[] value')
+                                    logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x <= self.draw_segs[i][0].x:
                                     continue
@@ -463,7 +510,7 @@ class Town:
                         self.map_points.append(point)
         self.map_area = len(self.map_points)
 
-    def generateNobility(self, string):
+    def generateNobility(self):
         if self.economy == 'Church':
             self.nobility_mod = 0.5
         elif self.economy == 'Military':
@@ -471,10 +518,10 @@ class Town:
         else:
             self.nobility_mod = 0.35
 
-        self.nobility = int(10*self.nobility_mod*int(string))
+        self.nobility = int(10*self.nobility_mod*int(seed.getRand()))
 
-    def generateWealth(self, string):
-        self.wealth = int(string) - 5
+    def generateWealth(self):
+        self.wealth = int(seed.getRand()) - 5
 
     def getAvailableBlocks(self):
         self.noble_blocks =  int(len(self.block_list) * self.number_noble_house /
@@ -543,10 +590,19 @@ class Town:
                 block = Block(top_left_x, top_left_y, bot_right_x, bot_right_y)
                 self.block_list.append(block)
 
+    def increasePopulation(self, num):
+        self.population = self.population + num
+
     def linkRelationships(self, string):
         pass
 
-    def placeBuildings(self, string):
+    def placeBuildings(self):
+        # List of MapPoints pointing to self.map_points[] which contains
+        # buildings and empty space
+        self.noble_houses = []
+        self.middle_houses = []
+        self.poor_houses = []
+
         self.placed_nobles = 0
         self.placed_middle = 0
         self.placed_poor = 0
@@ -604,11 +660,14 @@ class Town:
                     point_building = 'Colosseum'
                 else:
                     point_building = 'none'
-                    print(self.economy)
+                    logger.warning('Set building to {0} because town.economy is\
+                                   not recognized.'.format(point_building))
                 num_points = self.special_area
             else:
                 num_points = 0
                 point_building = 'none'
+                logger.warning('Set building to {0}, building type not\
+                               recognized.'.format(point_building))
 
             # Get start point for special building
             placed = False
@@ -638,9 +697,9 @@ class Town:
         # Placing housing
         for i, block in enumerate(self.block_list):
             begin_x = int(((block.bot_right_x - block.top_left_x) *
-                          int(string[2*i])/10 + block.top_left_x))
+                          int(seed.getRand())/10 + block.top_left_x))
             begin_y = int(((block.bot_right_y - block.top_left_y) *
-                          int(string[2*i + 1])/10 + block.top_left_y))
+                          int(seed.getRand())/10 + block.top_left_y))
 
             self.map_points[begin_y][begin_x] = Building(block.wealth)
             point_x = begin_x
@@ -691,10 +750,13 @@ class Town:
 
         if block.wealth == 'NobleHouse':
             self.placed_nobles = self.placed_nobles + 1
+            self.noble_houses.append(MapPoint(place_x, place_y))
         elif block.wealth == 'MiddleHouse':
             self.placed_middle = self.placed_middle + 1
+            self.middle_houses.append(MapPoint(place_x, place_y))
         elif block.wealth == 'PoorHouse':
             self.placed_poor = self.placed_poor + 1
+            self.poor_houses.append(MapPoint(place_x, place_y))
 
         return current_y, current_x
 
@@ -752,8 +814,9 @@ class Town:
 
 
 class MapPoint:
-    def __init__(self):
-        self.building = '*'
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
     def __str__(self):
         return '({0}, {1})'.format(self.x, self.y)

@@ -10,4 +10,4 @@ def getRand():
 
 def createSeed():
     global rand_seed
-    rand_seed = ''.join(choice(digits) for a in range(150))
+    rand_seed = ''

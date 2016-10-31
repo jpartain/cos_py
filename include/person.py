@@ -1,169 +1,139 @@
-from enum import Enum
+import linecache
+import logging
+import include.seed as seed
 
-Age = Enum('Age',
-           'Baby'
-           'Child'
-           'Teenager'
-           'YoungAdult'
-           'Adult'
-           'MiddleAge'
-           'Old')
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename = 'person.log', level = logging.DEBUG)
 
-Gender = Enum('Gender',
-              'Female'
-              'Male')
 
-Relationship = Enum('Relationship',
-                    'Wife'
-                    'Husband'
-                    'Daughter'
-                    'Son'
-                    'Father'
-                    'Mother'
-                    'Sister'
-                    'Brother'
-                    'Aunt'
-                    'Uncle'
-                    'Grandmother'
-                    'Grandfather'
-                    'Cousin'
-                    'Mistress'
-                    'Mister'
-                    'B_Son'
-                    'B_Daughter')
+Age = ['Baby',
+       'Child',
+       'Teenager'
+       'YoungAdult',
+       'Adult',
+       'MiddleAge',
+       'Old']
 
-Title = Enum('Title',
-             'King'
-             'Queen'
-             'Prince'
-             'Princess'
-             'Servant'
-             'Priest'
-             'Acolyte'
-             'Knight'
-             'Squire'
-             'Soldier'
-             'Farmer'
-             'RockMason'
-             'Smithy'
-             'Lumberjack'
-             'Weaver'
-             'Bartender'
-             'Waiter'
-             'Waitress'
-             'Janitor'
-             'Trader'
-             'Seller'
-             'Manager'
-             'Foreman')
+Gender = ['Female',
+          'Male']
+
+Relationship = ['Wife',
+                'Husband',
+                'Daughter',
+                'Son',
+                'Father',
+                'Mother',
+                'Sister'
+                'Brother',
+                'Aunt',
+                'Uncle',
+                'Grandmother',
+                'Grandfather',
+                'Cousin',
+                'Mistress',
+                'Mister',
+                'B_Son',
+                'B_Daughter']
+
+Title = ['Mayor'
+         'Official',
+         'Prince',
+         'Princess',
+         'Servant',
+         'Priest',
+         'Acolyte',
+         'Knight',
+         'Squire',
+         'Soldier',
+         'Farmer',
+         'RockMason'
+         'Smithy',
+         'Lumberjack',
+         'Weaver',
+         'Bartender',
+         'Waiter',
+         'Waitress',
+         'Janitor',
+         'Trader',
+         'Seller',
+         'Manager',
+         'Foreman']
+
+def createFamilyName(self):
+    name_idx = int((seed.getRand() * seed.getRand() * seed.getRand() *
+                    seed.getRand() * seed.getRand() * seed.getRand()) /
+                    531441 * len(names))
+
+    name = linecache.getline('names/last', name_idx)
+    linecache.clearcache()
+
+    return name
+
 
 class Person:
-    def __init__(self, happiness, hunger, approval, fulfillment, fame, consensus,
-                       age, honesty, toughness, gender, relations, opinion_of_others,
+    def __init__(self, wealth, approval, fulfillment, fame, consensus,
+                       age, integrity, toughness, gender, relations, opinion_of_others,
                        job_title, inventory):
-        self.happiness = happiness
-        self.hunger = hunger
-        self.approval = approval
-        self.fulfillment = fulfillment
-        self.fame = fame
-        self.consensus = consensus
-        self.age = age
-        self.honesty = honesty
-        self.toughness = toughness
-        self.gender = gender
-        self.relations = relations
-        self.opinion_of_others = opinion_of_others
-        self.job_title = job_title
-        self.inventory = inventory
-
-    def setHappiness(self, happiness):
-        self.happiness = happiness
-
-    def setHunger(self, hunger):
-        self.hunger = hunger
-
-    def setApproval(self, approval):
-        self.approval = approval
-
-    def setFulfillment(self, fulfillment):
-        self.fulfillment = fulfillment
-
-    def setFame(self, fame):
-        self.fame = fame
-
-    def setConsensus(self, consensus):
-        self.consensus = consensus
-
-    def setAge(self, age):
-        self.age = age
-
-    def setHonesty(self, honesty):
-        self.honesty = honesty
-
-    def setToughness(self, toughness):
-        self.toughness = toughness
-
-    def setGender(self, gender):
-        self.gender = gender
+        self.wealth = 0
+        self.approval = 0
+        self.fulfillment = 0
+        self.fame = 0
+        self.consensus = 0
+        self.age = ''
+        self.integrity = 0
+        self.toughness = 0
+        self.gender = ''
+        self.relations = []
+        self.opinion_of_others = []
+        self.job_title = ''
+        self.inventory = []
+        self.family_name = ''
+        self.name = ''
 
     def addRelation(self, relationship, person):
         # self.relations.append(relationship, person) tuple probably
+        pass
+
+    def getFame(self):
+        pass
+
+    def getInventory(self):
+        pass
+
+    def getOpinion(self, person):
+        return self.opinion_of_others.person
+
+    def putItem(self, item):
+        # self.inventory.append(item)
         pass
 
     def removeRelation(self, person):
         # self.relations.delete(person)
         pass
 
+    def setName(self):
+        if self.gender == 'Female':
+            name_file = 'names/female'
+        elif self.gender == 'Male':
+            name_file = 'names/male'
+        else:
+            name_file = 'names/female'
+            logger.warning('Set name gender to female because Person.gender not set.')
+
+        name_idx = int((seed.getRand() * seed.getRand() * seed.getRand() *
+                        seed.getRand()) / 6561 * len(names))
+
+        self.name = linecache.getline(name_file, name_idx)
+        linecache.clearcache()
+
     def setOpinion(self, person, opinion):
         # self.opinion_of_others.person = opinion
-        pass
-
-    def setTitle(self, title):
-        self.title = title
-
-    def putItem(self, item):
-        # self.inventory.append(item)
         pass
 
     def takeItem(self, item):
         # self.inventory.decrease/delete(item
         pass
 
-    def getHappiness(self):
-        return self.happiness
+    def updateConsensus(self):
+        pass
 
-    def getHunger(self):
-        return self.hunger
-
-    def getApproval(self):
-        return self.approval
-
-    def getFulfillment(self):
-        return self.fulfillment
-
-    def getFame(self):
-        return self.fame
-
-    def getConsensus(self):
-        return self.consensus
-
-    def getAge(self):
-        return self.age
-
-    def getHonesty(self):
-        return self.honesty
-
-    def getToughness(self):
-        return self.toughness
-
-    def getRelations(self):
-        return self.relations
-
-    def getOpinion(self, person):
-        return self.opinion_of_others.person
-
-    def getTitle(self):
-        return self.title
-
-    def getInventory(self):
-        return self.inventory
