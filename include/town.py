@@ -40,6 +40,74 @@ class Town:
         self.placeBuildings()
         self.createPopulation()
 
+    def buildFamilyTree(self, l_name, wealth):
+        family_list = []
+
+        old_generation = []
+        mid_generation = []
+        yng_generation = []
+
+        # Generate old_generation
+        for i in range(10):
+            old = person.Person()
+            old.age = 'Old'
+
+            if seed.getRand() > 4:
+                old.gender = 'Male'
+            else:
+                old.gender = 'Female'
+
+            old.setName()
+            old.family_name = l_name
+            old.wealth = wealth
+
+            old_generation.append(old)
+
+        # Generate mid_generation
+        for i in range(15):
+            mid = person.Person()
+
+            if seed.getRand() > 4:
+                mid.age = 'Adult'
+            else:
+                mid.age = 'YoungAdult'
+
+            if seed.getRand() > 4:
+                mid.gender = 'Male'
+            else:
+                mid.gender = 'Female'
+
+            mid.setName()
+            mid.family_name = l_name
+            mid.wealth = wealth
+
+            mid_generation.append(old)
+
+        # Generate yng_generation
+        for i in range(20):
+            yng = person.Person()
+
+            dice_roll = seed.getRand()
+            if dice_roll > 6:
+                yng.age = 'Teenager'
+            elif dice_roll > 3:
+                yng.age = 'Child'
+            else:
+                yng.age = 'Baby'
+
+            if seed.getRand() > 4:
+                yng.gender = 'Male'
+            else:
+                yng.gender = 'Female'
+
+            yng.setName()
+            yng.family_name = l_name
+            yng.wealth = wealth
+
+            yng_generation.append(old)
+
+        return family_list
+
     def buildMap(self):
         self.height = 40
         self.width = 40
@@ -71,46 +139,17 @@ class Town:
 
                 self.map_points[y][x] = building
 
-    def createFamily(self, class):
+    def createFamily(self, wealth):
+        family = []
         family_name = person.createFamilyName()
         family_size = seed.getRand() + 1
 
-        dice_roll = seed.getRand() + seed.getRand()
-        if family_size < 2:
-            if dice_roll <= 18/2:
-                # Single male in building
-                self.createPerson('Male', 'Child', 'Old', family_name)
-                self.increasePopulation(1)
+        self.increasePopulation(family_size)
+        unpruned_family_list = self.buildFamilyTree(family_name, wealth)
 
-            else:
-                # Single female in building
-                self.createPerson('Female', 'Child', 'Old', family_name)
-                self.increasePopulation(1)
-
-        elif family_size < 3:
-            if dice_roll <= 18/4:
-                # Female + Male adults
-                pass
-
-            elif dice_roll <= 18/2:
-                # Mother + Children
-                pass
-
-            elif dice_roll <= 3*18/4:
-                # Father + Children
-                pass
-
-            else:
-                # Two kids
-                pass
-
-        for i in range(family_size):
-            create
+        return family
 
     def createOpinions(self, string):
-        pass
-
-    def createPerson(self, gender, age_h_limit, age_l_limit, l_name):
         pass
 
     def createPopulation(self):
@@ -224,6 +263,7 @@ class Town:
         self.number_poor_house =   int((free_area - self.number_noble_house -
                                         self.number_middle_house)*0.25)
 
+        '''
         logger.info('Noble area:\t', self.number_noble_house, '\t',
                     int(self.number_noble_house/free_area * 100), '%')
 
@@ -232,6 +272,7 @@ class Town:
 
         logger.info('Poor area:\t', self.number_poor_house, '\t',
                     int(self.number_poor_house/free_area * 100), '%')
+        '''
 
     def generateEconomy(self):
         self.economy = TownEconomy[int(seed.getRand())]
@@ -592,9 +633,6 @@ class Town:
 
     def increasePopulation(self, num):
         self.population = self.population + num
-
-    def linkRelationships(self, string):
-        pass
 
     def placeBuildings(self):
         # List of MapPoints pointing to self.map_points[] which contains

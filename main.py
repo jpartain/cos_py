@@ -2,8 +2,9 @@ import include.town as town
 import include.seed as seed
 
 def generateTown():
-    new_town = Town()
+    new_town = town.Town()
 
+    '''
     print('')
     print('Nobles placed:\t', new_town.placed_nobles)
     print('Middle placed:\t', new_town.placed_middle)
@@ -16,6 +17,7 @@ def generateTown():
     print('')
 
     new_town.printMapCorners()
+    '''
 
 def main():
     seed.createSeed()

@@ -8,16 +8,20 @@ Age	include/person.py	/^Age = ['Baby',$/;"	v
 Block	include/block.py	/^class Block:$/;"	c
 Building	include/building.py	/^class Building:$/;"	c
 CommonBuildings	include/building.py	/^CommonBuildings = ['Road',$/;"	v
+F_Match_Relations	include/person.py	/^F_Match_Relations = ['Wife',$/;"	v
 Gender	include/person.py	/^Gender = ['Female',$/;"	v
+M_Match_Relations	include/person.py	/^M_Match_Relations = ['Husband',$/;"	v
 MapPoint	include/town.py	/^class MapPoint:$/;"	c
 Person	include/person.py	/^class Person:$/;"	c
-Relationship	include/person.py	/^Relationship = ['Wife',$/;"	v
+Relation	include/person.py	/^class Relation:$/;"	c
+Relations	include/person.py	/^Relations = ['Wife',$/;"	v
 SpecialBuildings	include/building.py	/^SpecialBuildings = ['Barn',$/;"	v
 Title	include/person.py	/^Title = ['Mayor'$/;"	v
 Town	include/town.py	/^class Town:$/;"	c
 TownEconomy	include/town.py	/^TownEconomy = ['Farm',$/;"	v
 __init__	include/block.py	/^    def __init__(self, top_left_x, top_left_y, bot_right_x, bot_right_y):$/;"	m	class:Block
 __init__	include/building.py	/^    def __init__(self, building_type):$/;"	m	class:Building
+__init__	include/person.py	/^    def __init__(self, name, relationship):$/;"	m	class:Relation
 __init__	include/person.py	/^    def __init__(self, wealth, approval, fulfillment, fame, consensus,$/;"	m	class:Person
 __init__	include/town.py	/^    def __init__(self):$/;"	m	class:Town
 __init__	include/town.py	/^    def __init__(self, x, y):$/;"	m	class:MapPoint
@@ -27,7 +31,7 @@ __repr__	include/town.py	/^    def __repr__(self):$/;"	m	class:MapPoint	file:
 __str__	include/block.py	/^    def __str__(self):$/;"	m	class:Block	file:
 __str__	include/building.py	/^    def __str__(self):$/;"	m	class:Building	file:
 __str__	include/town.py	/^    def __str__(self):$/;"	m	class:MapPoint	file:
-addRelation	include/person.py	/^    def addRelation(self, relationship, person):$/;"	m	class:Person
+alreadyHasRelation	include/person.py	/^    def alreadyHasRelation(self, person, match):$/;"	m	class:Person
 buildMap	include/town.py	/^    def buildMap(self):$/;"	m	class:Town
 createFamily	include/town.py	/^    def createFamily(self, class):$/;"	m	class:Town
 createFamilyName	include/person.py	/^def createFamilyName(self):$/;"	f
@@ -58,7 +62,8 @@ getOpinion	include/person.py	/^    def getOpinion(self, person):$/;"	m	class:Per
 getRand	include/seed.py	/^def getRand():$/;"	f
 getStreetBlocks	include/town.py	/^    def getStreetBlocks(self):$/;"	m	class:Town
 grouped	include/town.py	/^        def grouped(iterable, n):$/;"	f	function:Town.generateMap
-linkRelationships	include/town.py	/^    def linkRelationships(self, string):$/;"	m	class:Town
+increasePopulation	include/town.py	/^    def increasePopulation(self, num):$/;"	m	class:Town
+linkRelationships	include/town.py	/^    def linkRelationships(self, family):$/;"	m	class:Town
 logger	include/building.py	/^logger = logging.getLogger(__name__)$/;"	v
 logger	include/person.py	/^logger = logging.getLogger(__name__)$/;"	v
 logger	include/town.py	/^logger = logging.getLogger(__name__)$/;"	v
