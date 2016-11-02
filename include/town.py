@@ -5,8 +5,6 @@ import include.person as person
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename = 'town.log', level = logging.DEBUG)
-
 
 TownEconomy = ['Farm',
                'Mine',
@@ -16,7 +14,6 @@ TownEconomy = ['Farm',
                'Lumber',
                'Church',
                'Textile',
-               'Tavern',
                'Colosseum']
 
 
@@ -105,6 +102,12 @@ class Town:
             yng.wealth = wealth
 
             yng_generation.append(old)
+
+        family_list.append(old_generation)
+        family_list.append(mid_generation)
+        family_list.append(yng_generation)
+
+        family_list = self.linkFamilyRelations(family_list)
 
         return family_list
 
@@ -275,7 +278,11 @@ class Town:
         '''
 
     def generateEconomy(self):
-        self.economy = TownEconomy[int(seed.getRand())]
+        dice_roll = seed.getRand()
+        if dice_roll == 9:
+            dice_roll = 5
+
+        self.economy = TownEconomy[dice_roll]
 
     def generateDanger(self):
         if self.economy == 'Military':
@@ -634,6 +641,76 @@ class Town:
     def increasePopulation(self, num):
         self.population = self.population + num
 
+    def linkFamilyRelations(self, family):
+        possible_indices = [i for i in range(10)]
+        pair = []
+        num_old_relations = 4
+
+        for i in range(num_old_relations * 2):
+            pair.append(possible_indices.pop(int(seed.getRand() / 9 *
+                                                 (len(possible_indices) - 1))))
+
+            if i % 2 != 0:
+                if seed.getRand() > 4:
+
+                    # Marry
+                    l_person = family[0][pair[0]]
+                    r_person = family[0][pair[1]]
+
+                    if r_person.gender == 'Male':
+                        l_relation_type = 'Husband'
+                    else:
+                        l_relation_type = 'Wife'
+
+                    if l_person.gender == 'Male':
+                        r_relation_type = 'Husband'
+                    else:
+                        r_relation_type = 'Wife'
+
+                    l_person.relation_names.append(r_person.name)
+                    l_person.relations.append(l_relation_type)
+                    r_person.relation_names.append(l_person.name)
+                    r_person.relations.append(r_relation_type)
+
+                pair.pop()
+                pair.pop()
+
+        possible_indices = [i for i in range(15)]
+        possible_old_indices = [i for i in range(10)]
+        pair = []
+        num_mid_relations = 15
+
+        for i in range(num_mid_relations):
+            # Mid generation person
+            first = possible_indices.pop(int(seed.getRand() / 9 *
+                                             (len(possible_indices) - 1)))
+            # Old person
+            second = possible_old_indices[int(seed.getRand() / 9 *
+                                              (len(possible_old_indices) - 1))]
+            if seed.getRand() > 4:
+
+                # Son/Daughter Father/Mother relation
+                l_person = family[1][first]
+                r_person = family[0][second]
+
+                if l_person.gender == 'Male':
+                    l_relation_type = 'Son'
+                else:
+                    l_relation_type = 'Daughter'
+
+                if r_person.gender == 'Male':
+                    r_relation_type = 'Father'
+                else:
+                    r_relation_type = 'Mother'
+
+                l_person.addRelation(r_person.name, r_relation_type)
+                r_person.addRelation(l_person.name, l_relation_type)
+
+                print(r_person.name, r_person.family_name, r_relation_type)
+                print(l_person.name, l_person.family_name, l_relation_type)
+
+        return family
+
     def placeBuildings(self):
         # List of MapPoints pointing to self.map_points[] which contains
         # buildings and empty space
@@ -698,14 +775,14 @@ class Town:
                     point_building = 'Colosseum'
                 else:
                     point_building = 'none'
-                    logger.warning('Set building to {0} because town.economy is\
-                                   not recognized.'.format(point_building))
+                    logger.warning('Set building to {0} because town.economy {1} is not recognized.'
+                                   .format(point_building, self.economy))
                 num_points = self.special_area
             else:
                 num_points = 0
                 point_building = 'none'
-                logger.warning('Set building to {0}, building type not\
-                               recognized.'.format(point_building))
+                logger.warning('Set building to {0}, building type not recognized.'
+                               .format(point_building))
 
             # Get start point for special building
             placed = False

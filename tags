@@ -21,8 +21,8 @@ Town	include/town.py	/^class Town:$/;"	c
 TownEconomy	include/town.py	/^TownEconomy = ['Farm',$/;"	v
 __init__	include/block.py	/^    def __init__(self, top_left_x, top_left_y, bot_right_x, bot_right_y):$/;"	m	class:Block
 __init__	include/building.py	/^    def __init__(self, building_type):$/;"	m	class:Building
+__init__	include/person.py	/^    def __init__(self):$/;"	m	class:Person
 __init__	include/person.py	/^    def __init__(self, name, relationship):$/;"	m	class:Relation
-__init__	include/person.py	/^    def __init__(self, wealth, approval, fulfillment, fame, consensus,$/;"	m	class:Person
 __init__	include/town.py	/^    def __init__(self):$/;"	m	class:Town
 __init__	include/town.py	/^    def __init__(self, x, y):$/;"	m	class:MapPoint
 __repr__	include/block.py	/^    def __repr__(self):$/;"	m	class:Block	file:
@@ -32,15 +32,17 @@ __str__	include/block.py	/^    def __str__(self):$/;"	m	class:Block	file:
 __str__	include/building.py	/^    def __str__(self):$/;"	m	class:Building	file:
 __str__	include/town.py	/^    def __str__(self):$/;"	m	class:MapPoint	file:
 alreadyHasRelation	include/person.py	/^    def alreadyHasRelation(self, person, match):$/;"	m	class:Person
+buildFamilyTree	include/town.py	/^    def buildFamilyTree(self, l_name, wealth):$/;"	m	class:Town
 buildMap	include/town.py	/^    def buildMap(self):$/;"	m	class:Town
-createFamily	include/town.py	/^    def createFamily(self, class):$/;"	m	class:Town
-createFamilyName	include/person.py	/^def createFamilyName(self):$/;"	f
+createFamily	include/town.py	/^    def createFamily(self, wealth):$/;"	m	class:Town
+createFamilyName	include/person.py	/^def createFamilyName():$/;"	f
 createOpinions	include/town.py	/^    def createOpinions(self, string):$/;"	m	class:Town
-createPerson	include/town.py	/^    def createPerson(self, gender, age_h_limit, age_l_limit, l_name):$/;"	m	class:Town
 createPointPlacementRadius	include/town.py	/^    def createPointPlacementRadius(self):$/;"	m	class:Town
 createPopulation	include/town.py	/^    def createPopulation(self):$/;"	m	class:Town
 createRoadsEquations	include/town.py	/^    def createRoadsEquations(self, string):$/;"	m	class:Town
 createSeed	include/seed.py	/^def createSeed():$/;"	f
+f_names	include/person.py	/^    f_names = f.read().splitlines()$/;"	v
+f_names_len	include/person.py	/^f_names_len = len(f_names)$/;"	v
 fillStreetBlocks	include/town.py	/^    def fillStreetBlocks(self):$/;"	m	class:Town
 generateBuildingRatios	include/town.py	/^    def generateBuildingRatios(self):$/;"	m	class:Town
 generateDanger	include/town.py	/^    def generateDanger(self):$/;"	m	class:Town
@@ -63,10 +65,15 @@ getRand	include/seed.py	/^def getRand():$/;"	f
 getStreetBlocks	include/town.py	/^    def getStreetBlocks(self):$/;"	m	class:Town
 grouped	include/town.py	/^        def grouped(iterable, n):$/;"	f	function:Town.generateMap
 increasePopulation	include/town.py	/^    def increasePopulation(self, num):$/;"	m	class:Town
-linkRelationships	include/town.py	/^    def linkRelationships(self, family):$/;"	m	class:Town
+l_names	include/person.py	/^    l_names = f.read().splitlines()$/;"	v
+l_names_len	include/person.py	/^l_names_len = len(l_names)$/;"	v
+linkFamilyRelations	include/town.py	/^    def linkFamilyRelations(self, family):$/;"	m	class:Town
 logger	include/building.py	/^logger = logging.getLogger(__name__)$/;"	v
 logger	include/person.py	/^logger = logging.getLogger(__name__)$/;"	v
 logger	include/town.py	/^logger = logging.getLogger(__name__)$/;"	v
+logger	main.py	/^logger = logging.getLogger(__name__)$/;"	v
+m_names	include/person.py	/^    m_names = f.read().splitlines()$/;"	v
+m_names_len	include/person.py	/^m_names_len = len(m_names)$/;"	v
 main	main.py	/^def main():$/;"	f
 placeBuildings	include/town.py	/^    def placeBuildings(self):$/;"	m	class:Town
 placePoint	include/town.py	/^    def placePoint(self, current_y, current_x, begin_x, begin_y, block):$/;"	m	class:Town
@@ -75,6 +82,7 @@ pointGoodToUse	include/town.py	/^    def pointGoodToUse(self, point_y, point_x, 
 printMapCorners	include/town.py	/^    def printMapCorners(self):$/;"	m	class:Town
 putItem	include/person.py	/^    def putItem(self, item):$/;"	m	class:Person
 removeRelation	include/person.py	/^    def removeRelation(self, person):$/;"	m	class:Person
+setAge	include/person.py	/^    def setAge(self, low, high):$/;"	m	class:Person
 setName	include/person.py	/^    def setName(self):$/;"	m	class:Person
 setOpinion	include/person.py	/^    def setOpinion(self, person, opinion):$/;"	m	class:Person
 takeItem	include/person.py	/^    def takeItem(self, item):$/;"	m	class:Person

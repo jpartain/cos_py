@@ -1,9 +1,7 @@
-import linecache
 import logging
 import include.seed as seed
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename = 'person.log', level = logging.DEBUG)
 
 
 Age = ['Baby',
@@ -106,19 +104,29 @@ Title = ['Mayor'
          'Manager',
          'Foreman']
 
+with open('names/last', 'r') as f:
+    l_names = f.read().splitlines()
+with open('names/female', 'r') as f:
+    f_names = f.read().splitlines()
+with open('names/male', 'r') as f:
+    m_names = f.read().splitlines()
+
+l_names_len = len(l_names)
+f_names_len = len(f_names)
+m_names_len = len(m_names)
+
 def createFamilyName():
-    with open('names/last', 'r') as f:
-        names_length = len(f.readlines())
+    num1 = seed.getRand() + 1
+    num2 = seed.getRand() + 1
+    num3 = seed.getRand() + 1
+    num4 = seed.getRand() + 1
+    num5 = seed.getRand() + 1
+    num6 = seed.getRand() + 1
 
-    name_idx = int((seed.getRand() * seed.getRand() * seed.getRand() *
-                    seed.getRand() * seed.getRand() * seed.getRand()) /
-                    531441 * names_length)
+    name_idx = int(num1 * num2 * num3 * num4 * num5 * num6 /
+                    1000000 * (l_names_len - 1))
 
-    name = linecache.getline('names/last', name_idx)
-    linecache.clearcache()
-
-    return name
-
+    return l_names[name_idx]
 
 class Person:
     def __init__(self):
@@ -131,12 +139,17 @@ class Person:
         self.integrity = 0
         self.toughness = 0
         self.gender = ''
-        self.relations = []
         self.opinion_of_others = []
         self.job_title = ''
         self.inventory = []
         self.family_name = ''
         self.name = ''
+        self.relation_names = []
+        self.relations = []
+
+    def addRelation(self, name, relation):
+        self.relation_names.append(name)
+        self.relations.append(relation)
 
     def alreadyHasRelation(self, person, match):
         for relation in person.relations:
@@ -170,21 +183,24 @@ class Person:
 
     def setName(self):
         if self.gender == 'Female':
-            name_file = 'names/female'
+            name_file = f_names
+            length = f_names_len
         elif self.gender == 'Male':
-            name_file = 'names/male'
+            name_file = m_names
+            length = m_names_len
         else:
-            name_file = 'names/female'
+            name_file = f_names
+            length = f_names_len
             logger.warning('Set name gender to female because Person.gender not set.')
 
-        with open(name_file, 'r') as f:
-            names_length = len(f.readlines())
+        num1 = seed.getRand() + 1
+        num2 = seed.getRand() + 1
+        num3 = seed.getRand() + 1
+        num4 = seed.getRand() + 1
 
-        name_idx = int((seed.getRand() * seed.getRand() * seed.getRand() *
-                        seed.getRand()) / 6561 * names_length)
+        name_idx = int((num1 * num2 * num3 * num4) / 10000 * (length - 1))
 
-        self.name = linecache.getline(name_file, name_idx)
-        linecache.clearcache()
+        self.name = name_file[name_idx]
 
     def setOpinion(self, person, opinion):
         # self.opinion_of_others.person = opinion

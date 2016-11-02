@@ -1,5 +1,10 @@
+import logging
 import include.town as town
 import include.seed as seed
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename = 'info.log', level = logging.DEBUG)
+
 
 def generateTown():
     new_town = town.Town()
