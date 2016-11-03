@@ -14,8 +14,7 @@ Age = ['Baby',
 Gender = ['Female',
           'Male']
 
-Relations = ['Wife',
-             'Husband',
+Relations = ['Spouse',
              'Daughter',
              'Son',
              'Granddaughter',
@@ -35,50 +34,6 @@ Relations = ['Wife',
              'Mister',
              'B_Son',
              'B_Daughter']
-
-M_Match_Relations = ['Husband',
-                     'Husband',
-                     'Father',
-                     'Father',
-                     'Grandfather',
-                     'Grandfather',
-                     'Uncle',
-                     'Uncle',
-                     'Son',
-                     'Son',
-                     'Brother',
-                     'Brother',
-                     'Nephew',
-                     'Nephew',
-                     'Grandson',
-                     'Grandson',
-                     'Cousin',
-                     'Mister',
-                     'Mister',
-                     'Father',
-                     'Father']
-
-F_Match_Relations = ['Wife',
-                     'Wife',
-                     'Mother',
-                     'Mother',
-                     'Grandmother',
-                     'Grandmother',
-                     'Aunt',
-                     'Aunt',
-                     'Daughter',
-                     'Daughter',
-                     'Sister',
-                     'Sister',
-                     'Niece',
-                     'Niece',
-                     'Granddaughter',
-                     'Granddaughter',
-                     'Cousin',
-                     'Mistress',
-                     'Mistress',
-                     'Mother',
-                     'Mother']
 
 Title = ['Mayor'
          'Official',
@@ -144,16 +99,16 @@ class Person:
         self.inventory = []
         self.family_name = ''
         self.name = ''
-        self.relation_names = []
+        self.relation_persons = []
         self.relations = []
 
-    def addRelation(self, name, relation):
-        self.relation_names.append(name)
+    def addRelation(self, person, relation):
+        self.relation_persons.append(person)
         self.relations.append(relation)
 
-    def alreadyHasRelation(self, person, match):
-        for relation in person.relations:
-            if relation.name == match.name:
+    def alreadyHasRelation(self, person):
+        for relation in self.relation_persons:
+            if relation == person:
                 return True
             else:
                 continue
@@ -212,6 +167,12 @@ class Person:
 
     def updateConsensus(self):
         pass
+
+    def __str__(self):
+        return '{0} {1}'.format(self.name, self.family_name)
+
+    def __repr__(self):
+        return '{0} {1}'.format(self.name, self.family_name)
 
 
 class Relation:

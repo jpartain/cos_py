@@ -78,7 +78,7 @@ class Town:
             mid.family_name = l_name
             mid.wealth = wealth
 
-            mid_generation.append(old)
+            mid_generation.append(mid)
 
         # Generate yng_generation
         for i in range(20):
@@ -101,7 +101,7 @@ class Town:
             yng.family_name = l_name
             yng.wealth = wealth
 
-            yng_generation.append(old)
+            yng_generation.append(mid)
 
         family_list.append(old_generation)
         family_list.append(mid_generation)
@@ -646,31 +646,20 @@ class Town:
         pair = []
         num_old_relations = 4
 
+        # Old person marriages
         for i in range(num_old_relations * 2):
             pair.append(possible_indices.pop(int(seed.getRand() / 9 *
                                                  (len(possible_indices) - 1))))
 
             if i % 2 != 0:
                 if seed.getRand() > 4:
-
-                    # Marry
                     l_person = family[0][pair[0]]
                     r_person = family[0][pair[1]]
 
-                    if r_person.gender == 'Male':
-                        l_relation_type = 'Husband'
-                    else:
-                        l_relation_type = 'Wife'
+                    relation_type = 'Spouse'
 
-                    if l_person.gender == 'Male':
-                        r_relation_type = 'Husband'
-                    else:
-                        r_relation_type = 'Wife'
-
-                    l_person.relation_names.append(r_person.name)
-                    l_person.relations.append(l_relation_type)
-                    r_person.relation_names.append(l_person.name)
-                    r_person.relations.append(r_relation_type)
+                    l_person.addRelation(r_person, relation_type)
+                    r_person.addRelation(l_person, relation_type)
 
                 pair.pop()
                 pair.pop()
@@ -678,9 +667,10 @@ class Town:
         possible_indices = [i for i in range(15)]
         possible_old_indices = [i for i in range(10)]
         pair = []
-        num_mid_relations = 15
+        num_mid_to_old_relations = 10
 
-        for i in range(num_mid_relations):
+        # Father/Mother -> Son/Daughter from Old to Mid
+        for i in range(num_mid_to_old_relations):
             # Mid generation person
             first = possible_indices.pop(int(seed.getRand() / 9 *
                                              (len(possible_indices) - 1)))
@@ -688,8 +678,6 @@ class Town:
             second = possible_old_indices[int(seed.getRand() / 9 *
                                               (len(possible_old_indices) - 1))]
             if seed.getRand() > 4:
-
-                # Son/Daughter Father/Mother relation
                 l_person = family[1][first]
                 r_person = family[0][second]
 
@@ -703,11 +691,34 @@ class Town:
                 else:
                     r_relation_type = 'Mother'
 
-                l_person.addRelation(r_person.name, r_relation_type)
-                r_person.addRelation(l_person.name, l_relation_type)
+                l_person.addRelation(r_person, r_relation_type)
+                r_person.addRelation(l_person, l_relation_type)
 
-                print(r_person.name, r_person.family_name, r_relation_type)
-                print(l_person.name, l_person.family_name, l_relation_type)
+                # print(r_person.name, r_person.family_name, '({})'.format(r_relation_type),
+                #       end=' -> ')
+                # print(l_person.name, l_person.family_name, '({})'.format(l_relation_type))
+
+        # Link shared children (based on dice roll, they could be from another
+        # marriage) if married
+        for old in family[0]:
+            if 'Spouse' in old.relations:
+                spouse = old.relation_persons[old.relations.index('Spouse')]
+
+                for i, relation in enumerate(old.relations):
+                    if relation != 'Spouse':
+                        child = old.relation_persons[i]
+
+                        if not spouse.alreadyHasRelation(child):
+                            if seed.getRand() > 2:
+                                spouse.addRelation(child, relation)
+
+                                if spouse.gender == 'Male':
+                                    new_relation = 'Father'
+                                else:
+                                    new_relation = 'Mother'
+
+                                child.addRelation(spouse, new_relation)
+                                print(old, spouse, child)
 
         return family
 
