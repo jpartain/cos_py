@@ -15,25 +15,16 @@ Gender = ['Female',
           'Male']
 
 Relations = ['Spouse',
-             'Daughter',
-             'Son',
-             'Granddaughter',
-             'Grandson',
-             'Niece',
-             'Nephew',
-             'Father',
-             'Mother',
-             'Sister'
-             'Brother',
-             'Aunt',
-             'Uncle',
-             'Grandmother',
-             'Grandfather',
+             'Child',
+             'Grandchild',
+             'SiblingChild',
+             'Parent',
+             'Sibling',
+             'ParentSibling',
+             'Grandparent',
              'Cousin',
-             'Mistress',
-             'Mister',
-             'B_Son',
-             'B_Daughter']
+             'SideJob',
+             'B_Child']
 
 Title = ['Mayor'
          'Official',

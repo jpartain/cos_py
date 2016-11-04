@@ -681,15 +681,8 @@ class Town:
                 l_person = family[1][first]
                 r_person = family[0][second]
 
-                if l_person.gender == 'Male':
-                    l_relation_type = 'Son'
-                else:
-                    l_relation_type = 'Daughter'
-
-                if r_person.gender == 'Male':
-                    r_relation_type = 'Father'
-                else:
-                    r_relation_type = 'Mother'
+                l_relation_type = 'Child'
+                r_relation_type = 'Parent'
 
                 l_person.addRelation(r_person, r_relation_type)
                 r_person.addRelation(l_person, l_relation_type)
@@ -712,13 +705,18 @@ class Town:
                             if seed.getRand() > 2:
                                 spouse.addRelation(child, relation)
 
-                                if spouse.gender == 'Male':
-                                    new_relation = 'Father'
-                                else:
-                                    new_relation = 'Mother'
+                                new_relation = 'Parent'
 
                                 child.addRelation(spouse, new_relation)
                                 print(old, spouse, child)
+
+        # Link brother/sisters based on last two link loops
+        for mid in family[1]:
+            if 'Parent' in mid.relations:
+
+                last_element = -1
+                for i, parent in enumerate(mid.relations.count('Parent')):
+                    parent = mid.relation_persons[mid.relations.index('Parent')]
 
         return family
 
