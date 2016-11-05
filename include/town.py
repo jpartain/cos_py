@@ -101,7 +101,7 @@ class Town:
             yng.family_name = l_name
             yng.wealth = wealth
 
-            yng_generation.append(mid)
+            yng_generation.append(yng)
 
         family_list.append(old_generation)
         family_list.append(mid_generation)
@@ -644,7 +644,7 @@ class Town:
     def linkFamilyRelations(self, family):
         possible_indices = [i for i in range(10)]
         pair = []
-        num_old_relations = 4
+        num_old_relations = 5
 
         # Old person marriages
         for i in range(num_old_relations * 2):
@@ -652,22 +652,20 @@ class Town:
                                                  (len(possible_indices) - 1))))
 
             if i % 2 != 0:
-                if seed.getRand() > 4:
+                if seed.getRand() > 3:
                     l_person = family[0][pair[0]]
                     r_person = family[0][pair[1]]
 
-                    relation_type = 'Spouse'
-
-                    l_person.addRelation(r_person, relation_type)
-                    r_person.addRelation(l_person, relation_type)
+                    l_person.addRelation(r_person, 'Spouse')
+                    r_person.addRelation(l_person, 'Spouse')
+                    print(r_person, l_person, ' - Old Spouses')
 
                 pair.pop()
                 pair.pop()
 
         possible_indices = [i for i in range(15)]
         possible_old_indices = [i for i in range(10)]
-        pair = []
-        num_mid_to_old_relations = 10
+        num_mid_to_old_relations = 15
 
         # Father/Mother -> Son/Daughter from Old to Mid
         for i in range(num_mid_to_old_relations):
@@ -686,13 +684,9 @@ class Town:
 
                 l_person.addRelation(r_person, r_relation_type)
                 r_person.addRelation(l_person, l_relation_type)
+                print(l_person, r_person, ' - Child -> Parent')
 
-                # print(r_person.name, r_person.family_name, '({})'.format(r_relation_type),
-                #       end=' -> ')
-                # print(l_person.name, l_person.family_name, '({})'.format(l_relation_type))
-
-        # Link shared children (based on dice roll, they could be from another
-        # marriage) if married
+        # Link shared children
         for old in family[0]:
             if 'Spouse' in old.relations:
                 spouse = old.relation_persons[old.relations.index('Spouse')]
@@ -702,21 +696,152 @@ class Town:
                         child = old.relation_persons[i]
 
                         if not spouse.alreadyHasRelation(child):
-                            if seed.getRand() > 2:
-                                spouse.addRelation(child, relation)
-
-                                new_relation = 'Parent'
-
-                                child.addRelation(spouse, new_relation)
-                                print(old, spouse, child)
+                            spouse.addRelation(child, relation)
+                            child.addRelation(spouse, 'Parent')
+                            print('Added {0} to {1}\'s relations as child'.format(child, spouse))
 
         # Link brother/sisters based on last two link loops
         for mid in family[1]:
             if 'Parent' in mid.relations:
 
-                last_element = -1
-                for i, parent in enumerate(mid.relations.count('Parent')):
-                    parent = mid.relation_persons[mid.relations.index('Parent')]
+                for i, parent in enumerate(range(mid.relations.count('Parent'))):
+                    # Get the i'th occurance of Parent
+                    parent_person_idx = -1
+                    for j in range(i + 1):
+                        parent_person_idx = mid.relations.index('Parent', parent_person_idx + 1)
+
+                    parent_person = mid.relation_persons[parent_person_idx]
+                    for second_mid in family[1]:
+                        # Skip the person we're matching with
+                        if second_mid == mid:
+                            continue
+                        if not mid.alreadyHasRelation(second_mid):
+                            if parent_person in second_mid.relation_persons:
+                                second_mid.addRelation(mid, 'Sibling')
+                                mid.addRelation(second_mid, 'Sibling')
+                                print(mid, second_mid, ' - Mid Siblings')
+
+        l_spouses = []
+        r_spouses = []
+
+        # Mid person marriages
+        for person in family[1]:
+            # In other words, if not already part of the family
+            if 'Parent' not in person.relations:
+                l_spouses.append(person)
+            else:
+                r_spouses.append(person)
+
+        for person in l_spouses:
+            if seed.getRand() > 2:
+                try:
+                    pair = r_spouses.pop(int(seed.getRand() / 9 *
+                                                    (len(r_spouses) - 1)))
+                except IndexError:
+                    # r_spouses is empty
+                    for possible_match in l_spouses:
+                        if 'Spouse' not in l_spouses:
+                            if possible_match != person:
+                                if possible_match not in person.relation_persons:
+                                    pair = possible_match
+
+                person.addRelation(pair, 'Spouse')
+                pair.addRelation(person, 'Spouse')
+                print(person, pair, ' - Mid Spouses')
+
+        possible_yng_indices = [i for i in range(20)]
+        possible_mid_indices = [i for i in range(15)]
+        num_yng_to_mid_relations = 15
+
+        # Father/Mother -> Son/Daughter from Mid to Yng
+        for i in range(num_yng_to_mid_relations):
+            # Yng generation person
+            first = possible_yng_indices.pop(int(seed.getRand() / 9 *
+                                                 (len(possible_yng_indices) - 1)))
+            # Mid person
+            second = possible_mid_indices[int(seed.getRand() / 9 *
+                                              (len(possible_mid_indices) - 1))]
+            if seed.getRand() > 4:
+                l_person = family[2][first]
+                r_person = family[1][second]
+
+                l_relation_type = 'Child'
+                r_relation_type = 'Parent'
+
+                l_person.addRelation(r_person, r_relation_type)
+                r_person.addRelation(l_person, l_relation_type)
+                print(l_person, r_person, ' - Child -> Parent')
+
+        # Link shared children
+        for mid in family[1]:
+            if 'Spouse' in mid.relations:
+                spouse = mid.relation_persons[mid.relations.index('Spouse')]
+
+                for i, relation in enumerate(mid.relations):
+                    if relation != 'Spouse':
+                        child = mid.relation_persons[i]
+
+                        if not spouse.alreadyHasRelation(child):
+                            if seed.getRand() > 2:
+                                spouse.addRelation(child, relation)
+                                child.addRelation(spouse, 'Parent')
+                                print('Added {0} to {1}\'s relations as child'.format(child, spouse))
+
+        # Link grandchildren and grandparents
+        for yng in family[2]:
+            if 'Parent' in yng.relations:
+                for i, parent_num in enumerate(range(yng.relations.count('Parent'))):
+                    # Get the i'th occurance of Parent
+                    parent_person_idx = -1
+                    for j in range(i + 1):
+                        parent_person_idx = yng.relations.index('Parent', parent_person_idx + 1)
+
+                    parent = yng.relation_persons[parent_person_idx]
+
+                    if 'Parent' in parent.relations:
+                        for k, gparent_num in enumerate(range(parent.relations.count('Parent'))):
+                            # Get the i'th occurance of Parent
+                            gparent_person_idx = -1
+                            for m in range(k + 1):
+                                gparent_person_idx = parent.relations.index('Parent', gparent_person_idx + 1)
+
+                            gparent = parent.relation_persons[gparent_person_idx]
+
+                            if not yng.alreadyHasRelation(gparent):
+                                yng.addRelation(gparent, 'Grandparent')
+                                gparent.addRelation(yng, 'Grandchild')
+                                print(yng, gparent, ' - Grandchild -> Grandparent')
+
+        # Link parent siblings with sibling children
+        for yng in family[2]:
+            if 'Parent' in yng.relations:
+                for i, parent_num in enumerate(range(yng.relations.count('Parent'))):
+                    # Get the i'th occurance of Parent
+                    parent_person_idx = -1
+                    for j in range(i + 1):
+                        parent_person_idx = yng.relations.index('Parent', parent_person_idx + 1)
+
+                    parent = yng.relation_persons[parent_person_idx]
+
+                    if 'Sibling' in parent.relations:
+                        for k, sibling_num in enumerate(range(parent.relations.count('Sibling'))):
+                            # Get the i'th occurance of Sibling
+                            sibling_person_idx = -1
+                            for m in range(k + 1):
+                                sibling_person_idx = parent.relations.index('Sibling', sibling_person_idx + 1)
+
+                            sibling = parent.relation_persons[sibling_person_idx]
+
+                            if not yng.alreadyHasRelation(sibling):
+                                if 'Spouse' in sibling.relations:
+                                    sib_spouse = sibling.relation_persons[sibling.relations.index('Spouse')]
+                                    yng.addRelation(sib_spouse, 'ParentSibling')
+                                    sib_spouse.addRelation(yng, 'SiblingChild')
+                                    print(yng, sib_spouse, ' - SiblingChild -> ParentSibling')
+
+                                yng.addRelation(sibling, 'ParentSibling')
+                                sibling.addRelation(yng, 'SiblingChild')
+                                print(yng, sibling, ' - SiblingChild -> ParentSibling')
 
         return family
 
