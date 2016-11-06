@@ -153,10 +153,19 @@ class Town:
         serial_family_list = (unpruned_family_list[0] + unpruned_family_list[1]
                               + unpruned_family_list[2])
 
-        possible_index = [i for i in range(len(serial_family_list))]
         for i in range(family_size):
-            pass
+            length = len(serial_family_list) - 1
+            rand = seed.getRand() * seed.getRand()
+            max_rand = 81
 
+            family.append(serial_family_list.pop(int(rand / max_rand *
+                                                     length)))
+
+        # print('Family - {}'.format(family_name))
+        # for dude in family:
+            # print('Name - {0} - {1}'.format(dude, dude.age))
+
+        # print('\n')
         return family
 
     def createOpinions(self, string):
@@ -665,7 +674,7 @@ class Town:
 
                     l_person.addRelation(r_person, 'Spouse')
                     r_person.addRelation(l_person, 'Spouse')
-                    print(r_person, l_person, ' - Old Spouses')
+                    # print(r_person, l_person, ' - Old Spouses')
 
                 pair.pop()
                 pair.pop()
@@ -691,7 +700,7 @@ class Town:
 
                 l_person.addRelation(r_person, r_relation_type)
                 r_person.addRelation(l_person, l_relation_type)
-                print(l_person, r_person, ' - Child -> Parent')
+                # print(l_person, r_person, ' - Child -> Parent')
 
         # Link shared children
         for old in family[0]:
@@ -705,7 +714,7 @@ class Town:
                         if not spouse.alreadyHasRelation(child):
                             spouse.addRelation(child, relation)
                             child.addRelation(spouse, 'Parent')
-                            print('Added {0} to {1}\'s relations as child'.format(child, spouse))
+                            # print('Added {0} to {1}\'s relations as child'.format(child, spouse))
 
         # Link brother/sisters based on last two link loops
         for mid in family[1]:
@@ -726,7 +735,7 @@ class Town:
                             if parent_person in second_mid.relation_persons:
                                 second_mid.addRelation(mid, 'Sibling')
                                 mid.addRelation(second_mid, 'Sibling')
-                                print(mid, second_mid, ' - Mid Siblings')
+                                # print(mid, second_mid, ' - Mid Siblings')
 
         l_spouses = []
         r_spouses = []
@@ -754,7 +763,7 @@ class Town:
 
                 person.addRelation(pair, 'Spouse')
                 pair.addRelation(person, 'Spouse')
-                print(person, pair, ' - Mid Spouses')
+                # print(person, pair, ' - Mid Spouses')
 
         possible_yng_indices = [i for i in range(20)]
         possible_mid_indices = [i for i in range(15)]
@@ -777,7 +786,7 @@ class Town:
 
                 l_person.addRelation(r_person, r_relation_type)
                 r_person.addRelation(l_person, l_relation_type)
-                print(l_person, r_person, ' - Child -> Parent')
+                # print(l_person, r_person, ' - Child -> Parent')
 
         # Link shared children
         for mid in family[1]:
@@ -792,7 +801,7 @@ class Town:
                             if seed.getRand() > 2:
                                 spouse.addRelation(child, relation)
                                 child.addRelation(spouse, 'Parent')
-                                print('Added {0} to {1}\'s relations as child'.format(child, spouse))
+                                # print('Added {0} to {1}\'s relations as child'.format(child, spouse))
 
         # Link parent siblings with sibling children
         for yng in family[2]:
@@ -820,11 +829,11 @@ class Town:
                                     sib_spouse = sibling.relation_persons[sibling.relations.index('Spouse')]
                                     yng.addRelation(sib_spouse, 'ParentSibling')
                                     sib_spouse.addRelation(yng, 'SiblingChild')
-                                    print(yng, sib_spouse, ' - SiblingChild -> ParentSibling')
+                                    # print(yng, sib_spouse, ' - SiblingChild -> ParentSibling')
 
                                 yng.addRelation(sibling, 'ParentSibling')
                                 sibling.addRelation(yng, 'SiblingChild')
-                                print(yng, sibling, ' - SiblingChild -> ParentSibling')
+                                # print(yng, sibling, ' - SiblingChild -> ParentSibling')
 
                             # Cousins
                             if 'Child' in sibling.relations:
@@ -838,7 +847,7 @@ class Town:
                                     if not yng.alreadyHasRelation(child):
                                         yng.addRelation(child, 'Cousin')
                                         child.addRelation(yng, 'Cousin')
-                                        print(yng, child, ' - Cousins')
+                                        # print(yng, child, ' - Cousins')
 
 
                     # Siblings
@@ -855,7 +864,7 @@ class Town:
                                 if not yng.alreadyHasRelation(child):
                                     yng.addRelation(child, 'Sibling')
                                     child.addRelation(yng, 'Sibling')
-                                    print(yng, child, ' - Yng Siblings')
+                                    # print(yng, child, ' - Yng Siblings')
 
                     # Grandparents
                     if 'Parent' in parent.relations:
@@ -870,7 +879,7 @@ class Town:
                             if not yng.alreadyHasRelation(gparent):
                                 yng.addRelation(gparent, 'Grandparent')
                                 gparent.addRelation(yng, 'Grandchild')
-                                print(yng, gparent, ' - Grandchild -> Grandparent')
+                                # print(yng, gparent, ' - Grandchild -> Grandparent')
 
         return family
 
