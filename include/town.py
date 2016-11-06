@@ -150,6 +150,13 @@ class Town:
         self.increasePopulation(family_size)
         unpruned_family_list = self.buildFamilyTree(family_name, wealth)
 
+        serial_family_list = (unpruned_family_list[0] + unpruned_family_list[1]
+                              + unpruned_family_list[2])
+
+        possible_index = [i for i in range(len(serial_family_list))]
+        for i in range(family_size):
+            pass
+
         return family
 
     def createOpinions(self, string):
@@ -787,31 +794,6 @@ class Town:
                                 child.addRelation(spouse, 'Parent')
                                 print('Added {0} to {1}\'s relations as child'.format(child, spouse))
 
-        # Link grandchildren and grandparents
-        for yng in family[2]:
-            if 'Parent' in yng.relations:
-                for i, parent_num in enumerate(range(yng.relations.count('Parent'))):
-                    # Get the i'th occurance of Parent
-                    parent_person_idx = -1
-                    for j in range(i + 1):
-                        parent_person_idx = yng.relations.index('Parent', parent_person_idx + 1)
-
-                    parent = yng.relation_persons[parent_person_idx]
-
-                    if 'Parent' in parent.relations:
-                        for k, gparent_num in enumerate(range(parent.relations.count('Parent'))):
-                            # Get the i'th occurance of Parent
-                            gparent_person_idx = -1
-                            for m in range(k + 1):
-                                gparent_person_idx = parent.relations.index('Parent', gparent_person_idx + 1)
-
-                            gparent = parent.relation_persons[gparent_person_idx]
-
-                            if not yng.alreadyHasRelation(gparent):
-                                yng.addRelation(gparent, 'Grandparent')
-                                gparent.addRelation(yng, 'Grandchild')
-                                print(yng, gparent, ' - Grandchild -> Grandparent')
-
         # Link parent siblings with sibling children
         for yng in family[2]:
             if 'Parent' in yng.relations:
@@ -823,6 +805,7 @@ class Town:
 
                     parent = yng.relation_persons[parent_person_idx]
 
+                    # Aunts and uncles
                     if 'Sibling' in parent.relations:
                         for k, sibling_num in enumerate(range(parent.relations.count('Sibling'))):
                             # Get the i'th occurance of Sibling
@@ -842,6 +825,52 @@ class Town:
                                 yng.addRelation(sibling, 'ParentSibling')
                                 sibling.addRelation(yng, 'SiblingChild')
                                 print(yng, sibling, ' - SiblingChild -> ParentSibling')
+
+                            # Cousins
+                            if 'Child' in sibling.relations:
+                                for l, child_num in enumerate(range(sibling.relations.count('Child'))):
+                                    # Get the i'th occurance of Child
+                                    child_person_idx = -1
+                                    for n in range(l + 1):
+                                        child_person_idx = sibling.relations.index('Child', child_person_idx + 1)
+
+                                    child = sibling.relation_persons[child_person_idx]
+                                    if not yng.alreadyHasRelation(child):
+                                        yng.addRelation(child, 'Cousin')
+                                        child.addRelation(yng, 'Cousin')
+                                        print(yng, child, ' - Cousins')
+
+
+                    # Siblings
+                    if 'Child' in parent.relations:
+                        for k, child_num in enumerate(range(parent.relations.count('Child'))):
+                            # Get the i'th occurance of Child
+                            child_person_idx = -1
+                            for m in range(k + 1):
+                                child_person_idx = parent.relations.index('Child', child_person_idx + 1)
+
+                            child = parent.relation_persons[child_person_idx]
+
+                            if yng != child:
+                                if not yng.alreadyHasRelation(child):
+                                    yng.addRelation(child, 'Sibling')
+                                    child.addRelation(yng, 'Sibling')
+                                    print(yng, child, ' - Yng Siblings')
+
+                    # Grandparents
+                    if 'Parent' in parent.relations:
+                        for k, gparent_num in enumerate(range(parent.relations.count('Parent'))):
+                            # Get the i'th occurance of Parent
+                            gparent_person_idx = -1
+                            for m in range(k + 1):
+                                gparent_person_idx = parent.relations.index('Parent', gparent_person_idx + 1)
+
+                            gparent = parent.relation_persons[gparent_person_idx]
+
+                            if not yng.alreadyHasRelation(gparent):
+                                yng.addRelation(gparent, 'Grandparent')
+                                gparent.addRelation(yng, 'Grandchild')
+                                print(yng, gparent, ' - Grandchild -> Grandparent')
 
         return family
 
