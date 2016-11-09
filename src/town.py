@@ -169,7 +169,6 @@ class Town:
         # for dude in family:
             # print('Name - {0} - {1}'.format(dude, dude.age))
 
-        # print('\n')
         return family
 
     def createOpinions(self, string):
