@@ -1,0 +1,18 @@
+#:kivy 1.9.2
+
+<CosGame>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+
+        Button:
+            text: 'Initialize Game'
+            on_press: root.init()
+
+        Button:
+            text: 'Generate new Town'
+            on_press: root.generateTown()
+
+        Button:
+            text: 'Draw Towns'
+            on_press: root.drawTowns()

@@ -6,34 +6,9 @@ import town
 import seed
 
 
-def generateTown():
-    new_town = town.Town()
-
-    '''
-    print('')
-    print('Nobles placed:\t', new_town.placed_nobles)
-    print('Middle placed:\t', new_town.placed_middle)
-    print('Poor placed:\t', new_town.placed_poor)
-    print('Wealth:\t\t', new_town.wealth)
-    print('Economy:\t', new_town.economy)
-    print('Danger:\t\t', new_town.danger)
-    print('Settled:\t', new_town.settled_ratio, '%')
-    print('Nobility:\t', new_town.nobility, '%')
-    print('')
-
-    new_town.printMapCorners()
-    '''
-
 
 class CosGame(Widget):
-    pass
-
-
-class CosApp(App):
-    def build(self):
-        return CosGame()
-
-    def init():
+    def init(self):
         # Logging stuff
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
@@ -45,9 +20,37 @@ class CosApp(App):
         # End logging stuff
 
         seed.initSeed()
-        generateTown()
+        self.towns = []
 
-        #input('Press enter to close this window.')
+    def generateTown(self):
+        new_town = town.Town()
+
+        '''
+        print('')
+        print('Nobles placed:\t', new_town.placed_nobles)
+        print('Middle placed:\t', new_town.placed_middle)
+        print('Poor placed:\t', new_town.placed_poor)
+        print('Wealth:\t\t', new_town.wealth)
+        print('Economy:\t', new_town.economy)
+        print('Danger:\t\t', new_town.danger)
+        print('Settled:\t', new_town.settled_ratio, '%')
+        print('Nobility:\t', new_town.nobility, '%')
+        print('')
+
+        new_town.printMapCorners()
+        '''
+
+        self.towns.append(new_town)
+
+    def drawTowns(self):
+        for towns in self.towns:
+            towns.printMapCorners()
+
+
+class CosApp(App):
+    def build(self):
+        return CosGame()
+
 
 if __name__ == '__main__':
     CosApp().run()

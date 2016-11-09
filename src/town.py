@@ -1090,7 +1090,7 @@ class Town:
         # print('\nMap corners modifiers:')
         # print(self.map_corners_mod)
 
-        print('\nMap area: ', self.map_area)
+        # print('\nMap area: ', self.map_area)
 
         # print('\nMap points: ', self.map_points)
 
