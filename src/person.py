@@ -1,5 +1,5 @@
 import logging
-import include.seed as seed
+import seed
 
 logger = logging.getLogger(__name__)
 

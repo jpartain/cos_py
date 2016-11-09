@@ -1,10 +1,10 @@
-from include.building import Building
-from include.block import Block
-import include.seed as seed
-import include.person as person
 import logging
 
-logger = logging.getLogger(__name__)
+from building import Building
+from block import Block
+import seed
+import person
+
 
 TownEconomy = ['Farm',
                'Mine',
@@ -19,6 +19,8 @@ TownEconomy = ['Farm',
 
 class Town:
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
         self.population = 0
         self.createPointPlacementRadius()
 
@@ -37,6 +39,8 @@ class Town:
         self.placeBuildings()
         self.createPopulation()
 
+    def assignWorkplace(self, person, building):
+        pass
     def buildFamilyTree(self, l_name, wealth):
         family_list = []
 
@@ -161,7 +165,7 @@ class Town:
             family.append(serial_family_list.pop(int(rand / max_rand *
                                                      length)))
 
-        # print('Family - {}'.format(family_name))
+        # self.logger.debug('Family - {}'.format(family_name))
         # for dude in family:
             # print('Name - {0} - {1}'.format(dude, dude.age))
 
@@ -283,13 +287,13 @@ class Town:
                                         self.number_middle_house)*0.25)
 
         '''
-        logger.info('Noble area:\t', self.number_noble_house, '\t',
+        self.logger.debug('Noble area:\t', self.number_noble_house, '\t',
                     int(self.number_noble_house/free_area * 100), '%')
 
-        logger.info('Middle area:\t', self.number_middle_house, '\t',
+        self.logger.debug('Middle area:\t', self.number_middle_house, '\t',
                     int(self.number_middle_house/free_area * 100), '%')
 
-        logger.info('Poor area:\t', self.number_poor_house, '\t',
+        self.logger.debug('Poor area:\t', self.number_poor_house, '\t',
                     int(self.number_poor_house/free_area * 100), '%')
         '''
 
@@ -447,7 +451,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    logger.warning('Unhandled draw_slope[] value')
+                                    self.logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x >= self.draw_segs[i][0].x:
                                     continue
@@ -481,7 +485,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    logger.warning('Unhandled draw_slope[] value')
+                                    self.logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x <= self.draw_segs[i][0].x:
                                     continue
@@ -518,7 +522,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    logger.warning('Unhandled draw_slope[] value')
+                                    self.logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x >= self.draw_segs[i][0].x:
                                     continue
@@ -552,7 +556,7 @@ class Town:
                                     else:
                                         break
                                 else:
-                                    logger.warning('Unhandled draw_slope[] value')
+                                    self.logger.warning('Unhandled draw_slope[] value')
                             else:
                                 if point.x <= self.draw_segs[i][0].x:
                                     continue
@@ -947,13 +951,13 @@ class Town:
                     point_building = 'Colosseum'
                 else:
                     point_building = 'none'
-                    logger.warning('Set building to {0} because town.economy {1} is not recognized.'
+                    self.logger.warning('Set building to {0} because town.economy {1} is not recognized.'
                                    .format(point_building, self.economy))
                 num_points = self.special_area
             else:
                 num_points = 0
                 point_building = 'none'
-                logger.warning('Set building to {0}, building type not recognized.'
+                self.logger.warning('Set building to {0}, building type not recognized.'
                                .format(point_building))
 
             # Get start point for special building

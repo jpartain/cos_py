@@ -8,6 +8,6 @@ def getRand():
     rand_seed = rand_seed + new_rand
     return int(new_rand)
 
-def createSeed():
+def initSeed():
     global rand_seed
     rand_seed = ''
