@@ -41,6 +41,7 @@ class Town:
 
     def assignWorkplace(self, person, building):
         pass
+
     def buildFamilyTree(self, l_name, wealth):
         family_list = []
 
@@ -164,6 +165,13 @@ class Town:
 
             family.append(serial_family_list.pop(int(rand / max_rand *
                                                      length)))
+
+        # Assemble relations_in_house
+        for dude in family:
+            for i, other_dude in enumerate(dude.relation_persons):
+                if other_dude in family:
+                    dude.relation_persons_in_house.append(other_dude)
+                    dude.relations_in_house.append(dude.relations[i])
 
         # self.logger.debug('Family - {}'.format(family_name))
         # for dude in family:
@@ -1074,33 +1082,14 @@ class Town:
             return False
 
     def printMapCorners(self):
-        # print('Map corner points:')
-        # print(self.draw_order[0], self.draw_order[1],
-        #       self.draw_order[2], self.draw_order[3])
-
-        # print('\nMap perimeter segment endpoints:')
-        # print(self.draw_segs)
-
-        # print('\nMap perimeter segment slopes:')
-        # print(self.draw_slopes)
-
-        # print('\nMap size modifier:', self.map_size_mod)
-
-        # print('\nMap corners modifiers:')
-        # print(self.map_corners_mod)
-
-        # print('\nMap area: ', self.map_area)
-
-        # print('\nMap points: ', self.map_points)
-
-        print('\nMap Visualization:')
+        text = ''
         for row in self.map_points:
             for building in row:
-                print(building, end = '')
+                text = text + building.__str__()
 
-            print()
+            text = text + '\n'
 
-        print()
+        return text
 
 
 class MapPoint:

@@ -40,6 +40,7 @@ class Building:
     def generateOccupants(self, string):
         pass
 
+    '''
     def __str__(self):
         typ = self.building_type
         if typ == 'Road':
@@ -78,6 +79,46 @@ class Building:
             char = '\033[97mO'
         else:
             char = '\033[92m*'
+        return char
+    '''
+    def __str__(self):
+        typ = self.building_type
+        if typ == 'Road':
+            char = 'R'
+        elif typ == 'PoorHouse':
+            char = 'P'
+        elif typ == 'MiddleHouse':
+            char = 'M'
+        elif typ == 'NobleHouse':
+            char = 'N'
+        elif typ == 'Tavern':
+            char = 'T'
+        elif typ == 'PublicPlumbing':
+            char = 'B'
+        elif typ == 'Market':
+            char = 'K'
+        elif typ == 'TradePost':
+            char = 'D'
+        elif typ == 'Inn':
+            char = 'I'
+        elif typ == 'Barn':
+            char = 'A'
+        elif typ == 'Barracks':
+            char = 'X'
+        elif typ == 'Mason':
+            char = 'S'
+        elif typ == 'Blacksmith':
+            char = 'L'
+        elif typ == 'Lumbermill':
+            char = 'E'
+        elif typ == 'Cathedral':
+            char = '+'
+        elif typ == 'Weavery':
+            char = 'Y'
+        elif typ == 'Colosseum':
+            char = 'O'
+        else:
+            char = '*'
         return char
 
     def __repr__(self):

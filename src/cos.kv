@@ -1,18 +1,56 @@
 #:kivy 1.9.2
 
-<CosGame>:
+<MainMenuScreen>:
     BoxLayout:
         orientation: 'vertical'
         padding: 20
+        spacing: 10
+        pos_hint: {'center_x':.5, 'center_y':.5}
+        size_hint: 1, 1
 
         Button:
-            text: 'Initialize Game'
-            on_press: root.init()
+            text: 'Search Towns'
+            on_press: root.goToMapScreen()
+            size_hint: 1, .33
 
-        Button:
-            text: 'Generate new Town'
-            on_press: root.generateTown()
+<MapScreen>:
+    map_box: root.map_box
+    map_nums: root.map_nums
 
-        Button:
-            text: 'Draw Towns'
-            on_press: root.drawTowns()
+    BoxLayout:
+        id: outer_box
+        size_hint: 1, 1
+        orientation: 'horizontal'
+        padding: 20
+        spacing: 10
+        pos_hint: {'center_x':.5, 'center_y':.5}
+
+        BoxLayout:
+            size_hint: .25, 1
+            orientation: 'vertical'
+            padding: 10
+            spacing: 10
+            pos: 0, outer_box.height/2 - self.height/2
+
+            Spinner:
+                size_hint: 1, None
+                text: 'Maps'
+                values: [idx for idx in root.map_nums]
+                on_text: root.showMap(*args)
+
+            Button:
+                text: 'Gen Town'
+                on_press: root.generateTown()
+                size_hint: 1, None
+
+            Button:
+                text: 'Main Menu'
+                on_press: root.goToMainMenu()
+                size_hint: 1, None
+
+        ArrowsEnterInput:
+            id: map_box
+            font_name: 'RobotoMono-Regular.ttf'
+            text: root.map_box
+            pos_hint: {'center_x':.5, 'center_y':.5}
+

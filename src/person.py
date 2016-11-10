@@ -92,6 +92,8 @@ class Person:
         self.name = ''
         self.relation_persons = []
         self.relations = []
+        self.relation_persons_in_house = []
+        self.relations_in_house = []
 
     def addRelation(self, person, relation):
         self.relation_persons.append(person)
@@ -160,7 +162,13 @@ class Person:
         pass
 
     def __str__(self):
-        return '{0} {1}'.format(self.name, self.family_name)
+        relation_string = ''
+        for dude, relation in zip(self.relation_persons_in_house,
+                                  self.relations_in_house):
+            relation_string = (relation_string + '\t\t' + dude.name + ' - ' +
+                               relation + '\n')
+
+        return '\t{0}\n{1}'.format(self.name, relation_string)
 
     def __repr__(self):
         return '{0} {1}'.format(self.name, self.family_name)

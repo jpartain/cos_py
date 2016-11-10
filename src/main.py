@@ -1,14 +1,28 @@
 import logging
 from kivy.app import App
 from kivy.uix.widget import Widget
+from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.config import Config
+from kivy.properties import StringProperty
+from kivy.properties import ListProperty
+from kivy.properties import ObjectProperty
+from kivy.uix.textinput import TextInput
 
 import town
 import seed
 
 
+global towns
+global current_town_map
 
-class CosGame(Widget):
-    def init(self):
+towns = []
+current_town_map = 0
+
+class MainMenuScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(MainMenuScreen, self).__init__(**kwargs)
+
         # Logging stuff
         logger = logging.getLogger(__name__)
         logger.setLevel(logging.INFO)
@@ -20,9 +34,24 @@ class CosGame(Widget):
         # End logging stuff
 
         seed.initSeed()
-        self.towns = []
+
+    def goToMapScreen(self):
+        self.manager.current = 'map'
+
+
+class MapScreen(Screen):
+
+    map_box = StringProperty('')
+    map_nums = ListProperty([])
+    mapBoxFilter = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        self.generateTown()
+        super(MapScreen, self).__init__(**kwargs)
 
     def generateTown(self):
+        self.map_box = 'Generating new town..'
+
         new_town = town.Town()
 
         '''
@@ -40,16 +69,59 @@ class CosGame(Widget):
         new_town.printMapCorners()
         '''
 
-        self.towns.append(new_town)
+        towns.append(new_town)
+        self.map_nums.append(str(towns.index(new_town)))
+        self.map_box = 'Generating new town.. done.'
 
-    def drawTowns(self):
-        for towns in self.towns:
-            towns.printMapCorners()
+    def goToMainMenu(self):
+        self.manager.current = 'main_menu'
+
+    def mapBoxFilter(self, string, is_undo):
+        print(r'{}'.format(string))
+
+        return string
+    def showMap(self, instance, value):
+        current_town_map = value
+        self.map_box = towns[int(value)].printMapCorners()
+
+
+class ArrowsEnterInput(TextInput):
+
+    def insert_text(self, substring, from_undo=False):
+        if substring == '\n':
+            self.getPeopleAtCursor()
+
+        s = ''
+
+        return super(ArrowsEnterInput, self).insert_text(s, from_undo=from_undo)
+
+    def getPeopleAtCursor(self):
+        pos = self.cursor
+        people = towns[current_town_map].map_points[pos[1]][pos[0]].people
+
+        try:
+            print('|-------- {}\'s --------|\n'.format(people[0].family_name))
+            for dude in people:
+                print(dude)
+
+        except IndexError:
+            # probably an empty map spot
+            pass
 
 
 class CosApp(App):
+
     def build(self):
-        return CosGame()
+        Config.set( 'graphics', 'width', '600' )
+        Config.set( 'graphics', 'height', '360' )
+
+        screens = ScreenManager()
+        screens.add_widget(MainMenuScreen(name='main_menu'))
+        screens.add_widget(MapScreen(name='map'))
+        screens.current = 'main_menu'
+
+
+        return screens
 
 
 if __name__ == '__main__':
