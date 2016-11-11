@@ -158,6 +158,11 @@ class Town:
         serial_family_list = (unpruned_family_list[0] + unpruned_family_list[1]
                               + unpruned_family_list[2])
 
+        for dude in serial_family_list:
+            if dude.relations == []:
+                if seed.getRand() > 2:
+                    serial_family_list.remove(dude)
+
         for i in range(family_size):
             length = len(serial_family_list) - 1
             rand = seed.getRand() * seed.getRand()
@@ -706,11 +711,8 @@ class Town:
                 l_person = family[1][first]
                 r_person = family[0][second]
 
-                l_relation_type = 'Child'
-                r_relation_type = 'Parent'
-
-                l_person.addRelation(r_person, r_relation_type)
-                r_person.addRelation(l_person, l_relation_type)
+                l_person.addRelation(r_person, 'Parent')
+                r_person.addRelation(l_person, 'Child')
                 # print(l_person, r_person, ' - Child -> Parent')
 
         # Link shared children
@@ -719,11 +721,11 @@ class Town:
                 spouse = old.relation_persons[old.relations.index('Spouse')]
 
                 for i, relation in enumerate(old.relations):
-                    if relation != 'Spouse':
+                    if relation == 'Child':
                         child = old.relation_persons[i]
 
                         if not spouse.alreadyHasRelation(child):
-                            spouse.addRelation(child, relation)
+                            spouse.addRelation(child, 'Child')
                             child.addRelation(spouse, 'Parent')
                             # print('Added {0} to {1}\'s relations as child'.format(child, spouse))
 
@@ -792,11 +794,8 @@ class Town:
                 l_person = family[2][first]
                 r_person = family[1][second]
 
-                l_relation_type = 'Child'
-                r_relation_type = 'Parent'
-
-                l_person.addRelation(r_person, r_relation_type)
-                r_person.addRelation(l_person, l_relation_type)
+                l_person.addRelation(r_person, 'Parent')
+                r_person.addRelation(l_person, 'Child')
                 # print(l_person, r_person, ' - Child -> Parent')
 
         # Link shared children
@@ -805,12 +804,12 @@ class Town:
                 spouse = mid.relation_persons[mid.relations.index('Spouse')]
 
                 for i, relation in enumerate(mid.relations):
-                    if relation != 'Spouse':
+                    if relation == 'Child':
                         child = mid.relation_persons[i]
 
                         if not spouse.alreadyHasRelation(child):
                             if seed.getRand() > 2:
-                                spouse.addRelation(child, relation)
+                                spouse.addRelation(child, 'Child')
                                 child.addRelation(spouse, 'Parent')
                                 # print('Added {0} to {1}\'s relations as child'.format(child, spouse))
 

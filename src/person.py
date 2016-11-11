@@ -165,10 +165,10 @@ class Person:
         relation_string = ''
         for dude, relation in zip(self.relation_persons_in_house,
                                   self.relations_in_house):
-            relation_string = (relation_string + '\t\t' + dude.name + ' - ' +
+            relation_string = (relation_string + '        ' + dude.name + ' - ' +
                                relation + '\n')
 
-        return '\t{0}\n{1}'.format(self.name, relation_string)
+        return '    {0} - {1}\n{2}'.format(self.name, self.age, relation_string)
 
     def __repr__(self):
         return '{0} {1}'.format(self.name, self.family_name)

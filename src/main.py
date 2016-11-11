@@ -43,7 +43,6 @@ class MapScreen(Screen):
 
     map_box = StringProperty('')
     map_nums = ListProperty([])
-    mapBoxFilter = ObjectProperty()
 
     def __init__(self, **kwargs):
         self.generateTown()
@@ -76,16 +75,14 @@ class MapScreen(Screen):
     def goToMainMenu(self):
         self.manager.current = 'main_menu'
 
-    def mapBoxFilter(self, string, is_undo):
-        print(r'{}'.format(string))
-
-        return string
     def showMap(self, instance, value):
         current_town_map = value
         self.map_box = towns[int(value)].printMapCorners()
 
 
 class ArrowsEnterInput(TextInput):
+
+    name_out = StringProperty('')
 
     def insert_text(self, substring, from_undo=False):
         if substring == '\n':
@@ -97,12 +94,12 @@ class ArrowsEnterInput(TextInput):
 
     def getPeopleAtCursor(self):
         pos = self.cursor
-        people = towns[current_town_map].map_points[pos[1]][pos[0]].people
 
         try:
-            print('|-------- {}\'s --------|\n'.format(people[0].family_name))
+            people = towns[current_town_map].map_points[pos[1]][pos[0]].people
+            self.name_out = '[b][u]{}\'s[/u][/b]\n'.format(people[0].family_name)
             for dude in people:
-                print(dude)
+                self.name_out = self.name_out + dude.__str__()
 
         except IndexError:
             # probably an empty map spot
@@ -112,7 +109,7 @@ class ArrowsEnterInput(TextInput):
 class CosApp(App):
 
     def build(self):
-        Config.set( 'graphics', 'width', '600' )
+        Config.set( 'graphics', 'width', '1000' )
         Config.set( 'graphics', 'height', '360' )
 
         screens = ScreenManager()

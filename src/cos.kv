@@ -16,6 +16,7 @@
 <MapScreen>:
     map_box: root.map_box
     map_nums: root.map_nums
+    name_out: root.name_out
 
     BoxLayout:
         id: outer_box
@@ -49,8 +50,13 @@
                 size_hint: 1, None
 
         ArrowsEnterInput:
-            id: map_box
+            id: places
             font_name: 'RobotoMono-Regular.ttf'
             text: root.map_box
+            pos_hint: {'center_x':.5, 'center_y':.5}
+
+        Label:
+            markup: True
+            text: places.name_out
             pos_hint: {'center_x':.5, 'center_y':.5}
 
