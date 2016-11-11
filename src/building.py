@@ -84,41 +84,41 @@ class Building:
     def __str__(self):
         typ = self.building_type
         if typ == 'Road':
-            char = 'R'
+            char = '[color=eeb09c]R[/color]'
         elif typ == 'PoorHouse':
-            char = 'P'
+            char = '[color=317873]P[/color]'
         elif typ == 'MiddleHouse':
-            char = 'M'
+            char = '[color=5f9ea0]M[/color]'
         elif typ == 'NobleHouse':
-            char = 'N'
+            char = '[color=a0d6b4]N[/color]'
         elif typ == 'Tavern':
-            char = 'T'
+            char = '[color=275749]T[/color]'
         elif typ == 'PublicPlumbing':
-            char = 'B'
+            char = '[color=275749]B[/color]'
         elif typ == 'Market':
-            char = 'K'
+            char = '[color=275749]K[/color]'
         elif typ == 'TradePost':
-            char = 'D'
+            char = '[color=275749]D[/color]'
         elif typ == 'Inn':
-            char = 'I'
+            char = '[color=275749]I[/color]'
         elif typ == 'Barn':
-            char = 'A'
+            char = '[color=275749]A[/color]'
         elif typ == 'Barracks':
-            char = 'X'
+            char = '[color=275749]X[/color]'
         elif typ == 'Mason':
-            char = 'S'
+            char = '[color=275749]S[/color]'
         elif typ == 'Blacksmith':
-            char = 'L'
+            char = '[color=275749]L[/color]'
         elif typ == 'Lumbermill':
-            char = 'E'
+            char = '[color=275749]E[/color]'
         elif typ == 'Cathedral':
-            char = '+'
+            char = '[color=275749]+[/color]'
         elif typ == 'Weavery':
-            char = 'Y'
+            char = '[color=275749]Y[/color]'
         elif typ == 'Colosseum':
-            char = 'O'
+            char = '[color=275749]O[/color]'
         else:
-            char = '*'
+            char = '[color=a3c1ad]*[/color]'
         return char
 
     def __repr__(self):

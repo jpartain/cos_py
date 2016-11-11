@@ -109,14 +109,13 @@ class ArrowsEnterInput(TextInput):
 class CosApp(App):
 
     def build(self):
-        Config.set( 'graphics', 'width', '1000' )
+        Config.set( 'graphics', 'width', '800' )
         Config.set( 'graphics', 'height', '360' )
 
         screens = ScreenManager()
         screens.add_widget(MainMenuScreen(name='main_menu'))
         screens.add_widget(MapScreen(name='map'))
         screens.current = 'main_menu'
-
 
         return screens
 

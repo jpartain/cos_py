@@ -22,12 +22,12 @@
         id: outer_box
         size_hint: 1, 1
         orientation: 'horizontal'
-        padding: 20
+        padding: 10
         spacing: 10
         pos_hint: {'center_x':.5, 'center_y':.5}
 
         BoxLayout:
-            size_hint: .25, 1
+            size_hint: .3, 1
             orientation: 'vertical'
             padding: 10
             spacing: 10
@@ -49,14 +49,18 @@
                 on_press: root.goToMainMenu()
                 size_hint: 1, None
 
-        ArrowsEnterInput:
-            id: places
-            font_name: 'RobotoMono-Regular.ttf'
-            text: root.map_box
-            pos_hint: {'center_x':.5, 'center_y':.5}
+        ScrollView:
+            Label:
+                id: map_text
+                markup: True
+                text: root.map_box
+                font_name: 'RobotoMono-Regular.ttf'
+                size_hint_y: None
+                height: self.texture_size[1]
 
         Label:
             markup: True
-            text: places.name_out
+            h_align: 'left'
+            size_hint: .25, None
             pos_hint: {'center_x':.5, 'center_y':.5}
 
