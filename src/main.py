@@ -7,16 +7,17 @@ from kivy.properties import StringProperty
 from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.textinput import TextInput
+from kivy.clock import Clock
 
 import town
 import seed
 
 
-global towns
 global current_town_map
+global towns
 
-towns = []
 current_town_map = 0
+towns = []
 
 class MainMenuScreen(Screen):
 
@@ -49,10 +50,16 @@ class MapScreen(Screen):
         self.generateTown()
         super(MapScreen, self).__init__(**kwargs)
 
+    def createNewTown(self, dt):
+        new_town = town.Town()
+        towns.append(new_town)
+        self.map_nums.append(new_town.name)
+        self.map_box = 'Generating new town.. done.'
+
     def generateTown(self):
         self.map_box = 'Generating new town..'
 
-        new_town = town.Town()
+        Clock.schedule_once(self.createNewTown)
 
         '''
         print('')
@@ -68,10 +75,6 @@ class MapScreen(Screen):
 
         new_town.printMapCorners()
         '''
-
-        towns.append(new_town)
-        self.map_nums.append(str(towns.index(new_town)))
-        self.map_box = 'Generating new town.. done.'
 
     def goToMainMenu(self):
         self.manager.current = 'main_menu'
@@ -92,7 +95,11 @@ class MapScreen(Screen):
 
     def showMap(self, instance, value):
         current_town_map = value
-        self.map_box = towns[int(value)].printMapCorners()
+        for i, place in enumerate(towns):
+            if place.name == value:
+                current_town_map = i
+
+        self.map_box = towns[current_town_map].printMapCorners()
 
 
 class CosApp(App):

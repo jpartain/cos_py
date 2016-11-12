@@ -16,6 +16,11 @@ TownEconomy = ['Farm',
                'Textile',
                'Colosseum']
 
+with open('names/town', 'r') as f:
+    t_names = f.read().splitlines()
+
+t_names_len = len(t_names)
+
 
 class Town:
     def __init__(self):
@@ -24,6 +29,7 @@ class Town:
         self.population = 0
         self.createPointPlacementRadius()
 
+        self.assignName()
         self.generateWealth()
         self.generateEconomy()
         self.generateDanger()
@@ -38,6 +44,16 @@ class Town:
         self.fillStreetBlocks()
         self.placeBuildings()
         self.createPopulation()
+
+    def assignName(self):
+        num1 = seed.getRand() + 1
+        num2 = seed.getRand() + 1
+        num3 = seed.getRand() + 1
+        num4 = seed.getRand() + 1
+
+        name_idx = int((num1 * num2 * num3 * num4) / 10000 * (t_names_len - 1))
+
+        self.name = t_names[name_idx]
 
     def assignWorkplace(self, person, building):
         pass
@@ -676,7 +692,7 @@ class Town:
     def linkFamilyRelations(self, family):
         possible_indices = [i for i in range(10)]
         pair = []
-        num_old_relations = 5
+        num_old_relations = 4
 
         # Old person marriages
         for i in range(num_old_relations * 2):
@@ -684,7 +700,7 @@ class Town:
                                                  (len(possible_indices) - 1))))
 
             if i % 2 != 0:
-                if seed.getRand() > 3:
+                if True:
                     l_person = family[0][pair[0]]
                     r_person = family[0][pair[1]]
 
@@ -697,7 +713,7 @@ class Town:
 
         possible_indices = [i for i in range(15)]
         possible_old_indices = [i for i in range(10)]
-        num_mid_to_old_relations = 15
+        num_mid_to_old_relations = 10
 
         # Father/Mother -> Son/Daughter from Old to Mid
         for i in range(num_mid_to_old_relations):
@@ -707,7 +723,7 @@ class Town:
             # Old person
             second = possible_old_indices[int(seed.getRand() / 9 *
                                               (len(possible_old_indices) - 1))]
-            if seed.getRand() > 4:
+            if True:
                 l_person = family[1][first]
                 r_person = family[0][second]
 
@@ -780,7 +796,7 @@ class Town:
 
         possible_yng_indices = [i for i in range(20)]
         possible_mid_indices = [i for i in range(15)]
-        num_yng_to_mid_relations = 15
+        num_yng_to_mid_relations = 10
 
         # Father/Mother -> Son/Daughter from Mid to Yng
         for i in range(num_yng_to_mid_relations):
@@ -790,7 +806,7 @@ class Town:
             # Mid person
             second = possible_mid_indices[int(seed.getRand() / 9 *
                                               (len(possible_mid_indices) - 1))]
-            if seed.getRand() > 4:
+            if True:
                 l_person = family[2][first]
                 r_person = family[1][second]
 
