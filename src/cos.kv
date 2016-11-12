@@ -16,7 +16,7 @@
 <MapScreen>:
     map_box: root.map_box
     map_nums: root.map_nums
-    name_out: root.name_out
+    names_box: root.names_box
 
     BoxLayout:
         id: outer_box
@@ -51,16 +51,18 @@
 
         ScrollView:
             Label:
-                id: map_text
                 markup: True
                 text: root.map_box
                 font_name: 'RobotoMono-Regular.ttf'
                 size_hint_y: None
                 height: self.texture_size[1]
+                on_ref_press: root.labelPress(*args)
 
-        Label:
-            markup: True
-            h_align: 'left'
-            size_hint: .25, None
-            pos_hint: {'center_x':.5, 'center_y':.5}
+        ScrollView:
+            Label:
+                markup: True
+                h_align: 'left'
+                text: root.names_box
+                size_hint_y: None
+                height: self.texture_size[1]
 

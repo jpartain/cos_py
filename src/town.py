@@ -1082,9 +1082,9 @@ class Town:
 
     def printMapCorners(self):
         text = ''
-        for row in self.map_points:
-            for building in row:
-                text = text + building.__str__()
+        for y, row in enumerate(self.map_points):
+            for x, building in enumerate(row):
+                text = text + '[ref={0} {1}]{2}[/ref]'.format(x, y, building.__str__())
 
             text = text + '\n'
 

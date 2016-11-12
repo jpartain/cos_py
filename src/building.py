@@ -84,7 +84,7 @@ class Building:
     def __str__(self):
         typ = self.building_type
         if typ == 'Road':
-            char = '[color=eeb09c]R[/color]'
+            char = '[color=ff0000]R[/color]'
         elif typ == 'PoorHouse':
             char = '[color=317873]P[/color]'
         elif typ == 'MiddleHouse':
@@ -112,13 +112,13 @@ class Building:
         elif typ == 'Lumbermill':
             char = '[color=275749]E[/color]'
         elif typ == 'Cathedral':
-            char = '[color=275749]+[/color]'
+            char = '[color=000000]+[/color]'
         elif typ == 'Weavery':
             char = '[color=275749]Y[/color]'
         elif typ == 'Colosseum':
             char = '[color=275749]O[/color]'
         else:
-            char = '[color=a3c1ad]*[/color]'
+            char = '[color=00b000]*[/color]'
         return char
 
     def __repr__(self):
