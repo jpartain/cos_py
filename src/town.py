@@ -1,6 +1,6 @@
 import logging
 
-from building import Building
+from building import *
 from block import Block
 import seed
 import person
@@ -27,6 +27,7 @@ class Town:
         self.logger = logging.getLogger(__name__)
 
         self.population = 0
+        self.workable = 0
         self.createPointPlacementRadius()
 
         self.assignName()
@@ -44,6 +45,56 @@ class Town:
         self.fillStreetBlocks()
         self.placeBuildings()
         self.createPopulation()
+        self.getWorkPlaces()
+        self.assignJobs()
+
+    def assignJobs(self):
+        num_to_employ = int(self.workable * self.employment / 100)
+        every_place_has_one = False
+        every_one_list = []
+
+        for place in self.workplaces:
+            every_one_list.append(place)
+
+        # print('Number to employ: {}'.format(num_to_employ))
+
+        employed = 0
+        for dude in self.people:
+            if employed == num_to_employ:
+                # print('Employed {} people.'.format(employed))
+                break
+
+            num_workplaces = len(self.workplaces)
+            if not dude.employed:
+                if dude.age == 'Adult' or dude.age == 'YoungAdult':
+
+                    rand_percent = seed.getRand() * seed.getRand() / 81
+
+                    if not every_place_has_one:
+                        if len(every_one_list) != 0:
+                            workplace_idx = int((len(every_one_list) - 1) * rand_percent)
+                            workplace = every_one_list.pop(workplace_idx)
+
+                            workplace.employees.append(dude)
+                            dude.employed = True
+
+                        else:
+                            every_place_has_one = True
+
+                    else:
+                        workplace_idx = int((num_workplaces - 1) * rand_percent)
+                        workplace = self.workplaces[workplace_idx]
+
+                        workplace.employees.append(dude)
+                        dude.employed = True
+
+                        if len(workplace.employees) == int(seed.getRand() / 3) + 1:
+                            self.workplaces.remove(workplace)
+
+                    employed = employed + 1
+                    # print('{} - Employed {} {} at {}.'.format(employed, dude.name,
+                    #                                           dude.family_name,
+                    #                                           workplace.building_type))
 
     def assignName(self):
         num1 = seed.getRand() + 1
@@ -106,9 +157,7 @@ class Town:
             yng = person.Person()
 
             dice_roll = seed.getRand()
-            if dice_roll > 6:
-                yng.age = 'Teenager'
-            elif dice_roll > 3:
+            if dice_roll > 4:
                 yng.age = 'Child'
             else:
                 yng.age = 'Baby'
@@ -189,6 +238,8 @@ class Town:
 
         # Assemble relations_in_house
         for dude in family:
+            if dude.age == 'YoungAdult' or dude.age == 'Adult':
+                self.workable = self.workable + 1
             for i, other_dude in enumerate(dude.relation_persons):
                 if other_dude in family:
                     dude.relation_persons_in_house.append(other_dude)
@@ -204,17 +255,33 @@ class Town:
         pass
 
     def createPopulation(self):
+        self.people = []
         for house in self.noble_houses:
-            family = self.createFamily('noble')
+            family = self.createFamily('Noble')
             self.map_points[house.y][house.x].people = family
+
+            for dude in family:
+                # print('Adding {} {} to town population.'.format(dude.name,
+                #                                                 dude.family_name))
+                self.people.append(dude)
 
         for house in self.middle_houses:
-            family = self.createFamily('middle')
+            family = self.createFamily('Middle')
             self.map_points[house.y][house.x].people = family
 
+            for dude in family:
+                # print('Adding {} {} to town population.'.format(dude.name,
+                #                                                 dude.family_name))
+                self.people.append(dude)
+
         for house in self.poor_houses:
-            family = self.createFamily('poor')
+            family = self.createFamily('Poor')
             self.map_points[house.y][house.x].people = family
+
+            for dude in family:
+                # print('Adding {} {} to town population.'.format(dude.name,
+                #                                                 dude.family_name))
+                self.people.append(dude)
 
     def createPointPlacementRadius(self):
         self.placement_radius = []
@@ -301,15 +368,17 @@ class Town:
         self.plumbing_area = int(20  * (1 + area_mod) * (self.map_area/map_unit_area))
         self.market_area =   int(100 * (1 + area_mod) * (self.map_area/map_unit_area))
         self.trade_area =    int(60  * (1 + area_mod) * (self.map_area/map_unit_area))
+        self.doctor_area =   int(30  * (1 + area_mod) * (self.map_area/map_unit_area))
         self.inn_area =      int(30  * (1 + area_mod) * (self.map_area/map_unit_area))
         self.special_area =  int(100 * (1 + area_mod) * (self.map_area/map_unit_area))
-        self.empty_area =    int(20 * (self.map_area/map_unit_area))
+        self.empty_area =    int(20  * (self.map_area/map_unit_area))
 
         free_area =  int(self.map_area - self.tavern_area - self.plumbing_area -
                          self.market_area - self.trade_area - self.inn_area -
-                         self.special_area - self.road_area - self.empty_area)
+                         self.special_area - self.road_area - self.empty_area -
+                         self.doctor_area)
 
-        self.number_noble_house =  int(free_area * (0.05 + self.wealth/100))
+        self.number_noble_house =  int(free_area * (0.03 + self.wealth/100))
         self.number_middle_house = int(free_area * (0.1 + self.wealth/100))
         self.number_poor_house =   int((free_area - self.number_noble_house -
                                         self.number_middle_house)*0.25)
@@ -618,6 +687,7 @@ class Town:
 
     def generateWealth(self):
         self.wealth = int(seed.getRand()) - 5
+        self.employment = (self.wealth + 6) * 10
 
     def getAvailableBlocks(self):
         self.noble_blocks =  int(len(self.block_list) * self.number_noble_house /
@@ -685,6 +755,14 @@ class Town:
 
                 block = Block(top_left_x, top_left_y, bot_right_x, bot_right_y)
                 self.block_list.append(block)
+
+    def getWorkPlaces(self):
+        self.workplaces = []
+
+        for row in self.map_points:
+            for place in row:
+                if place.building_type in Work_Places:
+                    self.workplaces.append(place)
 
     def increasePopulation(self, num):
         self.population = self.population + num
@@ -955,6 +1033,7 @@ class Town:
                 num_points = self.inn_area
                 point_building = 'Inn'
             elif building == 'special_idx':
+                num_points = self.special_area
                 if self.economy == 'Farm':
                     point_building = 'Barn'
                 elif self.economy == 'Military':
@@ -971,11 +1050,12 @@ class Town:
                     point_building = 'Weavery'
                 elif self.economy == 'Colosseum':
                     point_building = 'Colosseum'
+                elif self.economy == 'Mine':
+                    point_building = 'Mine'
                 else:
                     point_building = 'none'
                     self.logger.warning('Set building to {0} because town.economy {1} is not recognized.'
                                    .format(point_building, self.economy))
-                num_points = self.special_area
             else:
                 num_points = 0
                 point_building = 'none'

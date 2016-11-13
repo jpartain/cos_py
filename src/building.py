@@ -10,9 +10,30 @@ CommonBuildings = ['Road',
                    'PublicPlumbing',
                    'Market',
                    'TradePost',
+                   'Doctor',
                    'Inn']
 
+# Work_Places dict with number of employees per building cell
+Work_Places = {'NobleHouse':3,
+               'Tavern':2,
+               'PublicPlumbing':1,
+               'Market':4,
+               'TradePost':4,
+               'Doctor':3,
+               'Inn':2,
+               'Barn':2,
+               'Mine':4,
+               'Butcher':1,
+               'Mason':4,
+               'Blacksmith':2,
+               'Weavery':3,
+               'Barracks':4,
+               'LumberMill':4,
+               'Cathedral':3,
+               'Colosseum':4}
+
 SpecialBuildings = ['Barn',
+                    'Mine',
                     'Butcher',
                     'Mason',
                     'Blacksmith',
@@ -30,6 +51,13 @@ class Building:
         self.building_type = building_type
         self.health = 100
         self.people = []
+        self.employees = []
+
+    def fullyStaffed(self):
+        if self.employees == Work_Places[self.building_type]:
+            return True
+        else:
+            return False
 
     def generateSize(self, string):
         pass
@@ -112,11 +140,13 @@ class Building:
         elif typ == 'Lumbermill':
             char = '[color=275749]E[/color]'
         elif typ == 'Cathedral':
-            char = '[color=000000]+[/color]'
+            char = '[color=ffffff]+[/color]'
         elif typ == 'Weavery':
             char = '[color=275749]Y[/color]'
         elif typ == 'Colosseum':
             char = '[color=275749]O[/color]'
+        elif typ == 'Doctor':
+            char = '[color=000049]C[/color]'
         else:
             char = '[color=00b000]*[/color]'
         return char

@@ -34,8 +34,6 @@ class MainMenuScreen(Screen):
         logger.addHandler(fh)
         # End logging stuff
 
-        seed.initSeed()
-
     def goToMapScreen(self):
         self.manager.current = 'map'
 
@@ -83,15 +81,31 @@ class MapScreen(Screen):
         pos_x = int(value.split()[0])
         pos_y = int(value.split()[1])
 
-        try:
-            people = towns[current_town_map].map_points[pos_y][pos_x].people
-            self.names_box = '[b][u]{}\'s[/u][/b]\n'.format(people[0].family_name)
+        place = towns[current_town_map].map_points[pos_y][pos_x]
+        b_type = place.building_type
+        self.names_box = '[b]{0}[/b]\n\n'.format(b_type)
+
+        if len(place.people) != 0:
+            people = place.people
+            self.names_box = self.names_box + \
+                                '[b][u]Family - {}[/u][/b]\n'.format(people[0].family_name)
             for dude in people:
                 self.names_box = self.names_box + dude.__str__()
 
-        except IndexError:
-            # probably an empty map spot
-            self.names_box = 'No people found.'
+            self.names_box = self.names_box + '\n'
+
+        else:
+            self.names_box = self.names_box + '[b][u]Family - None[/u][/b]\n\n'
+
+        emp_str = '[b][u]Employees[/u][/b]\n'
+        self.names_box = self.names_box + emp_str
+        if len(place.employees) != 0:
+            employees = place.employees
+            for dude in employees:
+                self.names_box = self.names_box + \
+                                    '    {0} {1}\n'.format(dude.name, dude.family_name)
+        else:
+            self.names_box = self.names_box + '    None'
 
     def showMap(self, instance, value):
         current_town_map = value

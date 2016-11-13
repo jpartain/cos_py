@@ -6,7 +6,6 @@ logger = logging.getLogger(__name__)
 
 Age = ['Baby',
        'Child',
-       'Teenager'
        'YoungAdult',
        'Adult',
        'Old']
@@ -76,24 +75,25 @@ def createFamilyName():
 
 class Person:
     def __init__(self):
-        self.wealth = 0
-        self.approval = 0
-        self.fulfillment = 0
-        self.fame = 0
-        self.consensus = 0
         self.age = ''
-        self.integrity = 0
-        self.toughness = 0
-        self.gender = ''
-        self.opinion_of_others = []
-        self.job_title = ''
-        self.inventory = []
+        self.approval = 0
+        self.consensus = 0
+        self.employed = False
+        self.fame = 0
         self.family_name = ''
+        self.fulfillment = 0
+        self.gender = ''
+        self.integrity = 0
+        self.inventory = []
+        self.job_title = ''
         self.name = ''
+        self.opinion_of_others = []
         self.relation_persons = []
-        self.relations = []
         self.relation_persons_in_house = []
+        self.relations = []
         self.relations_in_house = []
+        self.toughness = 0
+        self.wealth = 0
 
     def addRelation(self, person, relation):
         self.relation_persons.append(person)
