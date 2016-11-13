@@ -50,6 +50,8 @@ class Town:
 
     def assignJobs(self):
         num_to_employ = int(self.workable * self.employment / 100)
+        print('{} - {}'.format(num_to_employ / len(self.workplaces),
+                               self.employment))
         every_place_has_one = False
         every_one_list = []
 
@@ -88,7 +90,10 @@ class Town:
                         workplace.employees.append(dude)
                         dude.employed = True
 
-                        if len(workplace.employees) == int(seed.getRand() / 3) + 1:
+                        # Scales with wealth to make sure we have enough places
+                        # for workers
+                        if len(workplace.employees) >= (int(seed.getRand() / 3)
+                                                        + num_to_employ / len(self.workplaces)):
                             self.workplaces.remove(workplace)
 
                     employed = employed + 1
