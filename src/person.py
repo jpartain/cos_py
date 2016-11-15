@@ -73,11 +73,12 @@ class Person:
         self.family_name = ''
         self.fulfillment = 0
         self.gender = ''
+        self.house = None
         self.integrity = 0
         self.inventory = []
         self.job_title = ''
         self.name = ''
-        self.opinion_of_others = []
+        self.opinion_of_others = {}
         self.relation_persons = []
         self.relation_persons_in_house = []
         self.relations = []

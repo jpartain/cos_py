@@ -1,4 +1,3 @@
-import logging
 import random
 
 from building import *
@@ -24,8 +23,6 @@ t_names_len = len(t_names)
 
 class Town:
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
-
         self.mayor = None
         self.officials = []
 
@@ -48,32 +45,31 @@ class Town:
         self.getWorkPlaces()
         self.assignJobs()
         self.assignOfficials()
+        self.createOpinions()
 
     def addToBuildingPoints(self, building_type, x, y):
-        if building_type == 'Tavern':
-            self.tavern.append(self.map_points[y][x])
+        self.work_places_dict = {'Tavern':           self.tavern,
+                                 'PublicPlumbing':   self.publicplumbing,
+                                 'Market':           self.market,
+                                 'TradePost':        self.tradepost,
+                                 'Doctor':           self.doctor,
+                                 'Inn':              self.inn,
+                                 'Special':          self.special,
+                                 'Barn':             self.special,
+                                 'Mine':             self.special,
+                                 'Butcher':          self.special,
+                                 'Mason':            self.special,
+                                 'Blacksmith':       self.special,
+                                 'Weavery':          self.special,
+                                 'Barracks':         self.special,
+                                 'Lumbermill':       self.special,
+                                 'Cathedral':        self.special,
+                                 'Colosseum':        self.special}
+        try:
+            self.work_places_dict[building_type].append(self.map_points[y][x])
 
-        elif building_type == 'PublicPlumbing':
-            self.publicplumbing.append(self.map_points[y][x])
-
-        elif building_type == 'Market':
-            self.market.append(self.map_points[y][x])
-
-        elif building_type == 'TradePost':
-            self.tradepost.append(self.map_points[y][x])
-
-        elif building_type == 'Doctor':
-            self.doctor.append(self.map_points[y][x])
-
-        elif building_type == 'Inn':
-            self.inn.append(self.map_points[y][x])
-
-        elif building_type == 'Special':
-            self.special.append(self.map_points[y][x])
-
-        else:
+        except KeyError:
             print('{} not a valid building type in addToBuildingPoints'.format(building_type))
-            pass
 
     def addNewEmployee(self, place, dude):
         if place.building_type == 'Tavern':
@@ -490,12 +486,12 @@ class Town:
         height = self.height
         width = self.width
 
-        self.map_points = [[Building('none') for i in range(width)] for j in range(height)]
+        self.map_points = [[None for i in range(width)] for j in range(height)]
         self.map_area = height * width
 
         for y, row in enumerate(self.map_points):
             for x, cell in enumerate(row):
-                building = Building('none')
+                building = Building('none', x, y)
 
                 # Place roads on map edge
                 if (x == 0) or (x == width - 1) or (y == 0) or (y == height - 1):
@@ -513,7 +509,7 @@ class Town:
 
                 self.map_points[y][x] = building
 
-    def createFamily(self, wealth):
+    def createFamily(self, wealth, house):
         family = []
         family_name = person.createFamilyName()
         family_size = random.randint(1, 10)
@@ -547,15 +543,60 @@ class Town:
         # for dude in family:
             # print('Name - {0} - {1}'.format(dude, dude.age))
 
+        for dude in family:
+            dude.house = house
+
         return family
 
-    def createOpinions(self, string):
-        pass
+    def createOpinions(self):
+        for dude in self.people:
+
+            # Family opinions
+            # print('Creating family member opinions')
+            for member in dude.relation_persons_in_house:
+                dude.opinion_of_others[member] = random.randint(-2, 2)
+                # print('{} {}\'s opinion of {} {} is {}'.format(dude.name,
+                #                                                dude.family_name,
+                #                                                member.name,
+                #                                                member.family_name,
+                #                                                dude.opinion_of_others[member]))
+
+            # Coworker opinions
+            if dude.employed:
+                print('\nCreating coworker opinions')
+                try:
+                    for point in self.work_places_dict[dude.workplace]:
+                        for coworker in point.employees:
+                            dude.opinion_of_others[coworker] = random.randint(-2, 2)
+                            print('{} {}\'s opinion of {} {} is {}'.format(dude.name,
+                                                                           dude.family_name,
+                                                                           coworker.name,
+                                                                           coworker.family_name,
+                                                                           dude.opinion_of_others[coworker]))
+                except KeyError:
+                    print('{} not a valid building type in dude.workplace in createOpinions'.format(dude.workplace))
+
+            # Neighbor opinions
+            # print('\nCreating neighbor opinions')
+            for y_pos in range(dude.house.y - 5, dude.house.y + 5):
+                for x_pos in range(dude.house.x - 5, dude.house.x + 5):
+
+                    if x_pos < 0 or x_pos > self.width - 1 or y_pos < 0 or y_pos > self.height - 1:
+                        continue
+
+                    neighbor_house = self.map_points[y_pos][x_pos]
+                    for neighbor in neighbor_house.people:
+                        dude.opinion_of_others[neighbor] = random.randint(-2, 2)
+                        # print('{} {}\'s opinion of {} {} is {}'.format(dude.name,
+                        #                                                dude.family_name,
+                        #                                                neighbor.name,
+                        #                                                neighbor.family_name,
+                        #                                                dude.opinion_of_others[neighbor]))
 
     def createPopulation(self):
         self.people = []
         for house in self.noble_houses:
-            family = self.createFamily('Noble')
+            family = self.createFamily('Noble', house)
             self.map_points[house.y][house.x].people = family
 
             for dude in family:
@@ -564,7 +605,7 @@ class Town:
                 self.people.append(dude)
 
         for house in self.middle_houses:
-            family = self.createFamily('Middle')
+            family = self.createFamily('Middle', house)
             self.map_points[house.y][house.x].people = family
 
             for dude in family:
@@ -573,7 +614,7 @@ class Town:
                 self.people.append(dude)
 
         for house in self.poor_houses:
-            family = self.createFamily('Poor')
+            family = self.createFamily('Poor', house)
             self.map_points[house.y][house.x].people = family
 
             for dude in family:
@@ -1369,7 +1410,8 @@ class Town:
                 if self.pointGoodToUse(start_y, start_x, block):
                     placed = True
 
-            self.map_points[start_y][start_x] = Building(point_building)
+            self.map_points[start_y][start_x] = Building(point_building,
+                                                         start_x, start_y)
 
             if (point_building == 'Barn' or point_building == 'Barracks' or
                 point_building == 'Mason' or point_building == 'Blacksmith' or
@@ -1390,7 +1432,8 @@ class Town:
 
                     point_num = point_num + 1
 
-                self.map_points[point_y][point_x] = Building(point_building)
+                self.map_points[point_y][point_x] = Building(point_building,
+                                                             point_x, point_y)
 
                 if (point_building == 'Barn' or point_building == 'Barracks' or
                     point_building == 'Mason' or point_building == 'Blacksmith' or
@@ -1408,7 +1451,8 @@ class Town:
             begin_y = int(((block.bot_right_y - block.top_left_y) *
                           int(random.randint(0, 9))/10 + block.top_left_y))
 
-            self.map_points[begin_y][begin_x] = Building(block.wealth)
+            self.map_points[begin_y][begin_x] = Building(block.wealth, begin_x,
+                                                         begin_y)
             point_x = begin_x
             point_y = begin_y
 
@@ -1453,7 +1497,8 @@ class Town:
 
                 iteration = iteration + 1
 
-        self.map_points[place_y][place_x] = Building(block.wealth)
+        self.map_points[place_y][place_x] = Building(block.wealth, place_x,
+                                                     place_y)
 
         if block.wealth == 'NobleHouse':
             self.placed_nobles = self.placed_nobles + 1

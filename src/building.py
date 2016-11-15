@@ -45,29 +45,12 @@ SpecialBuildings = ['Barn',
 
 
 class Building:
-    def __init__(self, building_type):
-        # self.generateSize(seed[0])
-        # self.generateOccupants(seed[3:20])
+    def __init__(self, building_type, x, y):
         self.building_type = building_type
         self.health = 100
         self.people = []
         self.employees = []
-
-    def fullyStaffed(self):
-        if self.employees == Work_Places[self.building_type]:
-            return True
-        else:
-            return False
-
-    def generateSize(self, string):
-        pass
-
-    def generateType(self, string):
-        pass
-
-    def generateOccupants(self, string):
-        pass
-
+        self.point = [y, x]
     '''
     def __str__(self):
         typ = self.building_type

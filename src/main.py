@@ -1,4 +1,3 @@
-import logging
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.screenmanager import Screen, ScreenManager
@@ -22,16 +21,6 @@ class MainMenuScreen(Screen):
 
     def __init__(self, **kwargs):
         super(MainMenuScreen, self).__init__(**kwargs)
-
-        # Logging stuff
-        logger = logging.getLogger(__name__)
-        logger.setLevel(logging.INFO)
-        fh = logging.FileHandler('info.log')
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s -\
-                                    %(message)s')
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-        # End logging stuff
 
     def goToMapScreen(self):
         self.manager.current = 'map'
