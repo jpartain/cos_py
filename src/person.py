@@ -39,10 +39,11 @@ Title = ['Mayor'
          'RockMason'
          'Smithy',
          'Lumberjack',
+         'Doctor',
+         'Nurse',
          'Weaver',
          'Bartender',
-         'Waiter',
-         'Waitress',
+         'Worker',
          'Janitor',
          'Trader',
          'Seller',
@@ -94,6 +95,7 @@ class Person:
         self.relations_in_house = []
         self.toughness = 0
         self.wealth = 0
+        self.workplace = ''
 
     def addRelation(self, person, relation):
         self.relation_persons.append(person)

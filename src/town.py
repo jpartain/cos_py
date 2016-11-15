@@ -48,10 +48,283 @@ class Town:
         self.getWorkPlaces()
         self.assignJobs()
 
+    def addToBuildingPoints(self, building_type, x, y):
+        if building_type == 'Tavern':
+            self.tavern.append(self.map_points[y][x])
+
+        elif building_type == 'PublicPlumbing':
+            self.publicplumbing.append(self.map_points[y][x])
+
+        elif building_type == 'Market':
+            self.market.append(self.map_points[y][x])
+
+        elif building_type == 'TradePost':
+            self.tradepost.append(self.map_points[y][x])
+
+        elif building_type == 'Doctor':
+            self.doctor.append(self.map_points[y][x])
+
+        elif building_type == 'Inn':
+            self.inn.append(self.map_points[y][x])
+
+        elif building_type == 'Special':
+            self.special.append(self.map_points[y][x])
+
+        else:
+            print('{} not a valid building type in addToBuildingPoints'.format(building_type))
+            pass
+
+    def addNewEmployee(self, place, dude):
+        if place.building_type == 'Tavern':
+            owners = 0
+
+            for other_blocks in self.tavern:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Owner':
+                        owners = owners + 1
+                    else:
+                        pass
+
+            if owners == 0:
+                dude.job_title = 'Owner'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'NobleHouse':
+            dude.job_title = 'Servant'
+
+        elif place.building_type == 'PublicPlumbing':
+            dude.job_title = 'Janitor'
+
+        elif place.building_type == 'Market':
+            sellers = 0
+
+            for other_blocks in self.market:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Seller':
+                        sellers = sellers + 1
+                    else:
+                        pass
+
+            if sellers < 10:
+                dude.job_title = 'Seller'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'TradePost':
+            traders = 0
+
+            for other_blocks in self.tradepost:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Trader':
+                        traders = traders + 1
+                    else:
+                        pass
+
+                if traders < 10:
+                    dude.job_title = 'Trader'
+                else:
+                    dude.job_title = 'Worker'
+
+        elif place.building_type == 'Doctor':
+            doctors = 0
+
+            for other_blocks in self.doctor:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Doctor':
+                        traders = traders + 1
+                    else:
+                        pass
+
+                if traders < 5:
+                    dude.job_title = 'Doctor'
+                else:
+                    dude.job_title = 'Nurse'
+
+        elif place.building_type == 'Inn':
+            owners = 0
+
+            for other_blocks in self.inn:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Owner':
+                        owners = owners + 1
+                    else:
+                        pass
+
+                if owners == 0:
+                    dude.job_title = 'Owner'
+                else:
+                    dude.job_title = 'Worker'
+
+        # There's currently only one special building per map right now, as per
+        # the Town.economy
+        elif place.building_type == 'Barn':
+            owners = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Owner':
+                        owners = owners + 1
+                    else:
+                        pass
+
+            if owners == 0:
+                dude.job_title = 'Owner'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'Mine':
+            foremen = 0
+
+            for other_blocks in self.inn:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Foreman':
+                        foremen = foremen + 1
+                    else:
+                        pass
+
+            if owners < 5:
+                dude.job_title = 'Foreman'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'Butcher':
+            butchers = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Butcher':
+                        butchers = butchers + 1
+                    else:
+                        pass
+
+            if butchers < 8:
+                dude.job_title = 'Butcher'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'Mason':
+            foremen = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Foreman':
+                        Foreman = Foreman + 1
+                    else:
+                        pass
+
+            if foremen < 5:
+                dude.job_title = 'Foreman'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'Blacksmith':
+            smiths = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Smith':
+                        smiths = smiths + 1
+                    else:
+                        pass
+
+            if smiths < 5:
+                dude.job_title = 'Smith'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'Weavery':
+            owners = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Owner':
+                        owners = owners + 1
+                    else:
+                        pass
+
+            if owners == 0:
+                dude.job_title = 'Owner'
+            else:
+                dude.job_title = 'Weaver'
+
+        elif place.building_type == 'Barracks':
+            sergeants = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Sergeant':
+                        sergeants = sergeants + 1
+                    else:
+                        pass
+
+            if sergeants < 5:
+                dude.job_title = 'Sergeant'
+            else:
+                dude.job_title = 'Soldier'
+
+        elif place.building_type == 'Lumbermill':
+            owners = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Owner':
+                        owners = owners + 1
+                    else:
+                        pass
+
+            if owners == 0:
+                dude.job_title = 'Owner'
+            else:
+                dude.job_title = 'Worker'
+
+        elif place.building_type == 'Cathedral':
+            bishops = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Bishop':
+                        owners = owners + 1
+                    else:
+                        pass
+
+            if bishops == 3:
+                dude.job_title = 'Bishop'
+            else:
+                dude.job_title = 'Clergy'
+
+        elif place.building_type == 'Colosseum':
+            owners = 0
+            entertainers = 0
+
+            for other_blocks in self.special:
+                for peep in other_blocks.employees:
+                    if peep.job_title == 'Owner':
+                        owners = owners + 1
+                    elif peep.job_title == 'Entertainer':
+                        entertainers = entertainers + 1
+                    else:
+                        pass
+
+            if owners == 0:
+                dude.job_title = 'Owner'
+            elif entertainers < 5:
+                dude.job_title = 'Entertainer'
+            else:
+                dude.job_title = 'Worker'
+
+        else:
+            # print('Not a valid building type in addToBuildingPoints')
+            pass
+
+        place.employees.append(dude)
+        dude.employed = True
+        dude.workplace = place.building_type
+
     def assignJobs(self):
         num_to_employ = int(self.workable * self.employment / 100)
-        print('{} - {}'.format(num_to_employ / len(self.workplaces),
-                               self.employment))
+        # print('{} - {}'.format(num_to_employ / len(self.workplaces),
+        #                        self.employment))
         every_place_has_one = False
         every_one_list = []
 
@@ -77,8 +350,7 @@ class Town:
                             workplace_idx = int((len(every_one_list) - 1) * rand_percent)
                             workplace = every_one_list.pop(workplace_idx)
 
-                            workplace.employees.append(dude)
-                            dude.employed = True
+                            self.addNewEmployee(workplace, dude)
 
                         else:
                             every_place_has_one = True
@@ -87,8 +359,7 @@ class Town:
                         workplace_idx = int((num_workplaces - 1) * rand_percent)
                         workplace = self.workplaces[workplace_idx]
 
-                        workplace.employees.append(dude)
-                        dude.employed = True
+                        self.addNewEmployee(workplace, dude)
 
                         # Scales with wealth to make sure we have enough places
                         # for workers
@@ -999,6 +1270,14 @@ class Town:
         self.middle_houses = []
         self.poor_houses = []
 
+        self.tavern = []
+        self.publicplumbing = []
+        self.market = []
+        self.tradepost = []
+        self.doctor = []
+        self.inn = []
+        self.special = []
+
         self.placed_nobles = 0
         self.placed_middle = 0
         self.placed_poor = 0
@@ -1078,6 +1357,15 @@ class Town:
                 if self.pointGoodToUse(start_y, start_x, block):
                     placed = True
 
+            if (point_building == 'Barn' or point_building == 'Barracks' or
+                point_building == 'Mason' or point_building == 'Blacksmith' or
+                point_building == 'Lumbermill' or point_building == 'Cathedral' or
+                point_building == 'Weavery' or point_building == 'Colosseum' or
+                point_building == 'Mine'):
+                self.addToBuildingPoints('Special', start_x, start_y)
+            else:
+                self.addToBuildingPoints(point_building, start_x, start_y)
+
             self.map_points[start_y][start_x] = Building(point_building)
 
             for i in range(num_points - 1):
@@ -1089,6 +1377,15 @@ class Town:
                         placed = True
 
                     point_num = point_num + 1
+
+                if (point_building == 'Barn' or point_building == 'Barracks' or
+                    point_building == 'Mason' or point_building == 'Blacksmith' or
+                    point_building == 'Lumbermill' or point_building == 'Cathedral' or
+                    point_building == 'Weavery' or point_building == 'Colosseum' or
+                    point_building == 'Mine'):
+                    self.addToBuildingPoints('Special', start_x, start_y)
+                else:
+                    self.addToBuildingPoints(point_building, start_x, start_y)
 
                 self.map_points[point_y][point_x] = Building(point_building)
 

@@ -103,7 +103,10 @@ class MapScreen(Screen):
             employees = place.employees
             for dude in employees:
                 self.names_box = self.names_box + \
-                                    '    {0} {1}\n'.format(dude.name, dude.family_name)
+                                    '    {0} {1} - {2}\n'.format(dude.name,
+                                                                 dude.family_name,
+                                                                 dude.job_title)
+                # print(dude.name, dude.job_title)
         else:
             self.names_box = self.names_box + '    None'
 

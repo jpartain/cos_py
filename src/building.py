@@ -28,7 +28,7 @@ Work_Places = {'NobleHouse':3,
                'Blacksmith':2,
                'Weavery':3,
                'Barracks':4,
-               'LumberMill':4,
+               'Lumbermill':4,
                'Cathedral':3,
                'Colosseum':4}
 
