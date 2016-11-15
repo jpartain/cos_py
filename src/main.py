@@ -77,6 +77,8 @@ class MapScreen(Screen):
         self.manager.current = 'main_menu'
 
     def labelPress(self, instance, value):
+        global current_town_map
+
         pos_x = int(value.split()[0])
         pos_y = int(value.split()[1])
 
@@ -110,7 +112,8 @@ class MapScreen(Screen):
             self.names_box = self.names_box + '    None'
 
     def showMap(self, instance, value):
-        current_town_map = value
+        global current_town_map
+
         for i, place in enumerate(towns):
             if place.name == value:
                 current_town_map = i
