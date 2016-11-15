@@ -26,6 +26,9 @@ class Town:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
+        self.mayor = None
+        self.officials = []
+
         self.population = 0
         self.workable = 0
         self.createPointPlacementRadius()
@@ -47,6 +50,7 @@ class Town:
         self.createPopulation()
         self.getWorkPlaces()
         self.assignJobs()
+        self.assignOfficials()
 
     def addToBuildingPoints(self, building_type, x, y):
         if building_type == 'Tavern':
@@ -183,7 +187,7 @@ class Town:
                     else:
                         pass
 
-            if owners < 5:
+            if foremen < 5:
                 dude.job_title = 'Foreman'
             else:
                 dude.job_title = 'Worker'
@@ -209,7 +213,7 @@ class Town:
             for other_blocks in self.special:
                 for peep in other_blocks.employees:
                     if peep.job_title == 'Foreman':
-                        Foreman = Foreman + 1
+                        foremen = foremen + 1
                     else:
                         pass
 
@@ -279,19 +283,19 @@ class Town:
                 dude.job_title = 'Worker'
 
         elif place.building_type == 'Cathedral':
-            bishops = 0
+            priests = 0
 
             for other_blocks in self.special:
                 for peep in other_blocks.employees:
-                    if peep.job_title == 'Bishop':
-                        owners = owners + 1
+                    if peep.job_title == 'Priest':
+                        priests = priests + 1
                     else:
                         pass
 
-            if bishops == 3:
-                dude.job_title = 'Bishop'
+            if priests == 3:
+                dude.job_title = 'Priest'
             else:
-                dude.job_title = 'Clergy'
+                dude.job_title = 'Acolyte'
 
         elif place.building_type == 'Colosseum':
             owners = 0
@@ -381,6 +385,40 @@ class Town:
         name_idx = int((num1 * num2 * num3 * num4) / 10000 * (t_names_len - 1))
 
         self.name = t_names[name_idx]
+
+    def assignOfficials(self):
+        all_assigned = False
+        num_officials_to_go = 10
+        num_mayor_to_go = 1
+
+        while not all_assigned:
+            new_rand_idx = int((seed.getRand() * seed.getRand() *
+                                seed.getRand()) / 729 * len(self.people))
+            dude = self.people[new_rand_idx]
+
+            if (not dude.employed) and (dude.wealth != 'Poor') and\
+            (dude.age != 'Baby'):
+                    if num_mayor_to_go == 1:
+                        dude.job_title = 'Mayor'
+                        dude.employed = True
+                        self.mayor = dude
+                        num_mayor_to_go = 0
+                    elif num_officials_to_go > 0:
+                        dude.job_title = 'Official'
+                        dude.employed = True
+                        self.officials.append(dude)
+                        num_officials_to_go = num_officials_to_go - 1
+                    else:
+                        all_assigned = True
+
+            else:
+                continue
+
+        print('Mayor: {} {}'.format(self.mayor.name, self.mayor.family_name))
+
+        print('Officials:\n', end='')
+        for dude in self.officials:
+            print('\t{} {}'.format(dude.name, dude.family_name))
 
     def assignWorkplace(self, person, building):
         pass

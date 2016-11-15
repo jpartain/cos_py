@@ -27,8 +27,6 @@ Relations = ['Spouse',
 
 Title = ['Mayor'
          'Official',
-         'Prince',
-         'Princess',
          'Servant',
          'Priest',
          'Acolyte',
