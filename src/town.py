@@ -344,11 +344,9 @@ class Town:
             if not dude.employed:
                 if dude.age == 'Adult' or dude.age == 'YoungAdult':
 
-                    rand_percent = random.randint(0, 81) / 81
-
                     if not every_place_has_one:
                         if len(every_one_list) != 0:
-                            workplace_idx = int((len(every_one_list) - 1) * rand_percent)
+                            workplace_idx = random.randint(0, len(every_one_list) - 1)
                             workplace = every_one_list.pop(workplace_idx)
 
                             self.addNewEmployee(workplace, dude)
@@ -357,7 +355,7 @@ class Town:
                             every_place_has_one = True
 
                     else:
-                        workplace_idx = int((num_workplaces - 1) * rand_percent)
+                        workplace_idx = random.randint(0, num_workplaces - 1)
                         workplace = self.workplaces[workplace_idx]
 
                         self.addNewEmployee(workplace, dude)
@@ -404,11 +402,11 @@ class Town:
             else:
                 continue
 
-        print('Mayor: {} {}'.format(self.mayor.name, self.mayor.family_name))
+        # print('Mayor: {} {}'.format(self.mayor.name, self.mayor.family_name))
 
-        print('Officials:\n', end='')
-        for dude in self.officials:
-            print('\t{} {}'.format(dude.name, dude.family_name))
+        # print('Officials:\n', end='')
+        # for dude in self.officials:
+        #     print('\t{} {}'.format(dude.name, dude.family_name))
 
     def assignWorkplace(self, person, building):
         pass
@@ -1371,6 +1369,8 @@ class Town:
                 if self.pointGoodToUse(start_y, start_x, block):
                     placed = True
 
+            self.map_points[start_y][start_x] = Building(point_building)
+
             if (point_building == 'Barn' or point_building == 'Barracks' or
                 point_building == 'Mason' or point_building == 'Blacksmith' or
                 point_building == 'Lumbermill' or point_building == 'Cathedral' or
@@ -1379,8 +1379,6 @@ class Town:
                 self.addToBuildingPoints('Special', start_x, start_y)
             else:
                 self.addToBuildingPoints(point_building, start_x, start_y)
-
-            self.map_points[start_y][start_x] = Building(point_building)
 
             for i in range(num_points - 1):
                 placed = False
@@ -1392,16 +1390,16 @@ class Town:
 
                     point_num = point_num + 1
 
+                self.map_points[point_y][point_x] = Building(point_building)
+
                 if (point_building == 'Barn' or point_building == 'Barracks' or
                     point_building == 'Mason' or point_building == 'Blacksmith' or
                     point_building == 'Lumbermill' or point_building == 'Cathedral' or
                     point_building == 'Weavery' or point_building == 'Colosseum' or
                     point_building == 'Mine'):
-                    self.addToBuildingPoints('Special', start_x, start_y)
+                    self.addToBuildingPoints('Special', point_x, point_y)
                 else:
-                    self.addToBuildingPoints(point_building, start_x, start_y)
-
-                self.map_points[point_y][point_x] = Building(point_building)
+                    self.addToBuildingPoints(point_building, point_x, point_y)
 
         # Placing housing
         for i, block in enumerate(self.block_list):
