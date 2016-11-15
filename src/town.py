@@ -1,8 +1,8 @@
 import logging
+import random
 
 from building import *
 from block import Block
-import seed
 import person
 
 
@@ -40,11 +40,8 @@ class Town:
         self.generateNobility()
         self.generateHomeless()
         self.buildMap()
-        # self.generateMap(seed[6:25])
         self.generateBuildingRatios()
         self.getStreetBlocks()
-        # self.createRoadsEquations(seed[25:126])
-        # self.placeRoads()
         self.fillStreetBlocks()
         self.placeBuildings()
         self.createPopulation()
@@ -347,7 +344,7 @@ class Town:
             if not dude.employed:
                 if dude.age == 'Adult' or dude.age == 'YoungAdult':
 
-                    rand_percent = seed.getRand() * seed.getRand() / 81
+                    rand_percent = random.randint(0, 81) / 81
 
                     if not every_place_has_one:
                         if len(every_one_list) != 0:
@@ -367,7 +364,7 @@ class Town:
 
                         # Scales with wealth to make sure we have enough places
                         # for workers
-                        if len(workplace.employees) >= (int(seed.getRand() / 3)
+                        if len(workplace.employees) >= (random.randint(1, 3)
                                                         + num_to_employ / len(self.workplaces)):
                             self.workplaces.remove(workplace)
 
@@ -377,13 +374,7 @@ class Town:
                     #                                           workplace.building_type))
 
     def assignName(self):
-        num1 = seed.getRand() + 1
-        num2 = seed.getRand() + 1
-        num3 = seed.getRand() + 1
-        num4 = seed.getRand() + 1
-
-        name_idx = int((num1 * num2 * num3 * num4) / 10000 * (t_names_len - 1))
-
+        name_idx = random.randint(0, t_names_len - 1)
         self.name = t_names[name_idx]
 
     def assignOfficials(self):
@@ -392,8 +383,7 @@ class Town:
         num_mayor_to_go = 1
 
         while not all_assigned:
-            new_rand_idx = int((seed.getRand() * seed.getRand() *
-                                seed.getRand()) / 729 * len(self.people))
+            new_rand_idx = random.randint(0, len(self.people) - 1)
             dude = self.people[new_rand_idx]
 
             if (not dude.employed) and (dude.wealth != 'Poor') and\
@@ -435,7 +425,7 @@ class Town:
             old = person.Person()
             old.age = 'Old'
 
-            if seed.getRand() > 4:
+            if random.randint(0, 1) > 0:
                 old.gender = 'Male'
             else:
                 old.gender = 'Female'
@@ -450,12 +440,12 @@ class Town:
         for i in range(15):
             mid = person.Person()
 
-            if seed.getRand() > 4:
+            if random.randint(0, 1) > 0:
                 mid.age = 'Adult'
             else:
                 mid.age = 'YoungAdult'
 
-            if seed.getRand() > 4:
+            if random.randint(0, 1) > 0:
                 mid.gender = 'Male'
             else:
                 mid.gender = 'Female'
@@ -470,13 +460,12 @@ class Town:
         for i in range(20):
             yng = person.Person()
 
-            dice_roll = seed.getRand()
-            if dice_roll > 4:
+            if random.randint(0, 1) > 0:
                 yng.age = 'Child'
             else:
                 yng.age = 'Baby'
 
-            if seed.getRand() > 4:
+            if random.randint(0, 1) > 0:
                 yng.gender = 'Male'
             else:
                 yng.gender = 'Female'
@@ -529,7 +518,7 @@ class Town:
     def createFamily(self, wealth):
         family = []
         family_name = person.createFamilyName()
-        family_size = seed.getRand() + 1
+        family_size = random.randint(1, 10)
 
         self.increasePopulation(family_size)
         unpruned_family_list = self.buildFamilyTree(family_name, wealth)
@@ -539,16 +528,13 @@ class Town:
 
         for dude in serial_family_list:
             if dude.relations == []:
-                if seed.getRand() > 2:
+                if random.randint(0, 9) > 2:
                     serial_family_list.remove(dude)
 
         for i in range(family_size):
             length = len(serial_family_list) - 1
-            rand = seed.getRand() * seed.getRand()
-            max_rand = 81
-
-            family.append(serial_family_list.pop(int(rand / max_rand *
-                                                     length)))
+            rand = random.randint(0, length)
+            family.append(serial_family_list.pop(rand))
 
         # Assemble relations_in_house
         for dude in family:
@@ -671,7 +657,7 @@ class Town:
         types_for_use = self.getAvailableBlocks()
 
         for block in self.block_list:
-            rand_select = int((len(types_for_use) - 1) * int(seed.getRand())/9)
+            rand_select = random.randint(0, len(types_for_use) - 1)
             block.wealth = types_for_use.pop(rand_select)
 
     def generateBuildingRatios(self):
@@ -709,11 +695,7 @@ class Town:
         '''
 
     def generateEconomy(self):
-        dice_roll = seed.getRand()
-        if dice_roll == 9:
-            dice_roll = 5
-
-        self.economy = TownEconomy[dice_roll]
+        self.economy = TownEconomy[random.randint(0, 8)]
 
     def generateDanger(self):
         if self.economy == 'Military':
@@ -725,10 +707,10 @@ class Town:
         else:
             self.danger_mod = 1
 
-        self.danger = int(self.danger_mod*int(seed.getRand()))
+        self.danger = int(self.danger_mod*random.randint(0, 9))
 
     def generateHomeless(self):
-        self.settled_ratio = int(10*(int(seed.getRand())/6 + self.wealth/2 + 7))
+        self.settled_ratio = int(10*(random.randint(0, 9)/6 + self.wealth/2 + 7))
 
     def generateMap(self, string):
         def grouped(iterable, n):
@@ -997,10 +979,10 @@ class Town:
         else:
             self.nobility_mod = 0.35
 
-        self.nobility = int(10*self.nobility_mod*int(seed.getRand()))
+        self.nobility = int(10*self.nobility_mod*random.randint(0, 9))
 
     def generateWealth(self):
-        self.wealth = int(seed.getRand()) - 5
+        self.wealth = random.randint(0, 9) - 5
         self.employment = (self.wealth + 6) * 10
 
     def getAvailableBlocks(self):
@@ -1088,8 +1070,7 @@ class Town:
 
         # Old person marriages
         for i in range(num_old_relations * 2):
-            pair.append(possible_indices.pop(int(seed.getRand() / 9 *
-                                                 (len(possible_indices) - 1))))
+            pair.append(possible_indices.pop(random.randint(0, len(possible_indices) - 1)))
 
             if i % 2 != 0:
                 if True:
@@ -1110,11 +1091,9 @@ class Town:
         # Father/Mother -> Son/Daughter from Old to Mid
         for i in range(num_mid_to_old_relations):
             # Mid generation person
-            first = possible_indices.pop(int(seed.getRand() / 9 *
-                                             (len(possible_indices) - 1)))
+            first = possible_indices.pop(random.randint(0, len(possible_indices) - 1))
             # Old person
-            second = possible_old_indices[int(seed.getRand() / 9 *
-                                              (len(possible_old_indices) - 1))]
+            second = possible_old_indices[random.randint(0, len(possible_old_indices) - 1)]
             if True:
                 l_person = family[1][first]
                 r_person = family[0][second]
@@ -1170,10 +1149,9 @@ class Town:
                 r_spouses.append(person)
 
         for person in l_spouses:
-            if seed.getRand() > 2:
+            if random.randint(0, 9) > 2:
                 try:
-                    pair = r_spouses.pop(int(seed.getRand() / 9 *
-                                                    (len(r_spouses) - 1)))
+                    pair = r_spouses.pop(random.randint(0, len(r_spouses) - 1))
                 except IndexError:
                     # r_spouses is empty
                     for possible_match in l_spouses:
@@ -1193,11 +1171,9 @@ class Town:
         # Father/Mother -> Son/Daughter from Mid to Yng
         for i in range(num_yng_to_mid_relations):
             # Yng generation person
-            first = possible_yng_indices.pop(int(seed.getRand() / 9 *
-                                                 (len(possible_yng_indices) - 1)))
+            first = possible_yng_indices.pop(random.randint(0, len(possible_yng_indices) - 1))
             # Mid person
-            second = possible_mid_indices[int(seed.getRand() / 9 *
-                                              (len(possible_mid_indices) - 1))]
+            second = possible_mid_indices[random.randint(0, len(possible_mid_indices) - 1)]
             if True:
                 l_person = family[2][first]
                 r_person = family[1][second]
@@ -1216,7 +1192,7 @@ class Town:
                         child = mid.relation_persons[i]
 
                         if not spouse.alreadyHasRelation(child):
-                            if seed.getRand() > 2:
+                            if random.randint(0, 9) > 2:
                                 spouse.addRelation(child, 'Child')
                                 child.addRelation(spouse, 'Parent')
                                 # print('Added {0} to {1}\'s relations as child'.format(child, spouse))
@@ -1328,7 +1304,7 @@ class Town:
         # Assigning unique self.block_list indexes to special buildings
         idx_list = []
         while len(idx_list) < 6:
-            new_idx = int(seed.getRand()/9 * len(self.block_list) - 1)
+            new_idx = random.randint(0, len(self.block_list) - 1)
             if new_idx not in idx_list:
                 idx_list.append(new_idx)
 
@@ -1388,9 +1364,9 @@ class Town:
             placed = False
             while(not placed):
                 start_x = int((block.bot_right_x - block.top_left_x) *
-                            int(seed.getRand())/10 + block.top_left_x)
+                            int(random.randint(0, 9))/10 + block.top_left_x)
                 start_y = int((block.bot_right_y - block.top_left_y) *
-                            int(seed.getRand())/10 + block.top_left_y)
+                            int(random.randint(0, 9))/10 + block.top_left_y)
 
                 if self.pointGoodToUse(start_y, start_x, block):
                     placed = True
@@ -1430,9 +1406,9 @@ class Town:
         # Placing housing
         for i, block in enumerate(self.block_list):
             begin_x = int(((block.bot_right_x - block.top_left_x) *
-                          int(seed.getRand())/10 + block.top_left_x))
+                          int(random.randint(0, 9))/10 + block.top_left_x))
             begin_y = int(((block.bot_right_y - block.top_left_y) *
-                          int(seed.getRand())/10 + block.top_left_y))
+                          int(random.randint(0, 9))/10 + block.top_left_y))
 
             self.map_points[begin_y][begin_x] = Building(block.wealth)
             point_x = begin_x
@@ -1468,9 +1444,9 @@ class Town:
                     return current_y, current_x
 
                 point_x = int((block.bot_right_x - block.top_left_x) *
-                            int(seed.getRand())/10 + block.top_left_x)
+                            int(random.randint(0, 9))/10 + block.top_left_x)
                 point_y = int((block.bot_right_y - block.top_left_y) *
-                            int(seed.getRand())/10 + block.top_left_y)
+                            int(random.randint(0, 9))/10 + block.top_left_y)
 
                 if self.pointGoodToUse(point_y, point_x, block):
                     place_y = current_y = point_y

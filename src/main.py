@@ -10,7 +10,6 @@ from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
 
 import town
-import seed
 
 
 global current_town_map

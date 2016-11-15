@@ -1,5 +1,5 @@
 import logging
-import seed
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -60,16 +60,7 @@ f_names_len = len(f_names)
 m_names_len = len(m_names)
 
 def createFamilyName():
-    num1 = seed.getRand() + 1
-    num2 = seed.getRand() + 1
-    num3 = seed.getRand() + 1
-    num4 = seed.getRand() + 1
-    num5 = seed.getRand() + 1
-    num6 = seed.getRand() + 1
-
-    name_idx = int(num1 * num2 * num3 * num4 * num5 * num6 /
-                    1000000 * (l_names_len - 1))
-
+    name_idx = random.randint(0, l_names_len - 1)
     return l_names[name_idx]
 
 class Person:
@@ -127,7 +118,7 @@ class Person:
         pass
 
     def setAge(self, low, high):
-        return Age[int((high - low) * seed.getRand() / 9 + low)]
+        return Age[int((high - low) * random.randint(0, 9) / 9 + low)]
 
     def setName(self):
         if self.gender == 'Female':
@@ -141,13 +132,7 @@ class Person:
             length = f_names_len
             logger.warning('Set name gender to female because Person.gender not set.')
 
-        num1 = seed.getRand() + 1
-        num2 = seed.getRand() + 1
-        num3 = seed.getRand() + 1
-        num4 = seed.getRand() + 1
-
-        name_idx = int((num1 * num2 * num3 * num4) / 10000 * (length - 1))
-
+        name_idx = random.randint(0, length - 1)
         self.name = name_file[name_idx]
 
     def setOpinion(self, person, opinion):
