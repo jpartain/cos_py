@@ -2,6 +2,7 @@ import random
 
 from building import *
 from block import Block
+from block import Point
 import person
 
 
@@ -36,11 +37,13 @@ class Town:
         self.generateDanger()
         self.generateNobility()
         self.generateHomeless()
+
         self.buildMap()
         self.generateBuildingRatios()
         self.getStreetBlocks()
         self.fillStreetBlocks()
         self.placeBuildings()
+
         self.createPopulation()
         self.getWorkPlaces()
         self.assignJobs()
@@ -49,7 +52,7 @@ class Town:
 
         self.buildPlayMap()
 
-    def addToBuildingPoints(self, building_type, x, y):
+    def addToBuildingPoints(self, building_type, point):
         self.work_places_dict = {'Tavern':           self.tavern,
                                  'PublicPlumbing':   self.publicplumbing,
                                  'Market':           self.market,
@@ -68,7 +71,7 @@ class Town:
                                  'Cathedral':        self.special,
                                  'Colosseum':        self.special}
         try:
-            self.work_places_dict[building_type].append(self.map_points[y][x])
+            self.work_places_dict[building_type].append(self.map_points[point.y][point.x])
 
         except KeyError:
             print('{} not a valid building type in addToBuildingPoints'.format(building_type))
@@ -1088,11 +1091,14 @@ class Town:
 
         return house_per_block
 
-    def getNewPoint(self, start_y, start_x, i):
+    def getNewPoint(self, start, i):
         move_x = self.placement_radius[i][0]
         move_y = self.placement_radius[i][1]
 
-        return start_y + move_y, start_x + move_x
+        if start.x + move_x >= self.width or start.y + move_y >= self.height:
+            return start
+
+        return Point(start.x + move_x, start.y + move_y)
 
     def getStreetBlocks(self):
         self.block_list = []
@@ -1100,12 +1106,12 @@ class Town:
         height = self.height
         width = self.width
 
-        for j in range(4):
-            for i in range(4):
-                top_left_x  = int(i*width/4)        + 1
-                top_left_y  = int(j*height/4)       + 1
-                bot_right_x = int((i + 1)*width/4)  - 1
-                bot_right_y = int((j + 1)*height/4) - 1
+        for j in range(3):
+            for i in range(3):
+                top_left_x  = int(i*width/3)        + 1
+                top_left_y  = int(j*height/3)       + 1
+                bot_right_x = int((i + 1)*width/3)  - 1
+                bot_right_y = int((j + 1)*height/3) - 1
 
                 block = Block(top_left_x, top_left_y, bot_right_x, bot_right_y)
                 self.block_list.append(block)
@@ -1421,63 +1427,55 @@ class Town:
             # Get start point for special building
             placed = False
             while(not placed):
-                start_x = int((block.bot_right_x - block.top_left_x) *
-                            int(random.randint(0, 9))/10 + block.top_left_x)
-                start_y = int((block.bot_right_y - block.top_left_y) *
-                            int(random.randint(0, 9))/10 + block.top_left_y)
+                rand_idx = random.randint(0, len(block.points) - 1)
+                start_point = block.points[rand_idx]
 
-                if self.pointGoodToUse(start_y, start_x, block):
+                if self.pointGoodToUse(start_point, block):
                     placed = True
 
-            self.map_points[start_y][start_x] = Building(point_building,
-                                                         start_x, start_y)
+            self.map_points[start_point.y][start_point.x] = Building(point_building,
+                                                                     start_point.x,
+                                                                     start_point.y)
 
             if (point_building == 'Barn' or point_building == 'Barracks' or
                 point_building == 'Mason' or point_building == 'Blacksmith' or
                 point_building == 'Lumbermill' or point_building == 'Cathedral' or
                 point_building == 'Weavery' or point_building == 'Colosseum' or
                 point_building == 'Mine'):
-                self.addToBuildingPoints('Special', start_x, start_y)
+                self.addToBuildingPoints('Special', start_point)
             else:
-                self.addToBuildingPoints(point_building, start_x, start_y)
+                self.addToBuildingPoints(point_building, start_point)
 
             for i in range(num_points - 1):
                 placed = False
                 point_num = 0
                 while(not placed):
-                    point_y, point_x = self.getNewPoint(start_y, start_x, point_num)
-                    if self.pointGoodToUse(point_y, point_x, block):
+                    point = self.getNewPoint(start_point, point_num)
+                    if self.pointGoodToUse(point, block):
                         placed = True
 
                     point_num = point_num + 1
 
-                self.map_points[point_y][point_x] = Building(point_building,
-                                                             point_x, point_y)
+                self.map_points[point.y][point.x] = Building(point_building,
+                                                             point.x, point.y)
 
                 if (point_building == 'Barn' or point_building == 'Barracks' or
                     point_building == 'Mason' or point_building == 'Blacksmith' or
                     point_building == 'Lumbermill' or point_building == 'Cathedral' or
                     point_building == 'Weavery' or point_building == 'Colosseum' or
                     point_building == 'Mine'):
-                    self.addToBuildingPoints('Special', point_x, point_y)
+                    self.addToBuildingPoints('Special', point)
                 else:
-                    self.addToBuildingPoints(point_building, point_x, point_y)
+                    self.addToBuildingPoints(point_building, point)
 
         # Placing housing
         for i, block in enumerate(self.block_list):
-            begin_x = int(((block.bot_right_x - block.top_left_x) *
-                          int(random.randint(0, 9))/10 + block.top_left_x))
-            begin_y = int(((block.bot_right_y - block.top_left_y) *
-                          int(random.randint(0, 9))/10 + block.top_left_y))
-
-            self.map_points[begin_y][begin_x] = Building(block.wealth, begin_x,
-                                                         begin_y)
-            point_x = begin_x
-            point_y = begin_y
+            begin = block.points[random.randint(0, len(block.points) - 1)]
+            self.map_points[begin.y][begin.x] = Building(block.wealth, begin.x, begin.y)
+            point = begin
 
             for j in range(int(house_per_block[block.wealth]) - 1):
-                point_y, point_x = self.placePoint(point_y, point_x,
-                                                   begin_y, begin_x, block)
+                point = self.placePoint(point, begin, block)
 
         # print(self.number_noble_house)
         if self.noble_blocks == 0:
@@ -1492,23 +1490,23 @@ class Town:
                         self.map_points[y][x] = Building('NobleHouse', x, y)
                         placed = placed + 1
 
+    def placePoint(self, current, begin, block):
+        up = Point(current.x, current.y + 1)
+        lf = Point(current.x - 1, current.y)
+        dn = Point(current.x, current.y - 1)
+        rt = Point(current.x + 1, current.y)
 
-    def placePoint(self, current_y, current_x, begin_x, begin_y, block):
-        if self.pointGoodToUse(current_y + 1, current_x, block):
-            place_x = current_x
-            place_y = current_y + 1
+        if self.pointGoodToUse(up, block):
+            place = up
 
-        elif self.pointGoodToUse(current_y, current_x - 1, block):
-            place_x = current_x - 1
-            place_y = current_y
+        elif self.pointGoodToUse(lf, block):
+            place = lf
 
-        elif self.pointGoodToUse(current_y - 1, current_x, block):
-            place_x = current_x
-            place_y = current_y - 1
+        elif self.pointGoodToUse(dn, block):
+            place = dn
 
-        elif self.pointGoodToUse(current_y, current_x + 1, block):
-            place_x = current_x + 1
-            place_y = current_y
+        elif self.pointGoodToUse(rt, block):
+            place = rt
 
         else:
             moved_current = False
@@ -1516,34 +1514,30 @@ class Town:
 
             while(not moved_current):
                 if iteration > 100:
-                    return current_y, current_x
+                    return current
 
-                point_x = int((block.bot_right_x - block.top_left_x) *
-                            int(random.randint(0, 9))/10 + block.top_left_x)
-                point_y = int((block.bot_right_y - block.top_left_y) *
-                            int(random.randint(0, 9))/10 + block.top_left_y)
+                point = block.points[random.randint(0, len(block.points) - 1)]
 
-                if self.pointGoodToUse(point_y, point_x, block):
-                    place_y = current_y = point_y
-                    place_x = current_x = point_x
+                if self.pointGoodToUse(point, block):
+                    place = current = point
                     moved_current = True
 
                 iteration = iteration + 1
 
-        self.map_points[place_y][place_x] = Building(block.wealth, place_x,
-                                                     place_y)
+        self.map_points[place.y][place.x] = Building(block.wealth, place.x,
+                                                     place.y)
 
         if block.wealth == 'NobleHouse':
             self.placed_nobles = self.placed_nobles + 1
-            self.noble_houses.append(self.map_points[place_y][place_x])
+            self.noble_houses.append(self.map_points[place.y][place.x])
         elif block.wealth == 'MiddleHouse':
             self.placed_middle = self.placed_middle + 1
-            self.middle_houses.append(self.map_points[place_y][place_x])
+            self.middle_houses.append(self.map_points[place.y][place.x])
         elif block.wealth == 'PoorHouse':
             self.placed_poor = self.placed_poor + 1
-            self.poor_houses.append(self.map_points[place_y][place_x])
+            self.poor_houses.append(self.map_points[place.y][place.x])
 
-        return current_y, current_x
+        return current
 
     def placeRoads(self):
         for point in self.map_points:
@@ -1558,14 +1552,15 @@ class Town:
                         point.building = 'Road'
                         break
 
-    def pointGoodToUse(self, point_y, point_x, block):
-        if ((block.top_left_y <= point_y) and (point_y <= block.bot_right_y) and
-            (block.top_left_x <= point_x) and (point_x <= block.bot_right_x)):
-            if self.map_points[point_y][point_x].building_type == 'none':
+    def pointGoodToUse(self, point, block):
+        try:
+            if self.map_points[point.y][point.x].building_type == 'none':
                 return True
             else:
                 return False
-        else:
+        except:
+            print('({}, {}) not a valid point in map_points.'.format(point.x,
+                                                                     point.y))
             return False
 
     def printMapCorners(self):
@@ -1578,14 +1573,3 @@ class Town:
 
         return text
 
-
-class MapPoint:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return '({0}, {1})'.format(self.x, self.y)
-
-    def __repr__(self):
-        return '({0}, {1})'.format(self.x, self.y)
