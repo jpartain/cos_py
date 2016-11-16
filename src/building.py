@@ -50,7 +50,8 @@ class Building:
         self.health = 100
         self.people = []
         self.employees = []
-        self.point = [y, x]
+        self.x = x
+        self.y = y
     '''
     def __str__(self):
         typ = self.building_type

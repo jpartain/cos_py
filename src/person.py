@@ -85,7 +85,7 @@ class Person:
         self.relations_in_house = []
         self.toughness = 0
         self.wealth = 0
-        self.workplace = ''
+        self.workplace = None
 
     def addRelation(self, person, relation):
         self.relation_persons.append(person)

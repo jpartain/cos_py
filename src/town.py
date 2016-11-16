@@ -47,6 +47,8 @@ class Town:
         self.assignOfficials()
         self.createOpinions()
 
+        self.buildPlayMap()
+
     def addToBuildingPoints(self, building_type, x, y):
         self.work_places_dict = {'Tavern':           self.tavern,
                                  'PublicPlumbing':   self.publicplumbing,
@@ -316,7 +318,9 @@ class Town:
 
         place.employees.append(dude)
         dude.employed = True
-        dude.workplace = place.building_type
+        dude.workplace = place
+        # print('Added {} {} to {}.'.format(dude.name, dude.family_name,
+        #                                   dude.workplace.building_type))
 
     def assignJobs(self):
         num_to_employ = int(self.workable * self.employment / 100)
@@ -509,6 +513,9 @@ class Town:
 
                 self.map_points[y][x] = building
 
+    def buildPlayMap(self):
+        pass
+
     def createFamily(self, wealth, house):
         family = []
         family_name = person.createFamilyName()
@@ -562,19 +569,31 @@ class Town:
                 #                                                dude.opinion_of_others[member]))
 
             # Coworker opinions
-            if dude.employed:
-                print('\nCreating coworker opinions')
-                try:
-                    for point in self.work_places_dict[dude.workplace]:
-                        for coworker in point.employees:
-                            dude.opinion_of_others[coworker] = random.randint(-2, 2)
-                            print('{} {}\'s opinion of {} {} is {}'.format(dude.name,
-                                                                           dude.family_name,
-                                                                           coworker.name,
-                                                                           coworker.family_name,
-                                                                           dude.opinion_of_others[coworker]))
-                except KeyError:
-                    print('{} not a valid building type in dude.workplace in createOpinions'.format(dude.workplace))
+            if dude.employed and dude.job_title != 'Mayor' and dude.job_title != 'Official':
+                # print('\nCreating coworker opinions')
+                if dude.workplace.building_type == 'NobleHouse':
+                    for coworker in dude.workplace.employees:
+                        dude.opinion_of_others[coworker] = random.randint(-2, 2)
+                        # print('{} {}\'s opinion of {} {} is {}'.format(dude.name,
+                        #                                                dude.family_name,
+                        #                                                coworker.name,
+                        #                                                coworker.family_name,
+                        #                                                dude.opinion_of_others[coworker]))
+
+                else:
+                    try:
+                        for point in self.work_places_dict[dude.workplace.building_type]:
+                            for coworker in point.employees:
+                                dude.opinion_of_others[coworker] = random.randint(-2, 2)
+                                # print('{} {}\'s opinion of {} {} is {}'.format(dude.name,
+                                #                                                dude.family_name,
+                                #                                                coworker.name,
+                                #                                                coworker.family_name,
+                                #                                                dude.opinion_of_others[coworker]))
+                    except KeyError:
+                        # Either an unhandled builing_type or dude is not actually
+                        # employed
+                        print('{} not a valid building type in dude.workplace in createOpinions'.format(dude.workplace.building_type))
 
             # Neighbor opinions
             # print('\nCreating neighbor opinions')
@@ -597,7 +616,7 @@ class Town:
         self.people = []
         for house in self.noble_houses:
             family = self.createFamily('Noble', house)
-            self.map_points[house.y][house.x].people = family
+            house.people = family
 
             for dude in family:
                 # print('Adding {} {} to town population.'.format(dude.name,
@@ -606,7 +625,7 @@ class Town:
 
         for house in self.middle_houses:
             family = self.createFamily('Middle', house)
-            self.map_points[house.y][house.x].people = family
+            house.people = family
 
             for dude in family:
                 # print('Adding {} {} to town population.'.format(dude.name,
@@ -615,7 +634,7 @@ class Town:
 
         for house in self.poor_houses:
             family = self.createFamily('Poor', house)
-            self.map_points[house.y][house.x].people = family
+            house.people = family
 
             for dude in family:
                 # print('Adding {} {} to town population.'.format(dude.name,
@@ -1483,6 +1502,7 @@ class Town:
 
             while(not moved_current):
                 if iteration > 100:
+                    print('Too many iterations.')
                     return current_y, current_x
 
                 point_x = int((block.bot_right_x - block.top_left_x) *
@@ -1502,13 +1522,13 @@ class Town:
 
         if block.wealth == 'NobleHouse':
             self.placed_nobles = self.placed_nobles + 1
-            self.noble_houses.append(MapPoint(place_x, place_y))
+            self.noble_houses.append(self.map_points[place_y][place_x])
         elif block.wealth == 'MiddleHouse':
             self.placed_middle = self.placed_middle + 1
-            self.middle_houses.append(MapPoint(place_x, place_y))
+            self.middle_houses.append(self.map_points[place_y][place_x])
         elif block.wealth == 'PoorHouse':
             self.placed_poor = self.placed_poor + 1
-            self.poor_houses.append(MapPoint(place_x, place_y))
+            self.poor_houses.append(self.map_points[place_y][place_x])
 
         return current_y, current_x
 
