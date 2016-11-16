@@ -287,7 +287,7 @@ class Town:
                     else:
                         pass
 
-            if priests == 3:
+            if priests < 5:
                 dude.job_title = 'Priest'
             else:
                 dude.job_title = 'Acolyte'
@@ -1479,6 +1479,20 @@ class Town:
                 point_y, point_x = self.placePoint(point_y, point_x,
                                                    begin_y, begin_x, block)
 
+        # print(self.number_noble_house)
+        if self.noble_blocks == 0:
+            if self.number_noble_house != 0:
+                # print('Placing {} extra noble houses that don\'t belong to a block.'.format(self.number_noble_house))
+                placed = 0
+                while placed < self.number_noble_house:
+                    x = random.randint(0, self.width - 1)
+                    y = random.randint(0, self.height - 1)
+
+                    if self.map_points[y][x].building_type == 'none':
+                        self.map_points[y][x] = Building('NobleHouse', x, y)
+                        placed = placed + 1
+
+
     def placePoint(self, current_y, current_x, begin_x, begin_y, block):
         if self.pointGoodToUse(current_y + 1, current_x, block):
             place_x = current_x
@@ -1502,7 +1516,6 @@ class Town:
 
             while(not moved_current):
                 if iteration > 100:
-                    print('Too many iterations.')
                     return current_y, current_x
 
                 point_x = int((block.bot_right_x - block.top_left_x) *
