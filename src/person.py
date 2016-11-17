@@ -48,11 +48,11 @@ Title = ['Mayor'
          'Manager',
          'Foreman']
 
-with open('names/last', 'r') as f:
+with open('assets/names/last', 'r') as f:
     l_names = f.read().splitlines()
-with open('names/female', 'r') as f:
+with open('assets/names/female', 'r') as f:
     f_names = f.read().splitlines()
-with open('names/male', 'r') as f:
+with open('assets/names/male', 'r') as f:
     m_names = f.read().splitlines()
 
 l_names_len = len(l_names)

@@ -1,4 +1,5 @@
 import random
+from more_itertools import unique_everseen
 
 from building import *
 from block import Block
@@ -16,10 +17,44 @@ TownEconomy = ['Farm',
                'Textile',
                'Colosseum']
 
-with open('names/town', 'r') as f:
+with open('assets/names/town', 'r') as f:
     t_names = f.read().splitlines()
 
 t_names_len = len(t_names)
+
+global placement_radius
+
+def createPointPlacementRadius():
+    global placement_radius
+    radius = []
+
+    for r in range(0, 101):
+        x = r
+        y = 0
+        err = 0
+
+        while x >= y:
+            radius.append(Point(x, y))
+            radius.append(Point(y, x))
+            radius.append(Point(-y, x))
+            radius.append(Point(-x, y))
+            radius.append(Point(-x, -y))
+            radius.append(Point(-y, -x))
+            radius.append(Point(y, -x))
+            radius.append(Point(x, -y))
+
+            y = y + 1
+            err = err + 1 + 2*y
+            if (2*(err - x) + 1) > 0:
+                x = x - 1
+                err = err + 1 - 2*x
+
+    placement_radius = list(unique_everseen(radius))
+    #seen = list()
+    #seen_add = seen.append
+    #self.placement_radius = [x for x in radius if not (x in seen or seen_add(x))]
+
+createPointPlacementRadius()
 
 
 class Town:
@@ -29,7 +64,7 @@ class Town:
 
         self.population = 0
         self.workable = 0
-        self.createPointPlacementRadius()
+        # self.createPointPlacementRadius()
 
         self.assignName()
         self.generateWealth()
@@ -645,7 +680,7 @@ class Town:
                 self.people.append(dude)
 
     def createPointPlacementRadius(self):
-        self.placement_radius = []
+        radius = []
 
         for r in range(0, 101):
             x = r
@@ -653,20 +688,25 @@ class Town:
             err = 0
 
             while x >= y:
-                self.placement_radius.append([x, y])
-                self.placement_radius.append([y, x])
-                self.placement_radius.append([-y, x])
-                self.placement_radius.append([-x, y])
-                self.placement_radius.append([-x, -y])
-                self.placement_radius.append([-y, -x])
-                self.placement_radius.append([y, -x])
-                self.placement_radius.append([x, -y])
+                radius.append(Point(x, y))
+                radius.append(Point(y, x))
+                radius.append(Point(-y, x))
+                radius.append(Point(-x, y))
+                radius.append(Point(-x, -y))
+                radius.append(Point(-y, -x))
+                radius.append(Point(y, -x))
+                radius.append(Point(x, -y))
 
                 y = y + 1
                 err = err + 1 + 2*y
                 if (2*(err - x) + 1) > 0:
                     x = x - 1
                     err = err + 1 - 2*x
+
+        self.placement_radius = list(unique_everseen(radius))
+        #seen = list()
+        #seen_add = seen.append
+        #self.placement_radius = [x for x in radius if not (x in seen or seen_add(x))]
 
     def createRoadsEquations(self, string):
         self.horizontal_roads_m = []
@@ -1092,8 +1132,9 @@ class Town:
         return house_per_block
 
     def getNewPoint(self, start, i):
-        move_x = self.placement_radius[i][0]
-        move_y = self.placement_radius[i][1]
+        global placement_radius
+        move_x = placement_radius[i].x
+        move_y = placement_radius[i].y
 
         if start.x + move_x >= self.width or start.y + move_y >= self.height:
             return start
@@ -1433,6 +1474,7 @@ class Town:
                 if self.pointGoodToUse(start_point, block):
                     placed = True
 
+            # print('1', self.map_points[start_point.y][start_point.x])
             self.map_points[start_point.y][start_point.x] = Building(point_building,
                                                                      start_point.x,
                                                                      start_point.y)
@@ -1456,6 +1498,7 @@ class Town:
 
                     point_num = point_num + 1
 
+                # print('2', self.map_points[point.y][point.x])
                 self.map_points[point.y][point.x] = Building(point_building,
                                                              point.x, point.y)
 
@@ -1470,9 +1513,14 @@ class Town:
 
         # Placing housing
         for i, block in enumerate(self.block_list):
-            begin = block.points[random.randint(0, len(block.points) - 1)]
-            self.map_points[begin.y][begin.x] = Building(block.wealth, begin.x, begin.y)
-            point = begin
+            placed = False
+            while not placed:
+                begin = block.points[random.randint(0, len(block.points) - 1)]
+                # print('3', self.map_points[begin.y][begin.x])
+                if self.pointGoodToUse(begin, block):
+                    self.map_points[begin.y][begin.x] = Building(block.wealth, begin.x, begin.y)
+                    point = begin
+                    placed = True
 
             for j in range(int(house_per_block[block.wealth]) - 1):
                 point = self.placePoint(point, begin, block)
@@ -1487,7 +1535,9 @@ class Town:
                     y = random.randint(0, self.height - 1)
 
                     if self.map_points[y][x].building_type == 'none':
+                        # print('4', self.map_points[y][x])
                         self.map_points[y][x] = Building('NobleHouse', x, y)
+                        self.noble_houses.append(self.map_points[y][x])
                         placed = placed + 1
 
     def placePoint(self, current, begin, block):
@@ -1524,6 +1574,7 @@ class Town:
 
                 iteration = iteration + 1
 
+        # print('5', self.map_points[place.y][place.x])
         self.map_points[place.y][place.x] = Building(block.wealth, place.x,
                                                      place.y)
 

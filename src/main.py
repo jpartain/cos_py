@@ -25,6 +25,9 @@ class MainMenuScreen(Screen):
     def goToMapScreen(self):
         self.manager.current = 'map'
 
+    def goToCosScreen(self):
+        self.manager.current = 'cos'
+
 
 class MapScreen(Screen):
 
@@ -110,6 +113,16 @@ class MapScreen(Screen):
         self.map_box = towns[current_town_map].printMapCorners()
 
 
+class CosScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(CosScreen, self).__init__(**kwargs)
+
+    def goToMainMenu(self):
+        self.manager.current = 'main_menu'
+
+
+
 class CosApp(App):
 
     def build(self):
@@ -119,6 +132,7 @@ class CosApp(App):
         screens = ScreenManager()
         screens.add_widget(MainMenuScreen(name='main_menu'))
         screens.add_widget(MapScreen(name='map'))
+        screens.add_widget(CosScreen(name='cos'))
         screens.current = 'main_menu'
 
         return screens

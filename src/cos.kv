@@ -9,9 +9,12 @@
         size_hint: 1, 1
 
         Button:
+            text: 'Cos'
+            on_press: root.goToCosScreen()
+
+        Button:
             text: 'Search Towns'
             on_press: root.goToMapScreen()
-            size_hint: 1, .33
 
 <MapScreen>:
     map_box: root.map_box
@@ -65,3 +68,15 @@
                 size_hint_y: None
                 height: self.texture_size[1]
 
+<CosScreen>:
+    BoxLayout:
+        padding: 10
+        spacing: 10
+        orientiation: 'horizontal'
+
+        Button:
+            text: 'MainMenu'
+            on_press: root.goToMainMenu()
+
+        Label:
+            text: 'testing'
