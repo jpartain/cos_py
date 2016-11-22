@@ -102,14 +102,14 @@
 		"vertline": [96, 0, 12, 12],
 		"horizline": [108, 0, 12, 12],
 		"crossline": [120, 0, 12, 12],
-		"leftcrossline": [132, 0, 12, 12],
-		"upcrossline": [144, 0, 12, 12],
-		"rightcrossline": [156, 0, 12, 12],
-		"downcrossline": [168, 0, 12, 12],
-		"toprightcornerline": [180, 0, 12, 12],
-		"bottomrightcornerline": [192, 0, 12, 12],
-		"bottomleftcornerline": [204, 0, 12, 12],
-		"topleftcornerline": [216, 0, 12, 12],
+		"lcrossline": [132, 0, 12, 12],
+		"ucrossline": [144, 0, 12, 12],
+		"rcrossline": [156, 0, 12, 12],
+		"dcrossline": [168, 0, 12, 12],
+		"trcornerline": [180, 0, 12, 12],
+		"brcornerline": [192, 0, 12, 12],
+		"blcornerline": [204, 0, 12, 12],
+		"tlcornerline": [216, 0, 12, 12],
 		"square": [228, 0, 12, 12]
 	}
 }

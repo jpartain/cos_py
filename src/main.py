@@ -7,10 +7,12 @@ from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
+from kivy.core.window import Window
 
 from kivent_core.systems.position_systems import PositionSystem2D
 from kivent_core.systems.renderers import Renderer
 from kivent_core.systems.gamesystem import GameSystem
+from kivent_core.managers.resource_managers import texture_manager
 
 import town
 
@@ -20,6 +22,44 @@ global towns
 
 current_town_map = 0
 towns = []
+texture_manager.load_atlas('./assets/fonts/cogmind_font.atlas')
+
+class CosGame(Widget):
+
+    def __init__(self, **kwargs):
+        super(TestGame, self).__init__(**kwargs)
+        self.gameworld.init_gameworld(['renderer', 'position'], callback =
+                                      self.initGame)
+
+    def initGame(self):
+        self.setupStates()
+        self.setState()
+        self.loadModels()
+        self.drawStuff()
+
+    def load_models(self):
+        model_string = ('! dq # $ % & sq ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 ' +
+                        ': ; < = > ? @ [ fs ] ^ _ \' { | } A B C D E F G H I ' +
+                        'J K L M N O P Q R S T U V W X Y Z esq sq a b c d e ' +
+                        'f g h i j k l m n o p q r s t u v w x y z vertline ' +
+                        'horizl crossl lcrossl ucrossl rcrossl dcrossl ' +
+                        'trcornerl brcornerl blcornerl tlcornerl square')
+        models = model_string.split()
+        model_manager = self.gameworld.model_manager
+
+        for model in models:
+            model_manager.load_textured_rectangle('vertex_format_4f', 12., 12.,
+                                                  model, model + '_tx')
+
+    def setupStates(self):
+        pass
+
+    def setState(self):
+        pass
+
+    def drawStuff(self):
+        pass
+
 
 class MainMenuScreen(Screen):
 
