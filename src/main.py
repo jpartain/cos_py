@@ -8,6 +8,10 @@ from kivy.properties import ObjectProperty
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
 
+from kivent_core.systems.position_systems import PositionSystem2D
+from kivent_core.systems.renderers import Renderer
+from kivent_core.systems.gamesystem import GameSystem
+
 import town
 
 

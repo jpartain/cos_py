@@ -3,7 +3,7 @@
 <MainMenuScreen>:
     BoxLayout:
         orientation: 'vertical'
-        padding: 20
+        padding: 12
         spacing: 10
         pos_hint: {'center_x':.5, 'center_y':.5}
         size_hint: 1, 1
@@ -25,14 +25,14 @@
         id: outer_box
         size_hint: 1, 1
         orientation: 'horizontal'
-        padding: 10
+        padding: 12
         spacing: 10
         pos_hint: {'center_x':.5, 'center_y':.5}
 
         BoxLayout:
             size_hint: .3, 1
             orientation: 'vertical'
-            padding: 10
+            padding: 12
             spacing: 10
             pos: 0, outer_box.height/2 - self.height/2
 
@@ -58,7 +58,9 @@
                 text: root.map_box
                 font_name: 'RobotoMono-Regular.ttf'
                 size_hint_y: None
+                size_hint_x: None
                 height: self.texture_size[1]
+                width: self.texture_size[0]
                 on_ref_press: root.labelPress(*args)
 
         ScrollView:
@@ -70,7 +72,7 @@
 
 <CosScreen>:
     BoxLayout:
-        padding: 10
+        padding: 12
         spacing: 10
         orientiation: 'horizontal'
 
