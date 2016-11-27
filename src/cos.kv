@@ -29,7 +29,7 @@ CosGame:
             force_update: True
             size_of_batches: 512
             size_of_component_block: 128
-            # gameview: 'camera'
+            gameview: 'camera'
             shader_source: 'assets/shaders/positionshader.glsl'
 
         GameScreenManager:
@@ -42,7 +42,7 @@ CosGame:
             system_id: 'camera'
             gameworld: gameworld
             size: root.size
-            camera_scale: 1
+            camera_scale: 20
             pos: root.pos
             do_scroll: True
 
@@ -61,7 +61,7 @@ CosGame:
 <MainMenuScreen@GameScreen>:
     name: 'main_menu_screen'
 
-    BoxLayout:
+    FloatLayout:
         orientation: 'vertical'
         padding: 12
         spacing: 10
@@ -69,12 +69,16 @@ CosGame:
         size_hint: 1, 1
 
         Button:
+            size_hint: (.2, .1)
+            pos_hint: {'x': .025, 'y': .875}
             text: 'Cos'
-            on_release: app.game.gameworld.state = 'cos_game'
+            on_release: app.game.goToCosScreen()
 
         Button:
+            size_hint: (.2, .1)
+            pos_hint: {'x': .5025, 'y': .875}
             text: 'Search Towns'
-            on_release: app.game.gameworld.state = 'map_generation'
+            on_release: app.game.goToMapScreen()
 
 
 <CosScreen@GameScreen>:
@@ -85,15 +89,13 @@ CosGame:
             size_hint: (.2, .1)
             pos_hint: {'x': .025, 'y': .875}
             text: 'MainMenu'
-            on_release: app.game.gameworld.state = 'main_menu'
+            on_release: app.game.goToMainMenuScreen()
 
         Button:
             size_hint: (.2, .1)
             pos_hint: {'x': .5025, 'y': .875}
             text: 'Draw play map'
             on_release: app.game.drawPlayMap()
-
-        # GameView:
 
 
 <MapScreen@GameScreen>:
@@ -131,7 +133,7 @@ CosGame:
 
             Button:
                 text: 'Main Menu'
-                on_release: app.game.gameworld.state = 'main_menu'
+                on_release: app.game.goToMainMenuScreen()
                 size_hint: 1, None
 
         ScrollView:

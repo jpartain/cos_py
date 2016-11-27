@@ -536,17 +536,41 @@ class Town:
                 building = Building('none', x, y)
 
                 # Place roads on map edge
-                if (x == 0) or (x == width - 1) or (y == 0) or (y == height - 1):
-                    building.building_type = 'Road'
+                if (x == 0) or (x == width - 1):
+                    if y == 0 and x == 0:
+                        building.building_type = 'TLCRoad'
+                    elif y == 0 and x == width - 1:
+                        building.building_type = 'TRCRoad'
+                    elif y == height - 1 and x == 0:
+                        building.building_type = 'BLCRoad'
+                    elif y == height - 1 and x == width - 1:
+                        building.building_type = 'BRCRoad'
+                    elif (y == int(height/3) or y == int(2*height/3)) and x == 0:
+                        building.building_type = 'RIRoad'
+                    elif (y == int(height/3) or y == int(2*height/3)) and x == width - 1:
+                        building.building_type = 'LIRoad'
+                    else:
+                        building.building_type = 'VRoad'
+
                     self.road_area = self.road_area + 1
 
                 # A couple simple straight roads
-                if (x == int(width/3)) or (y == int(height/3)):
-                    building.building_type = 'Road'
+                elif (x == int(width/3)) or (x == int(2*width/3)):
+                    if y == 0:
+                        building.building_type = 'DIRoad'
+                    elif y == height - 1:
+                        building.building_type = 'UIRoad'
+                    elif y == int(height/3) or y == int(2*height/3):
+                        building.building_type = 'IRoad'
+                    else:
+                        building.building_type = 'VRoad'
+
                     self.road_area = self.road_area + 1
 
-                if (x == int(2*width/3)) or (y == int(2*height/3)):
-                    building.building_type = 'Road'
+                elif (y == 0 or y == height - 1 or y == int(height/3) or y ==
+                      int(2*height/3)):
+                    building.building_type = 'HRoad'
+
                     self.road_area = self.road_area + 1
 
                 self.map_points[y][x] = building

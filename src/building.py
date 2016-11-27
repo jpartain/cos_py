@@ -95,8 +95,28 @@ class Building:
     '''
     def __str__(self):
         typ = self.building_type
-        if typ == 'Road':
-            char = '[color=ff0000]R[/color]'
+        if typ == 'HRoad':
+            char = '[color=ff0000]-[/color]'
+        elif typ == 'VRoad':
+            char = '[color=ff0000]|[/color]'
+        elif typ == 'TLCRoad':
+            char = '[color=ff0000]([/color]'
+        elif typ == 'TRCRoad':
+            char = '[color=ff0000])[/color]'
+        elif typ == 'BLCRoad':
+            char = '[color=ff0000]{[/color]'
+        elif typ == 'BRCRoad':
+            char = '[color=ff0000]}[/color]'
+        elif typ == 'RIRoad':
+            char = '[color=ff0000]>[/color]'
+        elif typ == 'LIRoad':
+            char = '[color=ff0000]<[/color]'
+        elif typ == 'DIRoad':
+            char = '[color=ff0000]v[/color]'
+        elif typ == 'UIRoad':
+            char = '[color=ff0000]^[/color]'
+        elif typ == 'IRoad':
+            char = '[color=ff0000]+[/color]'
         elif typ == 'PoorHouse':
             char = '[color=317873]P[/color]'
         elif typ == 'MiddleHouse':

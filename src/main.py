@@ -26,7 +26,18 @@ global towns
 current_town_map = 0
 towns = []
 texture_manager.load_atlas('./assets/fonts/cogmind_font.atlas')
-texture_manager.load_image('./assets/pngs/road.png')
+texture_manager.load_image('./assets/pngs/BLCRoad.png')
+texture_manager.load_image('./assets/pngs/BRCRoad.png')
+texture_manager.load_image('./assets/pngs/DIRoad.png')
+texture_manager.load_image('./assets/pngs/HRoad.png')
+texture_manager.load_image('./assets/pngs/IRoad.png')
+texture_manager.load_image('./assets/pngs/LIRoad.png')
+texture_manager.load_image('./assets/pngs/RIRoad.png')
+texture_manager.load_image('./assets/pngs/TLCRoad.png')
+texture_manager.load_image('./assets/pngs/TRCRoad.png')
+texture_manager.load_image('./assets/pngs/UIRoad.png')
+texture_manager.load_image('./assets/pngs/VRoad.png')
+texture_manager.load_image('./assets/pngs/empty.png')
 
 
 class CosGame(Widget):
@@ -48,15 +59,20 @@ class CosGame(Widget):
                         'f g h i j k l m n o p q r s t u v w x y z vertl ' +
                         'horizl crossl lcrossl ucrossl rcrossl dcrossl ' +
                         'trcornerl brcornerl blcornerl tlcornerl square')
+        road_string = ('BLCRoad BRCRoad DIRoad HRoad IRoad LIRoad RIRoad ' +
+                       'TLCRoad TRCRoad UIRoad VRoad empty')
+
         models = model_string.split()
+        roads = road_string.split()
         model_manager = self.gameworld.model_manager
 
         for model in models:
             model_manager.load_textured_rectangle('vertex_format_4f', 12., 12.,
-                                                  model, model + '_tx')
+                                                  model, model)
 
-        model_manager.load_textured_rectangle('vertex_format_4f', 144., 144.,
-                                              'road', 'road')
+        for model in roads:
+            model_manager.load_textured_rectangle('vertex_format_4f', 144., 144.,
+                                                model, model)
 
 
     def setupStates(self):
@@ -67,8 +83,8 @@ class CosGame(Widget):
                                  screenmanager_screen='main_menu_screen')
 
         self.gameworld.add_state(state_name='map_generation', systems_added=[],
-                                 systems_removed=[],
-                                 systems_paused=['renderer', 'position'],
+                                 systems_removed=['renderer', 'position'],
+                                 systems_paused=[],
                                  systems_unpaused=[],
                                  screenmanager_screen='map_screen')
 
@@ -89,21 +105,33 @@ class CosGame(Widget):
         town = towns[current_town_map]
         for y, row in enumerate(town.map_points):
             for x, cell in enumerate(row):
-                pos = (x * 144 + 24, y * 144 + 24)
+                pos = (x * 144 + 144, y * 144 + 144)
                 building_type = cell.building_type
 
                 ent_id = self.createMapArea(pos, building_type)
 
     def createMapArea(self, pos, building):
+        if 'Road' not in building:
+            building = 'empty'
+
         component_dict = {'position': pos,
-                          'renderer': {'texture': 'road',
+                          'renderer': {'texture': building,
                                        'size': (144, 144),
-                                       'model_key': '+_tx',
+                                       'model_key': building,
                                        'render': True}}
 
         component_order = ['position', 'renderer']
 
         return self.gameworld.init_entity(component_dict, component_order)
+
+    def goToMainMenuScreen(self):
+        self.gameworld.state = 'main_menu'
+
+    def goToMapScreen(self):
+        self.gameworld.state = 'map_generation'
+
+    def goToCosScreen(self):
+        self.gameworld.state = 'cos_game'
 
 
 class MainMenuScreen(Screen):
