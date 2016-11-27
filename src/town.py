@@ -521,8 +521,8 @@ class Town:
         return family_list
 
     def buildMap(self):
-        self.height = 40
-        self.width = 40
+        self.height = 20
+        self.width = 20
         self.road_area = 0
 
         height = self.height
@@ -1083,7 +1083,7 @@ class Town:
         self.nobility = int(10*self.nobility_mod*random.randint(0, 9))
 
     def generateWealth(self):
-        self.wealth = random.randint(0, 9) - 5
+        self.wealth = random.randint(1, 9) - 5
         self.employment = (self.wealth + 6) * 10
 
     def getAvailableBlocks(self):

@@ -2,6 +2,7 @@
 
 CosGame:
 
+
 <CosGame>:
     gameworld: gameworld
 
@@ -28,7 +29,8 @@ CosGame:
             force_update: True
             size_of_batches: 512
             size_of_component_block: 128
-            shader_source:
+            # gameview: 'camera'
+            shader_source: 'assets/shaders/positionshader.glsl'
 
         GameScreenManager:
             id: gamescreenmanager
@@ -36,7 +38,29 @@ CosGame:
             size: root.size
             pos: root.pos
 
-<MainMenuScreen>:
+        GameView:
+            system_id: 'camera'
+            gameworld: gameworld
+            size: root.size
+            camera_scale: 1
+            pos: root.pos
+            do_scroll: True
+
+
+<GameScreenManager>:
+    MainMenuScreen:
+        id: main_menu_screen
+
+    CosScreen:
+        id: cos_screen
+
+    MapScreen:
+        id: map_screen
+
+
+<MainMenuScreen@GameScreen>:
+    name: 'main_menu_screen'
+
     BoxLayout:
         orientation: 'vertical'
         padding: 12
@@ -46,13 +70,35 @@ CosGame:
 
         Button:
             text: 'Cos'
-            on_press: root.goToCosScreen()
+            on_release: app.game.gameworld.state = 'cos_game'
 
         Button:
             text: 'Search Towns'
-            on_press: root.goToMapScreen()
+            on_release: app.game.gameworld.state = 'map_generation'
 
-<MapScreen>:
+
+<CosScreen@GameScreen>:
+    name: 'cos_screen'
+
+    FloatLayout:
+        Button:
+            size_hint: (.2, .1)
+            pos_hint: {'x': .025, 'y': .875}
+            text: 'MainMenu'
+            on_release: app.game.gameworld.state = 'main_menu'
+
+        Button:
+            size_hint: (.2, .1)
+            pos_hint: {'x': .5025, 'y': .875}
+            text: 'Draw play map'
+            on_release: app.game.drawPlayMap()
+
+        # GameView:
+
+
+<MapScreen@GameScreen>:
+    name: 'map_screen'
+
     map_box: root.map_box
     map_nums: root.map_nums
     names_box: root.names_box
@@ -80,12 +126,12 @@ CosGame:
 
             Button:
                 text: 'Gen Town'
-                on_press: root.generateTown()
+                on_release: root.generateTown()
                 size_hint: 1, None
 
             Button:
                 text: 'Main Menu'
-                on_press: root.goToMainMenu()
+                on_release: app.game.gameworld.state = 'main_menu'
                 size_hint: 1, None
 
         ScrollView:
@@ -105,16 +151,3 @@ CosGame:
                 text: root.names_box
                 size_hint_y: None
                 height: self.texture_size[1]
-
-<CosScreen>:
-    BoxLayout:
-        padding: 12
-        spacing: 10
-        orientiation: 'horizontal'
-
-        Button:
-            text: 'MainMenu'
-            on_press: root.goToMainMenu()
-
-        Label:
-            text: 'testing'

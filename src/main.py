@@ -8,11 +8,14 @@ from kivy.properties import ObjectProperty
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.factory import Factory
 
+import kivent_core
 from kivent_core.systems.position_systems import PositionSystem2D
 from kivent_core.systems.renderers import Renderer
 from kivent_core.systems.gamesystem import GameSystem
 from kivent_core.managers.resource_managers import texture_manager
+from kivent_core.gameworld import GameWorld
 
 import town
 
@@ -23,25 +26,26 @@ global towns
 current_town_map = 0
 towns = []
 texture_manager.load_atlas('./assets/fonts/cogmind_font.atlas')
+texture_manager.load_image('./assets/pngs/road.png')
+
 
 class CosGame(Widget):
 
     def __init__(self, **kwargs):
-        super(TestGame, self).__init__(**kwargs)
-        self.gameworld.init_gameworld(['renderer', 'position'], callback =
-                                      self.initGame)
+        super(CosGame, self).__init__(**kwargs)
+        self.gameworld.init_gameworld(['renderer', 'position', 'camera'],
+                                      callback = self.initGame)
 
     def initGame(self):
         self.setupStates()
         self.setState()
         self.loadModels()
-        self.drawStuff()
 
-    def load_models(self):
+    def loadModels(self):
         model_string = ('! dq # $ % & sq ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 ' +
                         ': ; < = > ? @ [ fs ] ^ _ \' { | } A B C D E F G H I ' +
                         'J K L M N O P Q R S T U V W X Y Z esq sq a b c d e ' +
-                        'f g h i j k l m n o p q r s t u v w x y z vertline ' +
+                        'f g h i j k l m n o p q r s t u v w x y z vertl ' +
                         'horizl crossl lcrossl ucrossl rcrossl dcrossl ' +
                         'trcornerl brcornerl blcornerl tlcornerl square')
         models = model_string.split()
@@ -51,26 +55,61 @@ class CosGame(Widget):
             model_manager.load_textured_rectangle('vertex_format_4f', 12., 12.,
                                                   model, model + '_tx')
 
+        model_manager.load_textured_rectangle('vertex_format_4f', 144., 144.,
+                                              'road', 'road')
+
+
     def setupStates(self):
-        pass
+        self.gameworld.add_state(state_name='main_menu', systems_added=[],
+                                 systems_removed=[],
+                                 systems_paused=['renderer', 'position'],
+                                 systems_unpaused=[],
+                                 screenmanager_screen='main_menu_screen')
+
+        self.gameworld.add_state(state_name='map_generation', systems_added=[],
+                                 systems_removed=[],
+                                 systems_paused=['renderer', 'position'],
+                                 systems_unpaused=[],
+                                 screenmanager_screen='map_screen')
+
+        self.gameworld.add_state(state_name='cos_game',
+                                 systems_added=['renderer', 'position'],
+                                 systems_removed=[], systems_paused=[],
+                                 systems_unpaused=['renderer', 'position'],
+                                 screenmanager_screen='cos_screen')
 
     def setState(self):
-        pass
+        self.gameworld.state = 'main_menu'
 
-    def drawStuff(self):
-        pass
+    def drawPlayMap(self):
+        gameview = self.gameworld.system_manager['camera']
+        x, y = int(-gameview.camera_pos[0]), int(-gameview.camera_pos[1])
+        w, h = int(gameview.size[0] + x), int(gameview.size[1] + y)
+
+        town = towns[current_town_map]
+        for y, row in enumerate(town.map_points):
+            for x, cell in enumerate(row):
+                pos = (x * 144 + 24, y * 144 + 24)
+                building_type = cell.building_type
+
+                ent_id = self.createMapArea(pos, building_type)
+
+    def createMapArea(self, pos, building):
+        component_dict = {'position': pos,
+                          'renderer': {'texture': 'road',
+                                       'size': (144, 144),
+                                       'model_key': '+_tx',
+                                       'render': True}}
+
+        component_order = ['position', 'renderer']
+
+        return self.gameworld.init_entity(component_dict, component_order)
 
 
 class MainMenuScreen(Screen):
 
     def __init__(self, **kwargs):
         super(MainMenuScreen, self).__init__(**kwargs)
-
-    def goToMapScreen(self):
-        self.manager.current = 'map'
-
-    def goToCosScreen(self):
-        self.manager.current = 'cos'
 
 
 class MapScreen(Screen):
@@ -108,9 +147,6 @@ class MapScreen(Screen):
 
         new_town.printMapCorners()
         '''
-
-    def goToMainMenu(self):
-        self.manager.current = 'main_menu'
 
     def labelPress(self, instance, value):
         global current_town_map
@@ -162,10 +198,6 @@ class CosScreen(Screen):
     def __init__(self, **kwargs):
         super(CosScreen, self).__init__(**kwargs)
 
-    def goToMainMenu(self):
-        self.manager.current = 'main_menu'
-
-
 
 class CosApp(App):
 
@@ -173,13 +205,9 @@ class CosApp(App):
         Config.set( 'graphics', 'width', '900' )
         Config.set( 'graphics', 'height', '360' )
 
-        screens = ScreenManager()
-        screens.add_widget(MainMenuScreen(name='main_menu'))
-        screens.add_widget(MapScreen(name='map'))
-        screens.add_widget(CosScreen(name='cos'))
-        screens.current = 'main_menu'
+        self.game = CosGame()
 
-        return screens
+        return self.game
 
 
 if __name__ == '__main__':
