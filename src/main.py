@@ -1,10 +1,11 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.screenmanager import Screen, ScreenManager, NoTransition
 from kivy.config import Config
 from kivy.properties import StringProperty
 from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
+from kivy.properties import NumericProperty
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -42,15 +43,58 @@ texture_manager.load_image('./assets/pngs/empty.png')
 
 class CosGame(Widget):
 
+    player_id = NumericProperty(-1)
+
     def __init__(self, **kwargs):
         super(CosGame, self).__init__(**kwargs)
         self.gameworld.init_gameworld(['renderer', 'position', 'camera'],
                                       callback = self.initGame)
 
     def initGame(self):
+        self.gameworld.gamescreenmanager.transition = NoTransition()
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        self._keyboard.bind(on_key_down = self._on_keyboard_down)
+
         self.setupStates()
         self.setState()
         self.loadModels()
+        self.drawPlayMap()
+
+    def _keyboard_closed(self):
+        self._keyboard.unbind(on_key_down = self._on_keyboard_down)
+        self._keyboard = None
+
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        global player_id
+
+        if keycode[1] == 'escape':
+            if self.gameworld.state == 'cos_game':
+                self.goToMainMenuScreen()
+
+            elif self.gameworld.state == 'main_menu':
+                self.goToCosScreen()
+
+            elif self.gameworld.state == 'map_generation':
+                self.goToMainMenuScreen()
+
+        elif keycode[1] == 'right':
+            player = self.gameworld.entities[self.player_id]
+            player.position.pos = (player.position.x + 2, player.position.y)
+
+        elif keycode[1] == 'left':
+            player = self.gameworld.entities[self.player_id]
+            player.position.pos = (player.position.x - 2, player.position.y)
+
+        elif keycode[1] == 'down':
+            player = self.gameworld.entities[self.player_id]
+            player.position.pos = (player.position.x, player.position.y - 2)
+
+        elif keycode[1] == 'up':
+            player = self.gameworld.entities[self.player_id]
+            player.position.pos = (player.position.x, player.position.y + 2)
+
+        else:
+            pass
 
     def loadModels(self):
         model_string = ('! dq # $ % & sq ( ) * + , - . / 0 1 2 3 4 5 6 7 8 9 ' +
@@ -74,24 +118,27 @@ class CosGame(Widget):
             model_manager.load_textured_rectangle('vertex_format_4f', 144., 144.,
                                                 model, model)
 
-
     def setupStates(self):
         self.gameworld.add_state(state_name='main_menu', systems_added=[],
-                                 systems_removed=[],
-                                 systems_paused=['renderer', 'position'],
-                                 systems_unpaused=[],
+                                 systems_removed=['camera'],
+                                 systems_paused=['position', 'camera'],
+                                 systems_unpaused=['renderer'],
                                  screenmanager_screen='main_menu_screen')
 
         self.gameworld.add_state(state_name='map_generation', systems_added=[],
-                                 systems_removed=['renderer', 'position'],
-                                 systems_paused=[],
+                                 systems_removed=['renderer', 'position',
+                                                  'camera'],
+                                 systems_paused=['renderer', 'position',
+                                                 'camera'],
                                  systems_unpaused=[],
                                  screenmanager_screen='map_screen')
 
         self.gameworld.add_state(state_name='cos_game',
-                                 systems_added=['renderer', 'position'],
+                                 systems_added=['renderer', 'position',
+                                                'camera'],
                                  systems_removed=[], systems_paused=[],
-                                 systems_unpaused=['renderer', 'position'],
+                                 systems_unpaused=['renderer', 'position',
+                                                   'camera'],
                                  screenmanager_screen='cos_screen')
 
     def setState(self):
@@ -105,10 +152,12 @@ class CosGame(Widget):
         town = towns[current_town_map]
         for y, row in enumerate(town.map_points):
             for x, cell in enumerate(row):
-                pos = (x * 144 + 144, y * 144 + 144)
+                pos = (x * 144 + 72, y * 144 + 72)
                 building_type = cell.building_type
 
                 ent_id = self.createMapArea(pos, building_type)
+
+        self.player_id = self.createPlayer()
 
     def createMapArea(self, pos, building):
         if 'Road' not in building:
@@ -118,6 +167,17 @@ class CosGame(Widget):
                           'renderer': {'texture': building,
                                        'size': (144, 144),
                                        'model_key': building,
+                                       'render': True}}
+
+        component_order = ['position', 'renderer']
+
+        return self.gameworld.init_entity(component_dict, component_order)
+
+    def createPlayer(self):
+        component_dict = {'position': (72, 72),
+                          'renderer': {'texture': '@',
+                                       'size': (12, 12),
+                                       'model_key': '@',
                                        'render': True}}
 
         component_order = ['position', 'renderer']
@@ -230,6 +290,7 @@ class CosScreen(Screen):
 class CosApp(App):
 
     def build(self):
+        Config.set('kivy', 'exit_on_escape', '0')
         Config.set( 'graphics', 'width', '900' )
         Config.set( 'graphics', 'height', '360' )
 

@@ -4,7 +4,9 @@ CosGame:
 
 
 <CosGame>:
+    id: cos_game
     gameworld: gameworld
+    player_id: self.player_id
 
     GameWorld:
         id: gameworld
@@ -38,13 +40,25 @@ CosGame:
             size: root.size
             pos: root.pos
 
+        GameMap:
+            id: gamemap
+            gameworld: gameworld
+            map_size: 144 * 20, 144 * 20
+            zones: ['general']
+
         GameView:
             system_id: 'camera'
             gameworld: gameworld
+            currentmap: gamemap
             size: root.size
-            camera_scale: 20
+            window_size: root.size
             pos: root.pos
+            updateable: True
             do_scroll: True
+            do_scroll_lock: True
+            focus_entity: True
+            entity_to_focus: cos_game.player_id
+            zones: ['general']
 
 
 <GameScreenManager>:
@@ -61,42 +75,24 @@ CosGame:
 <MainMenuScreen@GameScreen>:
     name: 'main_menu_screen'
 
-    FloatLayout:
+    BoxLayout:
         orientation: 'vertical'
         padding: 12
         spacing: 10
         pos_hint: {'center_x':.5, 'center_y':.5}
-        size_hint: 1, 1
+        size_hint: .4, .25
 
         Button:
-            size_hint: (.2, .1)
-            pos_hint: {'x': .025, 'y': .875}
             text: 'Cos'
             on_release: app.game.goToCosScreen()
 
         Button:
-            size_hint: (.2, .1)
-            pos_hint: {'x': .5025, 'y': .875}
             text: 'Search Towns'
             on_release: app.game.goToMapScreen()
 
 
 <CosScreen@GameScreen>:
     name: 'cos_screen'
-
-    FloatLayout:
-        Button:
-            size_hint: (.2, .1)
-            pos_hint: {'x': .025, 'y': .875}
-            text: 'MainMenu'
-            on_release: app.game.goToMainMenuScreen()
-
-        Button:
-            size_hint: (.2, .1)
-            pos_hint: {'x': .5025, 'y': .875}
-            text: 'Draw play map'
-            on_release: app.game.drawPlayMap()
-
 
 <MapScreen@GameScreen>:
     name: 'map_screen'
@@ -114,7 +110,7 @@ CosGame:
         pos_hint: {'center_x':.5, 'center_y':.5}
 
         BoxLayout:
-            size_hint: .3, 1
+            size_hint: .5, 1
             orientation: 'vertical'
             padding: 12
             spacing: 10
