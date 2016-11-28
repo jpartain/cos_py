@@ -1,6 +1,8 @@
 from kivy.app import App
 from kivy.uix.widget import Widget
-from kivy.uix.screenmanager import Screen, ScreenManager, NoTransition
+from kivy.uix.screenmanager import Screen, ScreenManager
+from kivy.uix.screenmanager import NoTransition, SlideTransition
+from kivy.uix.screenmanager import FallOutTransition, RiseInTransition
 from kivy.config import Config
 from kivy.properties import StringProperty
 from kivy.properties import ListProperty
@@ -12,11 +14,15 @@ from kivy.core.window import Window
 from kivy.factory import Factory
 
 import kivent_core
+import kivent_cymunk
 from kivent_core.systems.position_systems import PositionSystem2D
-from kivent_core.systems.renderers import Renderer
+from kivent_core.systems.rotate_systems import RotateSystem2D
+from kivent_core.systems.renderers import RotateRenderer
 from kivent_core.systems.gamesystem import GameSystem
 from kivent_core.managers.resource_managers import texture_manager
 from kivent_core.gameworld import GameWorld
+
+from math import radians
 
 import town
 
@@ -47,11 +53,10 @@ class CosGame(Widget):
 
     def __init__(self, **kwargs):
         super(CosGame, self).__init__(**kwargs)
-        self.gameworld.init_gameworld(['renderer', 'position', 'camera'],
-                                      callback = self.initGame)
+        self.gameworld.init_gameworld(['cymunk_physics', 'rotate_renderer', 'rotate',
+                                       'position', 'camera'], callback = self.initGame)
 
     def initGame(self):
-        self.gameworld.gamescreenmanager.transition = NoTransition()
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down = self._on_keyboard_down)
 
@@ -65,7 +70,7 @@ class CosGame(Widget):
         self._keyboard = None
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
-        global player_id
+        player_control_keys = 'l h j k y u b n'.split()
 
         if keycode[1] == 'escape':
             if self.gameworld.state == 'cos_game':
@@ -77,21 +82,36 @@ class CosGame(Widget):
             elif self.gameworld.state == 'map_generation':
                 self.goToMainMenuScreen()
 
-        elif keycode[1] == 'right':
-            player = self.gameworld.entities[self.player_id]
-            player.position.pos = (player.position.x + 2, player.position.y)
+            else:
+                pass
 
-        elif keycode[1] == 'left':
+        elif keycode[1] in player_control_keys:
+            s = 2
             player = self.gameworld.entities[self.player_id]
-            player.position.pos = (player.position.x - 2, player.position.y)
 
-        elif keycode[1] == 'down':
-            player = self.gameworld.entities[self.player_id]
-            player.position.pos = (player.position.x, player.position.y - 2)
+            if keycode[1] == 'l':
+                player.position.pos = (player.position.x + s, player.position.y)
 
-        elif keycode[1] == 'up':
-            player = self.gameworld.entities[self.player_id]
-            player.position.pos = (player.position.x, player.position.y + 2)
+            elif keycode[1] == 'h':
+                player.position.pos = (player.position.x - s, player.position.y)
+
+            elif keycode[1] == 'j':
+                player.position.pos = (player.position.x, player.position.y - s)
+
+            elif keycode[1] == 'k':
+                player.position.pos = (player.position.x, player.position.y + s)
+
+            elif keycode[1] == 'y':
+                player.position.pos = (player.position.x - s, player.position.y + s)
+
+            elif keycode[1] == 'u':
+                player.position.pos = (player.position.x + s, player.position.y + s)
+
+            elif keycode[1] == 'b':
+                player.position.pos = (player.position.x - s, player.position.y - s)
+
+            elif keycode[1] == 'n':
+                player.position.pos = (player.position.x + s, player.position.y - s)
 
         else:
             pass
@@ -122,22 +142,22 @@ class CosGame(Widget):
         self.gameworld.add_state(state_name='main_menu', systems_added=[],
                                  systems_removed=['camera'],
                                  systems_paused=['position', 'camera'],
-                                 systems_unpaused=['renderer'],
+                                 systems_unpaused=['rotate_renderer'],
                                  screenmanager_screen='main_menu_screen')
 
         self.gameworld.add_state(state_name='map_generation', systems_added=[],
-                                 systems_removed=['renderer', 'position',
+                                 systems_removed=['rotate_renderer', 'position',
                                                   'camera'],
-                                 systems_paused=['renderer', 'position',
+                                 systems_paused=['rotate_renderer', 'position',
                                                  'camera'],
                                  systems_unpaused=[],
                                  screenmanager_screen='map_screen')
 
         self.gameworld.add_state(state_name='cos_game',
-                                 systems_added=['renderer', 'position',
+                                 systems_added=['rotate_renderer', 'position',
                                                 'camera'],
                                  systems_removed=[], systems_paused=[],
-                                 systems_unpaused=['renderer', 'position',
+                                 systems_unpaused=['rotate_renderer', 'position',
                                                    'camera'],
                                  screenmanager_screen='cos_screen')
 
@@ -164,33 +184,60 @@ class CosGame(Widget):
             building = 'empty'
 
         component_dict = {'position': pos,
-                          'renderer': {'texture': building,
-                                       'size': (144, 144),
-                                       'model_key': building,
-                                       'render': True}}
+                          'rotate_renderer': {'texture': building,
+                                              'size': (144, 144),
+                                              'model_key': building,
+                                              'render': True},
+                          'rotate': 0}
 
-        component_order = ['position', 'renderer']
+        component_order = ['position','rotate', 'rotate_renderer']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
     def createPlayer(self):
+        shape_dict = {'inner_radius': 0, 'outer_radius': 8,
+                      'mass': 50, 'offset': (0, 0)}
+        col_shape = {'shape_type': 'circle', 'elasticity': .1,
+                     'collision_type': 1, 'shape_info': shape_dict,
+                     'friction': 1.0}
+        col_shapes = [col_shape]
+        physics_component = {'main_shape': 'circle',
+                             'velocity': (0, 0),
+                             'position': (72, 72), 'angle': 0,
+                             'angular_velocity': 0,
+                             'vel_limit': 250,
+                             'ang_vel_limit': radians(200),
+                             'mass': 50, 'col_shapes': col_shapes}
         component_dict = {'position': (72, 72),
-                          'renderer': {'texture': '@',
-                                       'size': (12, 12),
-                                       'model_key': '@',
-                                       'render': True}}
+                          'rotate_renderer': {'texture': '@',
+                                              'size': (12, 12),
+                                              'model_key': '@',
+                                              'render': True},
+                          'cymunk_physics': physics_component,
+                          'rotate': 0}
 
-        component_order = ['position', 'renderer']
+        component_order = ['position', 'rotate', 'rotate_renderer', 'cymunk_physics']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
     def goToMainMenuScreen(self):
-        self.gameworld.state = 'main_menu'
+        gw = self.gameworld
+
+        if gw.state == 'map_generation':
+            gw.gamescreenmanager.transition = SlideTransition()
+            gw.gamescreenmanager.transition.direction = 'right'
+        else:
+            gw.gamescreenmanager.transition = RiseInTransition()
+
+        gw.state = 'main_menu'
 
     def goToMapScreen(self):
+        self.gameworld.gamescreenmanager.transition = SlideTransition()
+        self.gameworld.gamescreenmanager.transition.direction = 'left'
         self.gameworld.state = 'map_generation'
 
     def goToCosScreen(self):
+        self.gameworld.gamescreenmanager.transition = FallOutTransition()
         self.gameworld.state = 'cos_game'
 
 
