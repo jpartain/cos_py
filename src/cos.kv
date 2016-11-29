@@ -20,7 +20,6 @@ CosGame:
             system_id: 'position'
             gameworld: gameworld
             zones: ['general']
-            size_of_component_block: 128
 
         RotateSystem2D:
             system_id: 'rotate'
@@ -34,21 +33,13 @@ CosGame:
             frame_count: 2
             updateable: True
             force_update: True
-            size_of_batches: 512
-            size_of_component_block: 128
             gameview: 'camera'
-            shader_source: 'assets/shaders/positionshader.glsl'
+            shader_source: 'assets/shaders/positionrotateshader.glsl'
 
         CymunkPhysics:
-            system_id: 'cymunk_physics'
-            gameworld: root.gameworld
-            zones: ['general']
-
-        GameScreenManager:
-            id: gamescreenmanager
             gameworld: gameworld
-            size: root.size
-            pos: root.pos
+            system_id: 'cymunk_physics'
+            zones: ['general']
 
         GameMap:
             id: gamemap
@@ -69,6 +60,12 @@ CosGame:
             focus_entity: True
             entity_to_focus: cos_game.player_id
             zones: ['general']
+
+    GameScreenManager:
+        id: gamescreenmanager
+        gameworld: gameworld
+        size: root.size
+        pos: root.pos
 
 
 <GameScreenManager>:

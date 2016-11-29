@@ -22,6 +22,8 @@ from kivent_core.systems.gamesystem import GameSystem
 from kivent_core.managers.resource_managers import texture_manager
 from kivent_core.gameworld import GameWorld
 
+from math import radians
+
 import town
 
 
@@ -85,32 +87,38 @@ class CosGame(Widget):
                 pass
 
         elif keycode[1] in player_control_keys:
-            s = 2
+            s = (1, 0)
             player = self.gameworld.entities[self.player_id]
+            apply_force = player.cymunk_physics.body.apply_force
 
             if keycode[1] == 'l':
-                player.position.pos = (player.position.x + s, player.position.y)
+                r = (1, 0)
+                apply_force(s, r)
+                print(player.cymunk_physics.body.force)
 
             elif keycode[1] == 'h':
-                player.position.pos = (player.position.x - s, player.position.y)
+                pass
 
             elif keycode[1] == 'j':
-                player.position.pos = (player.position.x, player.position.y - s)
+                pass
 
             elif keycode[1] == 'k':
-                player.position.pos = (player.position.x, player.position.y + s)
+                pass
 
             elif keycode[1] == 'y':
-                player.position.pos = (player.position.x - s, player.position.y + s)
+                pass
 
             elif keycode[1] == 'u':
-                player.position.pos = (player.position.x + s, player.position.y + s)
+                pass
 
             elif keycode[1] == 'b':
-                player.position.pos = (player.position.x - s, player.position.y - s)
+                pass
 
             elif keycode[1] == 'n':
-                player.position.pos = (player.position.x + s, player.position.y - s)
+                pass
+
+            else:
+                pass
 
         else:
             pass
@@ -141,24 +149,24 @@ class CosGame(Widget):
         self.gameworld.add_state(state_name='main_menu',
                                  systems_added=['rotate_renderer'],
                                  systems_removed=['camera'],
-                                 systems_paused=['camera'],
+                                 systems_paused=['position', 'camera'],
                                  systems_unpaused=['rotate_renderer'],
                                  screenmanager_screen='main_menu_screen')
 
         self.gameworld.add_state(state_name='map_generation', systems_added=[],
                                  systems_removed=['rotate_renderer', 'position',
-                                                  'camera', 'rotate'],
+                                                  'camera'],
                                  systems_paused=['rotate_renderer', 'position',
-                                                 'camera', 'rotate'],
+                                                 'camera'],
                                  systems_unpaused=[],
                                  screenmanager_screen='map_screen')
 
         self.gameworld.add_state(state_name='cos_game',
                                  systems_added=['rotate_renderer', 'position',
-                                                'camera', 'cymunk_physics', 'rotate'],
+                                                'camera'],
                                  systems_removed=[], systems_paused=[],
                                  systems_unpaused=['rotate_renderer', 'position',
-                                                   'camera', 'cymunk_physics', 'rotate'],
+                                                   'camera'],
                                  screenmanager_screen='cos_screen')
 
     def setState(self):
@@ -186,30 +194,35 @@ class CosGame(Widget):
         print(building)
         component_dict = {'position': pos,
                           'rotate_renderer': {'texture': building,
-                                       'size': (144, 144),
-                                       'render': True}}
+                                              'size': (144, 144),
+                                              'model_key': building,
+                                              'render': True},
+                          'rotate': 0}
 
-        component_order = ['position', 'rotate_renderer']
+        component_order = ['position','rotate', 'rotate_renderer']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
     def createPlayer(self):
         shape_dict = {'inner_radius': 0, 'outer_radius': 8,
                       'mass': 50, 'offset': (0, 0)}
-        col_shape = {'shape_type': 'circle', 'elasticity': 0,
-                     'collision_type': 1, 'shape_info': shape_dict, 'friction': 1.0}
+        col_shape = {'shape_type': 'circle', 'elasticity': .1,
+                     'collision_type': 1, 'shape_info': shape_dict,
+                     'friction': 1.0}
         col_shapes = [col_shape]
-        physics_component = {'main_shape': 'circle', 'velocity': (0, 0),
+        physics_component = {'main_shape': 'circle',
+                             'velocity': (0, 0),
                              'position': (72, 72), 'angle': 0,
                              'angular_velocity': 0,
-                             'vel_limit': 250, 'ang_vel_limit': 0, 'mass': 50,
-                             'col_shapes': col_shapes}
-        component_dict = {'cymunk_physics': physics_component,
-                          'position': (72, 72),
+                             'vel_limit': 250,
+                             'ang_vel_limit': radians(200),
+                             'mass': 50, 'col_shapes': col_shapes}
+        component_dict = {'position': (72, 72),
                           'rotate_renderer': {'texture': '@',
                                               'size': (12, 12),
                                               'model_key': '@',
                                               'render': True},
+                          'cymunk_physics': physics_component,
                           'rotate': 0}
 
         component_order = ['position', 'rotate', 'rotate_renderer', 'cymunk_physics']
