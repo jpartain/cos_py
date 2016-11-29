@@ -16,7 +16,8 @@ from kivy.factory import Factory
 import kivent_core
 import kivent_cymunk
 from kivent_core.systems.position_systems import PositionSystem2D
-from kivent_core.systems.renderers import Renderer
+from kivent_core.systems.rotate_systems import RotateSystem2D
+from kivent_core.systems.renderers import RotateRenderer
 from kivent_core.systems.gamesystem import GameSystem
 from kivent_core.managers.resource_managers import texture_manager
 from kivent_core.gameworld import GameWorld
@@ -50,8 +51,9 @@ class CosGame(Widget):
 
     def __init__(self, **kwargs):
         super(CosGame, self).__init__(**kwargs)
-        self.gameworld.init_gameworld(['cymunk_phyics', 'renderer', 'position',
-                                       'camera'], callback = self.initGame)
+        self.gameworld.init_gameworld(['cymunk_physics', 'rotate_renderer',
+                                       'position', 'rotate', 'camera'],
+                                      callback = self.initGame)
 
     def initGame(self):
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
@@ -136,26 +138,27 @@ class CosGame(Widget):
                                                 model, model)
 
     def setupStates(self):
-        self.gameworld.add_state(state_name='main_menu', systems_added=[],
+        self.gameworld.add_state(state_name='main_menu',
+                                 systems_added=['rotate_renderer'],
                                  systems_removed=['camera'],
-                                 systems_paused=['position', 'camera'],
-                                 systems_unpaused=['renderer'],
+                                 systems_paused=['camera'],
+                                 systems_unpaused=['rotate_renderer'],
                                  screenmanager_screen='main_menu_screen')
 
         self.gameworld.add_state(state_name='map_generation', systems_added=[],
-                                 systems_removed=['renderer', 'position',
-                                                  'camera'],
-                                 systems_paused=['renderer', 'position',
-                                                 'camera'],
+                                 systems_removed=['rotate_renderer', 'position',
+                                                  'camera', 'rotate'],
+                                 systems_paused=['rotate_renderer', 'position',
+                                                 'camera', 'rotate'],
                                  systems_unpaused=[],
                                  screenmanager_screen='map_screen')
 
         self.gameworld.add_state(state_name='cos_game',
-                                 systems_added=['renderer', 'position',
-                                                'camera'],
+                                 systems_added=['rotate_renderer', 'position',
+                                                'camera', 'cymunk_physics', 'rotate'],
                                  systems_removed=[], systems_paused=[],
-                                 systems_unpaused=['renderer', 'position',
-                                                   'camera'],
+                                 systems_unpaused=['rotate_renderer', 'position',
+                                                   'camera', 'cymunk_physics', 'rotate'],
                                  screenmanager_screen='cos_screen')
 
     def setState(self):
@@ -180,13 +183,13 @@ class CosGame(Widget):
         if 'Road' not in building:
             building = 'empty'
 
+        print(building)
         component_dict = {'position': pos,
-                          'renderer': {'texture': building,
+                          'rotate_renderer': {'texture': building,
                                        'size': (144, 144),
-                                       'model_key': building,
                                        'render': True}}
 
-        component_order = ['position', 'renderer']
+        component_order = ['position', 'rotate_renderer']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
@@ -194,22 +197,22 @@ class CosGame(Widget):
         shape_dict = {'inner_radius': 0, 'outer_radius': 8,
                       'mass': 50, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': 0,
-                     'collision_type': 1, 'shape_info': shape_dict, 'friction':
-                     1.0}
+                     'collision_type': 1, 'shape_info': shape_dict, 'friction': 1.0}
         col_shapes = [col_shape]
         physics_component = {'main_shape': 'circle', 'velocity': (0, 0),
                              'position': (72, 72), 'angle': 0,
                              'angular_velocity': 0,
                              'vel_limit': 250, 'ang_vel_limit': 0, 'mass': 50,
                              'col_shapes': col_shapes}
-        component_dict = {'cymunk_phyics': physics_component,
+        component_dict = {'cymunk_physics': physics_component,
                           'position': (72, 72),
-                          'renderer': {'texture': '@',
-                                       'size': (12, 12),
-                                       'model_key': '@',
-                                       'render': True}}
+                          'rotate_renderer': {'texture': '@',
+                                              'size': (12, 12),
+                                              'model_key': '@',
+                                              'render': True},
+                          'rotate': 0}
 
-        component_order = ['position', 'renderer', 'cymunk_phyics']
+        component_order = ['position', 'rotate', 'rotate_renderer', 'cymunk_physics']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
