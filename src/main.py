@@ -86,32 +86,38 @@ class CosGame(Widget):
                 pass
 
         elif keycode[1] in player_control_keys:
-            s = 2
+            s = (1, 0)
             player = self.gameworld.entities[self.player_id]
+            apply_force = player.cymunk_physics.body.apply_force
 
             if keycode[1] == 'l':
-                player.position.pos = (player.position.x + s, player.position.y)
+                r = (1, 0)
+                apply_force(s, r)
+                print(player.cymunk_physics.body.force)
 
             elif keycode[1] == 'h':
-                player.position.pos = (player.position.x - s, player.position.y)
+                pass
 
             elif keycode[1] == 'j':
-                player.position.pos = (player.position.x, player.position.y - s)
+                pass
 
             elif keycode[1] == 'k':
-                player.position.pos = (player.position.x, player.position.y + s)
+                pass
 
             elif keycode[1] == 'y':
-                player.position.pos = (player.position.x - s, player.position.y + s)
+                pass
 
             elif keycode[1] == 'u':
-                player.position.pos = (player.position.x + s, player.position.y + s)
+                pass
 
             elif keycode[1] == 'b':
-                player.position.pos = (player.position.x - s, player.position.y - s)
+                pass
 
             elif keycode[1] == 'n':
-                player.position.pos = (player.position.x + s, player.position.y - s)
+                pass
+
+            else:
+                pass
 
         else:
             pass
