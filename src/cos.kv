@@ -2,7 +2,6 @@
 
 CosGame:
 
-
 <CosGame>:
     id: cos_game
     gameworld: gameworld
@@ -11,15 +10,13 @@ CosGame:
     GameWorld:
         id: gameworld
         gamescreenmanager: gamescreenmanager
-        size_of_gameworld: 300 * 1024
-        size_of_entity_block: 128
-        system_count: 4
-        zones: {'general': 50000}
+        size_of_gameworld: 100 * 1024
+        zones: {'general': 20000, 'touch': 1000}
 
         PositionSystem2D:
             system_id: 'position'
             gameworld: gameworld
-            zones: ['general']
+            zones: ['general', 'touch']
 
         RotateSystem2D:
             system_id: 'rotate'
@@ -37,8 +34,8 @@ CosGame:
             shader_source: 'assets/shaders/positionrotateshader.glsl'
 
         CymunkPhysics:
-            gameworld: gameworld
             system_id: 'cymunk_physics'
+            gameworld: root.gameworld
             zones: ['general']
 
         GameMap:

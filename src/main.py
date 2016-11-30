@@ -15,6 +15,7 @@ from kivy.factory import Factory
 
 import kivent_core
 import kivent_cymunk
+from kivent_cymunk.interaction import CymunkTouchSystem
 from kivent_core.systems.position_systems import PositionSystem2D
 from kivent_core.systems.rotate_systems import RotateSystem2D
 from kivent_core.systems.renderers import RotateRenderer
@@ -58,6 +59,8 @@ class CosGame(Widget):
                                       callback = self.initGame)
 
     def initGame(self):
+        global player_id
+
         self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
         self._keyboard.bind(on_key_down = self._on_keyboard_down)
 
@@ -65,6 +68,8 @@ class CosGame(Widget):
         self.setState()
         self.loadModels()
         self.drawPlayMap()
+
+        print(self.gameworld.system_manager.systems['physics'])
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down = self._on_keyboard_down)
@@ -87,14 +92,13 @@ class CosGame(Widget):
                 pass
 
         elif keycode[1] in player_control_keys:
-            s = (1, 0)
             player = self.gameworld.entities[self.player_id]
-            apply_force = player.cymunk_physics.body.apply_force
+            apply_impulse = player.cymunk_physics.body.apply_impulse
 
             if keycode[1] == 'l':
                 r = (1, 0)
-                apply_force(s, r)
-                print(player.cymunk_physics.body.force)
+                apply_impulse(s, r)
+                print(player.cymunk_physics.body.velocity)
 
             elif keycode[1] == 'h':
                 pass
@@ -191,7 +195,6 @@ class CosGame(Widget):
         if 'Road' not in building:
             building = 'empty'
 
-        print(building)
         component_dict = {'position': pos,
                           'rotate_renderer': {'texture': building,
                                               'size': (144, 144),
@@ -225,7 +228,8 @@ class CosGame(Widget):
                           'cymunk_physics': physics_component,
                           'rotate': 0}
 
-        component_order = ['position', 'rotate', 'rotate_renderer', 'cymunk_physics']
+        component_order = ['position', 'rotate', 'rotate_renderer',
+                           'cymunk_physics']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
