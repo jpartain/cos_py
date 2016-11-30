@@ -35,6 +35,7 @@ CosGame:
 
         CymunkPhysics:
             system_id: 'cymunk_physics'
+            id: physics
             gameworld: root.gameworld
             zones: ['general']
 
@@ -56,6 +57,7 @@ CosGame:
             do_scroll_lock: True
             focus_entity: True
             entity_to_focus: cos_game.player_id
+            touch_pass_through: True
             zones: ['general']
 
     GameScreenManager:

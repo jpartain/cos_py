@@ -15,13 +15,15 @@ from kivy.factory import Factory
 
 import kivent_core
 import kivent_cymunk
-from kivent_cymunk.interaction import CymunkTouchSystem
 from kivent_core.systems.position_systems import PositionSystem2D
 from kivent_core.systems.rotate_systems import RotateSystem2D
 from kivent_core.systems.renderers import RotateRenderer
 from kivent_core.systems.gamesystem import GameSystem
 from kivent_core.managers.resource_managers import texture_manager
 from kivent_core.gameworld import GameWorld
+
+from cymunk import Body
+from cymunk import PivotJoint
 
 from math import radians
 
@@ -68,8 +70,6 @@ class CosGame(Widget):
         self.setState()
         self.loadModels()
         self.drawPlayMap()
-
-        print(self.gameworld.system_manager.systems['physics'])
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down = self._on_keyboard_down)
@@ -189,7 +189,20 @@ class CosGame(Widget):
 
                 ent_id = self.createMapArea(pos, building_type)
 
+        # Player
         self.player_id = self.createPlayer()
+        player = self.gameworld.entities[self.player_id]
+
+        # Touch object player will walk to
+        self.walking_to = Body('INF', 'INF')
+        start_pos = (player.position.pos[0], player.position.pos[1])
+        self.walking_to.position = start_pos
+
+        # Joint that pulls the two together
+        joint = PivotJoint(self.walking_to, player.cymunk_physics.body, (0, 0), (0, 0))
+        joint.max_force = 200.
+        joint.max_bias = 5000.
+        self.ids.physics.space.add_constraint(joint)
 
     def createMapArea(self, pos, building):
         if 'Road' not in building:
@@ -208,7 +221,7 @@ class CosGame(Widget):
 
     def createPlayer(self):
         shape_dict = {'inner_radius': 0, 'outer_radius': 8,
-                      'mass': 50, 'offset': (0, 0)}
+                      'mass': 2, 'offset': (0, 0)}
         col_shape = {'shape_type': 'circle', 'elasticity': .1,
                      'collision_type': 1, 'shape_info': shape_dict,
                      'friction': 1.0}
@@ -217,9 +230,9 @@ class CosGame(Widget):
                              'velocity': (0, 0),
                              'position': (72, 72), 'angle': 0,
                              'angular_velocity': 0,
-                             'vel_limit': 250,
+                             'vel_limit': 50,
                              'ang_vel_limit': radians(200),
-                             'mass': 50, 'col_shapes': col_shapes}
+                             'mass': 2, 'col_shapes': col_shapes}
         component_dict = {'position': (72, 72),
                           'rotate_renderer': {'texture': '@',
                                               'size': (12, 12),
@@ -252,6 +265,20 @@ class CosGame(Widget):
     def goToCosScreen(self):
         self.gameworld.gamescreenmanager.transition = FallOutTransition()
         self.gameworld.state = 'cos_game'
+
+    def on_touch_down(self, touch):
+        state = self.gameworld.state
+
+        if state == 'cos_game':
+            b = self.walking_to
+            b.position = touch.pos
+
+            bodies = self.ids.physics.space.bodies
+            if b not in bodies:
+                self.ids.physics.space.add_body(b)
+
+        else:
+            super(CosGame, self).on_touch_down(touch)
 
 
 class MainMenuScreen(Screen):
