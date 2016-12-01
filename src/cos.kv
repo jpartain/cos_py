@@ -18,6 +18,13 @@ CosGame:
             gameworld: gameworld
             zones: ['general', 'touch']
 
+        CharacterSystem:
+            system_id: 'characters'
+            id: person
+            gameworld: gameworld
+            zones: ['general']
+            updateable: False
+
         RotateSystem2D:
             system_id: 'rotate'
             gameworld: gameworld
@@ -47,6 +54,7 @@ CosGame:
 
         GameView:
             system_id: 'camera'
+            id: camera
             gameworld: gameworld
             currentmap: gamemap
             size: root.size

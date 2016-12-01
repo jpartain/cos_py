@@ -28,6 +28,7 @@ from cymunk import PivotJoint
 from math import radians
 
 import town
+import character_system
 
 
 global current_town_map
@@ -48,6 +49,7 @@ texture_manager.load_image('./assets/pngs/TRCRoad.png')
 texture_manager.load_image('./assets/pngs/UIRoad.png')
 texture_manager.load_image('./assets/pngs/VRoad.png')
 texture_manager.load_image('./assets/pngs/empty.png')
+texture_manager.load_image('./assets/pngs/Tavern.png')
 
 
 class CosGame(Widget):
@@ -57,7 +59,8 @@ class CosGame(Widget):
     def __init__(self, **kwargs):
         super(CosGame, self).__init__(**kwargs)
         self.gameworld.init_gameworld(['cymunk_physics', 'rotate_renderer',
-                                       'position', 'rotate', 'camera'],
+                                       'position', 'rotate', 'camera',
+                                       'characters'],
                                       callback = self.initGame)
 
     def initGame(self):
@@ -70,6 +73,7 @@ class CosGame(Widget):
         self.setState()
         self.loadModels()
         self.drawPlayMap()
+        print(self.ids.camera.camera_pos)
 
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down = self._on_keyboard_down)
@@ -135,17 +139,17 @@ class CosGame(Widget):
                         'horizl crossl lcrossl ucrossl rcrossl dcrossl ' +
                         'trcornerl brcornerl blcornerl tlcornerl square')
         road_string = ('BLCRoad BRCRoad DIRoad HRoad IRoad LIRoad RIRoad ' +
-                       'TLCRoad TRCRoad UIRoad VRoad empty')
+                       'TLCRoad TRCRoad UIRoad VRoad empty Tavern')
 
         models = model_string.split()
-        roads = road_string.split()
+        buildings = road_string.split()
         model_manager = self.gameworld.model_manager
 
         for model in models:
             model_manager.load_textured_rectangle('vertex_format_4f', 12., 12.,
                                                   model, model)
 
-        for model in roads:
+        for model in buildings:
             model_manager.load_textured_rectangle('vertex_format_4f', 144., 144.,
                                                 model, model)
 
@@ -200,22 +204,41 @@ class CosGame(Widget):
 
         # Joint that pulls the two together
         joint = PivotJoint(self.walking_to, player.cymunk_physics.body, (0, 0), (0, 0))
-        joint.max_force = 200.
+        joint.max_force = 500.
         joint.max_bias = 5000.
         self.ids.physics.space.add_constraint(joint)
 
     def createMapArea(self, pos, building):
-        if 'Road' not in building:
+        if 'Road' in building:
+            component_dict = {'position': pos,
+                             'rotate_renderer': {'texture': building,
+                                                 'size': (144, 144),
+                                                 'model_key': building,
+                                                 'render': True},
+                             'rotate': 0}
+
+            component_order = ['position','rotate', 'rotate_renderer']
+
+        elif building == 'Tavern':
+            print('drawing tavern at {}'.format(pos))
+            component_dict = {'position': pos,
+                             'rotate_renderer': {'texture': 'Tavern',
+                                                 'size': (144, 144),
+                                                 'model_key': 'Tavern',
+                                                 'render': True},
+                             'rotate': 0}
+
+            component_order = ['position','rotate', 'rotate_renderer']
+
+        else:
             building = 'empty'
+            component_dict = {'position': pos,
+                             'rotate_renderer': {'texture': building,
+                                                 'size': (144, 144),
+                                                 'render': True},
+                             'rotate': 0}
 
-        component_dict = {'position': pos,
-                          'rotate_renderer': {'texture': building,
-                                              'size': (144, 144),
-                                              'model_key': building,
-                                              'render': True},
-                          'rotate': 0}
-
-        component_order = ['position','rotate', 'rotate_renderer']
+            component_order = ['position','rotate', 'rotate_renderer']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
@@ -230,7 +253,7 @@ class CosGame(Widget):
                              'velocity': (0, 0),
                              'position': (72, 72), 'angle': 0,
                              'angular_velocity': 0,
-                             'vel_limit': 50,
+                             'vel_limit': 500,
                              'ang_vel_limit': radians(200),
                              'mass': 2, 'col_shapes': col_shapes}
         component_dict = {'position': (72, 72),
@@ -239,10 +262,17 @@ class CosGame(Widget):
                                               'model_key': '@',
                                               'render': True},
                           'cymunk_physics': physics_component,
-                          'rotate': 0}
+                          'rotate': 0,
+                          'characters': {'name': 'George',
+                                         'lname': 'Bob',
+                                         'age': 'Teenager',
+                                         'family': None,
+                                         'relations': None,
+                                         'house': None,
+                                         'workplace': None}}
 
         component_order = ['position', 'rotate', 'rotate_renderer',
-                           'cymunk_physics']
+                           'cymunk_physics', 'characters']
 
         return self.gameworld.init_entity(component_dict, component_order)
 
@@ -271,7 +301,15 @@ class CosGame(Widget):
 
         if state == 'cos_game':
             b = self.walking_to
-            b.position = touch.pos
+            cam_pos_x = -self.ids.camera.camera_pos[0]
+            cam_pos_y = -self.ids.camera.camera_pos[1]
+            touch_pos_x = touch.pos[0]
+            touch_pos_y = touch.pos[1]
+
+            world_pos_x = cam_pos_x + touch_pos_x
+            world_pos_y = cam_pos_y + touch_pos_y
+
+            b.position = (world_pos_x, world_pos_y)
 
             bodies = self.ids.physics.space.bodies
             if b not in bodies:
