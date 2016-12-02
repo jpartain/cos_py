@@ -50,6 +50,7 @@ texture_manager.load_image('./assets/pngs/UIRoad.png')
 texture_manager.load_image('./assets/pngs/VRoad.png')
 texture_manager.load_image('./assets/pngs/empty.png')
 texture_manager.load_image('./assets/pngs/Tavern.png')
+texture_manager.load_image('./assets/pngs/PublicPlumbing.png')
 
 
 class CosGame(Widget):
@@ -139,7 +140,8 @@ class CosGame(Widget):
                         'horizl crossl lcrossl ucrossl rcrossl dcrossl ' +
                         'trcornerl brcornerl blcornerl tlcornerl square')
         road_string = ('BLCRoad BRCRoad DIRoad HRoad IRoad LIRoad RIRoad ' +
-                       'TLCRoad TRCRoad UIRoad VRoad empty Tavern')
+                       'TLCRoad TRCRoad UIRoad VRoad empty Tavern ' +
+                       'PublicPlumbing')
 
         models = model_string.split()
         buildings = road_string.split()
@@ -225,6 +227,17 @@ class CosGame(Widget):
                              'rotate_renderer': {'texture': 'Tavern',
                                                  'size': (144, 144),
                                                  'model_key': 'Tavern',
+                                                 'render': True},
+                             'rotate': 0}
+
+            component_order = ['position','rotate', 'rotate_renderer']
+
+        elif building == 'PublicPlumbing':
+            print('drawing tavern at {}'.format(pos))
+            component_dict = {'position': pos,
+                             'rotate_renderer': {'texture': 'PublicPlumbing',
+                                                 'size': (144, 144),
+                                                 'model_key': 'PublicPlumbing',
                                                  'render': True},
                              'rotate': 0}
 
