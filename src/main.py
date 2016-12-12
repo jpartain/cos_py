@@ -28,7 +28,8 @@ from cymunk import PivotJoint
 from math import radians
 
 import town
-import character_system
+import character_system as csys
+import collision_from_png as col
 
 
 global current_town_map
@@ -222,34 +223,39 @@ class CosGame(Widget):
             component_order = ['position','rotate', 'rotate_renderer']
 
         elif building == 'Tavern':
-            print('drawing tavern at {}'.format(pos))
-            component_dict = {'position': pos,
-                             'rotate_renderer': {'texture': 'Tavern',
-                                                 'size': (144, 144),
-                                                 'model_key': 'Tavern',
-                                                 'render': True},
-                             'rotate': 0}
+            png_path = './assets/pngs/Tavern_collision.png'
+            physics = col.getCollisionShapes(png_path, 'building')
 
-            component_order = ['position','rotate', 'rotate_renderer']
+            physics['position'] = pos
+
+            component_dict = {'position': pos,
+                              'rotate_renderer': {'texture': 'Tavern',
+                                                  'size': (144, 144),
+                                                  'model_key': 'Tavern',
+                                                  'render': True},
+                              'cymunk_physics': physics,
+                              'rotate': 0}
+
+            component_order = ['position', 'rotate', 'rotate_renderer',
+                               'cymunk_physics']
 
         elif building == 'PublicPlumbing':
-            print('drawing tavern at {}'.format(pos))
             component_dict = {'position': pos,
-                             'rotate_renderer': {'texture': 'PublicPlumbing',
-                                                 'size': (144, 144),
-                                                 'model_key': 'PublicPlumbing',
-                                                 'render': True},
-                             'rotate': 0}
+                              'rotate_renderer': {'texture': 'PublicPlumbing',
+                                                  'size': (144, 144),
+                                                  'model_key': 'PublicPlumbing',
+                                                  'render': True},
+                              'rotate': 0}
 
             component_order = ['position','rotate', 'rotate_renderer']
 
         else:
             building = 'empty'
             component_dict = {'position': pos,
-                             'rotate_renderer': {'texture': building,
-                                                 'size': (144, 144),
-                                                 'render': True},
-                             'rotate': 0}
+                              'rotate_renderer': {'texture': building,
+                                                  'size': (144, 144),
+                                                  'render': True},
+                              'rotate': 0}
 
             component_order = ['position','rotate', 'rotate_renderer']
 
@@ -266,9 +272,11 @@ class CosGame(Widget):
                              'velocity': (0, 0),
                              'position': (72, 72), 'angle': 0,
                              'angular_velocity': 0,
-                             'vel_limit': 500,
+                             'vel_limit': 50,
                              'ang_vel_limit': radians(200),
-                             'mass': 2, 'col_shapes': col_shapes}
+                             'mass': 2,
+                             'moment': 1000000,
+                             'col_shapes': col_shapes}
         component_dict = {'position': (72, 72),
                           'rotate_renderer': {'texture': '@',
                                               'size': (12, 12),
